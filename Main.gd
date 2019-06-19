@@ -1,16 +1,39 @@
 extends Spatial
 
-var TILE_SIZE = 1
+var BuildOptionType = preload("res://Scripts/BuildOption.gd").BuildOptionType
 
+var TILE_SIZE = 1
 var pickerScene = preload("res://Picker.tscn")
 var picker: Spatial;
+var buildOption;
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	picker = pickerScene.instance()
 	add_child(picker)
+	for button in $UI.get_tree().get_nodes_in_group("BuildOptionButton"):
+		button.connect("pressed", self, "_on_build_option_button_press", [button])
 
 func _process(delta):
+	_place_picker()
+
+func _unhandled_input(event):
+	if event is InputEventMouseButton:
+		_handleMouseClick()
+		
+func _handleMouseClick():
+	print_debug("Clicked")
+	pass
+
+func _on_build_option_button_press(button):
+	if button.name == "BOptDirectionalTileButton":
+		buildOption = BuildOptionType.DIRECTIONAL_TILE
+	elif button.name == "BOptEntranceButton":
+		buildOption = BuildOptionType.ENTRANCE
+	elif button.name == "BOptExitButton":
+		buildOption = BuildOptionType.EXIT
+	
+func _place_picker():
 	var mousePos = get_viewport().get_mouse_position()
 	var ray_from = $Camera.project_ray_origin(mousePos)
 	var ray_to = ray_from + $Camera.project_ray_normal(mousePos) * 200
