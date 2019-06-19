@@ -1,0 +1,140 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://BuildModalToggleButton.gd" type="Script" id=1]
+[ext_resource path="res://BuildModal.gd" type="Script" id=2]
+
+[sub_resource type="Theme" id=1]
+
+[sub_resource type="Theme" id=2]
+
+[node name="MarginContainer" type="MarginContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 2
+custom_constants/margin_right = 20
+custom_constants/margin_top = 20
+custom_constants/margin_left = 20
+custom_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 1004.0
+margin_bottom = 580.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+editor/display_folded = true
+margin_right = 984.0
+margin_bottom = 40.0
+alignment = 2
+
+[node name="BuildModalToggleButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+margin_left = 924.0
+margin_right = 984.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 60, 40 )
+size_flags_stretch_ratio = 0.0
+theme = SubResource( 1 )
+text = "Build"
+script = ExtResource( 1 )
+
+[node name="BuildModal" type="HBoxContainer" parent="VBoxContainer"]
+editor/display_folded = true
+visible = false
+margin_top = 44.0
+margin_right = 984.0
+margin_bottom = 560.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 2 )
+
+[node name="Panel" type="Panel" parent="VBoxContainer/BuildModal"]
+margin_right = 984.0
+margin_bottom = 516.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = SubResource( 2 )
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/BuildModal/Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+custom_constants/margin_right = 20
+custom_constants/margin_top = 20
+custom_constants/margin_left = 20
+custom_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/BuildModal/Panel/MarginContainer"]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 964.0
+margin_bottom = 496.0
+custom_constants/separation = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer"]
+margin_right = 944.0
+margin_bottom = 30.0
+size_flags_horizontal = 3
+alignment = 2
+
+[node name="BuildModalCloseButton" type="Button" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/HBoxContainer"]
+margin_left = 914.0
+margin_right = 944.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 30, 30 )
+text = "X"
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer"]
+margin_top = 40.0
+margin_right = 944.0
+margin_bottom = 476.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/vseparation = 10
+custom_constants/hseparation = 10
+columns = 3
+
+[node name="Button" type="Button" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer"]
+margin_right = 100.0
+margin_bottom = 100.0
+rect_min_size = Vector2( 100, 100 )
+text = "Option1"
+
+[node name="Button4" type="Button" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer"]
+margin_left = 110.0
+margin_right = 210.0
+margin_bottom = 100.0
+rect_min_size = Vector2( 100, 100 )
+text = "Option1"
+
+[node name="Button2" type="Button" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer"]
+margin_left = 220.0
+margin_right = 320.0
+margin_bottom = 100.0
+rect_min_size = Vector2( 100, 100 )
+text = "Option1"
+
+[node name="Button6" type="Button" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer"]
+margin_top = 110.0
+margin_right = 100.0
+margin_bottom = 210.0
+rect_min_size = Vector2( 100, 100 )
+text = "Option1"
+
+[node name="Button3" type="Button" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer"]
+margin_left = 110.0
+margin_top = 110.0
+margin_right = 210.0
+margin_bottom = 210.0
+rect_min_size = Vector2( 100, 100 )
+text = "Option1"
+
+[node name="Button5" type="Button" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer"]
+margin_left = 220.0
+margin_top = 110.0
+margin_right = 320.0
+margin_bottom = 210.0
+rect_min_size = Vector2( 100, 100 )
+text = "Option1"
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/BuildModalToggleButton" to="VBoxContainer/BuildModal" method="_on_BuildModalToggleButton_pressed"]
+[connection signal="pressed" from="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/HBoxContainer/BuildModalCloseButton" to="VBoxContainer/BuildModal" method="_on_BuildModalCloseButton_pressed"]

@@ -17,8 +17,10 @@ _global_script_class_icons={
 
 config/name="Refactor1"
 run/main_scene="res://Main.tscn"
+boot_splash/bg_color=Color( 1, 1, 1, 1 )
 config/icon="res://icon.png"
 
 [rendering]
 
+environment/default_clear_color=Color( 1, 1, 1, 1 )
 environment/default_environment="res://default_env.tres"
