@@ -6,6 +6,9 @@
 
 [sub_resource type="SpatialMaterial" id=2]
 flags_transparent = true
+flags_unshaded = true
+flags_do_not_receive_shadows = true
+flags_disable_ambient_light = true
 albedo_texture = ExtResource( 1 )
 
 [node name="Spatial" type="Spatial"]

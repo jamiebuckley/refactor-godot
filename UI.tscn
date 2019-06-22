@@ -30,6 +30,7 @@ mouse_filter = 2
 editor/display_folded = true
 margin_right = 984.0
 margin_bottom = 40.0
+mouse_filter = 2
 custom_constants/separation = 20
 alignment = 2
 

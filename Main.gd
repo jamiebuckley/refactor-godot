@@ -20,7 +20,7 @@ var pulseTimer = 0.0;
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	grid = Grid.new(10, self)
+	grid = Grid.new(20, self)
 	picker = pickerScene.instance()
 	add_child(picker)
 	for button in $UI.get_tree().get_nodes_in_group("BuildOptionButton"):
@@ -31,7 +31,7 @@ func _process(delta):
 	_handle_time(delta)
 
 func _unhandled_input(event):
-	if event is InputEventMouseButton:
+	if event is InputEventMouseButton && event.pressed:
 		_handle_mouse_click(event)
 		
 func _handle_mouse_click(event: InputEventMouseButton):
@@ -41,6 +41,7 @@ func _handle_mouse_click(event: InputEventMouseButton):
 		_handle_grid_coords_click(grid_coords)
 
 func _handle_grid_coords_click(grid_coords):
+	print(str(grid_coords.x) + " " + str(grid_coords.z))
 	if buildOption != null:
 		if !grid.get_blocked(grid_coords.x, grid_coords.z):
 			if buildOption == BuildOptionType.ENTRANCE || buildOption == BuildOptionType.EXIT:
@@ -54,14 +55,23 @@ func _handle_grid_coords_click(grid_coords):
 		else:
 			print("Blocked")
 
+#
+# Build Entrances and Exits
+#
 func _handle_build_exit_entrance(grid_coords, is_exit):
-	if (grid_coords.x != -1 && grid_coords.x != 10) && \
-		(grid_coords.z != -1 && grid_coords.z != 10):
+	var minAxis = 0;
+	var maxAxis = 19;
+	var validX = (grid_coords.x == minAxis || grid_coords.x == maxAxis) && (grid_coords.z > minAxis && grid_coords.z < maxAxis)
+	var validZ = (grid_coords.z == minAxis || grid_coords.z == maxAxis) && (grid_coords.x > minAxis && grid_coords.x < maxAxis)
+	if !validX && !validZ:
 		return
 
 	var instance = _get_build_option_instance()
 	instance.set_meta("build_option", buildOption)
 	instance.translation = picker.translation
+	instance.orientation = Maths.get_edge_orientation(grid_coords.x, grid_coords.z, minAxis, maxAxis)
+	print(instance.orientation)
+	instance.rotate(Vector3(0, 1, 0), Maths.get_rotation_from_vector(instance.orientation))
 	add_child(instance)
 	grid.set_blocked(grid_coords.x, grid_coords.z, instance)
 
@@ -83,7 +93,8 @@ func _place_picker():
 	var result = _get_world_mouse_position()
 	if result:
 		picker.visible = true
-		picker.translation = Maths.get_tile_position(result.position)
+		picker.translation = Grid.get_tile_position(result.position)
+		picker.translation.y = 0.05;
 	else:
 		picker.visible = false
 
