@@ -59,12 +59,15 @@ func handle_tile_pulse(x, z):
 		return
 
 	if instance.get_meta("build_option") == BuildOptionType.ENTRANCE:
+		if instance.count == 0:
+			return
 		var workerWorldCoords = get_world_coords(x, z)
 		var worker = main.add_worker(workerWorldCoords.x, workerWorldCoords.z)
 		worker.destination = Vector3(x, 0, z) + instance.orientation
 		worker.grid = self
+		instance.count -= 1
 
 static func get_tile_position(position):
-    var xToTile = floor(position.x / TILE_SIZE) * TILE_SIZE  + (TILE_SIZE / 2)
-    var zToTile = floor(position.z / TILE_SIZE) * TILE_SIZE  + (TILE_SIZE / 2)
-    return Vector3(xToTile, 0, zToTile)
+	var xToTile = floor(position.x / TILE_SIZE) * TILE_SIZE  + (TILE_SIZE / 2)
+	var zToTile = floor(position.z / TILE_SIZE) * TILE_SIZE  + (TILE_SIZE / 2)
+	return Vector3(xToTile, 0, zToTile)

@@ -20,6 +20,10 @@ run/main_scene="res://Main.tscn"
 boot_splash/bg_color=Color( 1, 1, 1, 1 )
 config/icon="res://icon.png"
 
+[gui]
+
+theme/custom="res://Assets/RefactorTheme.tres"
+
 [rendering]
 
 environment/default_clear_color=Color( 1, 1, 1, 1 )
