@@ -43,13 +43,27 @@ func _handle_mouse_click(event: InputEventMouseButton):
 func _handle_grid_coords_click(grid_coords):
 	if buildOption != null:
 		if !grid.get_blocked(grid_coords.x, grid_coords.z):
-			var instance = _get_build_option_instance()
-			instance.set_meta("build_option", buildOption)
-			instance.translation = picker.translation
-			add_child(instance)
-			grid.set_blocked(grid_coords.x, grid_coords.z, instance)
+			if buildOption == BuildOptionType.ENTRANCE || buildOption == BuildOptionType.EXIT:
+				_handle_build_exit_entrance(grid_coords, buildOption == BuildOptionType.EXIT)
+			else:
+				var instance = _get_build_option_instance()
+				instance.set_meta("build_option", buildOption)
+				instance.translation = picker.translation
+				add_child(instance)
+				grid.set_blocked(grid_coords.x, grid_coords.z, instance)
 		else:
 			print("Blocked")
+
+func _handle_build_exit_entrance(grid_coords, is_exit):
+	if (grid_coords.x != -1 && grid_coords.x != 10) && \
+		(grid_coords.z != -1 && grid_coords.z != 10):
+		return
+
+	var instance = _get_build_option_instance()
+	instance.set_meta("build_option", buildOption)
+	instance.translation = picker.translation
+	add_child(instance)
+	grid.set_blocked(grid_coords.x, grid_coords.z, instance)
 
 func _get_build_option_instance():
 	if buildOption == BuildOptionType.ENTRANCE:
