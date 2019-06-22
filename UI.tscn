@@ -1,13 +1,14 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
-[ext_resource path="res://BuildModalToggleButton.gd" type="Script" id=1]
-[ext_resource path="res://BuildModal.gd" type="Script" id=2]
+[ext_resource path="res://Scripts/UI/UI.gd" type="Script" id=1]
+[ext_resource path="res://Scripts/UI/ModalToggleButton.gd" type="Script" id=2]
+[ext_resource path="res://BuildModal.gd" type="Script" id=3]
 
 [sub_resource type="Theme" id=1]
 
 [sub_resource type="Theme" id=2]
 
-[node name="MarginContainer" type="MarginContainer"]
+[node name="MainContainer" type="MarginContainer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
@@ -16,21 +17,31 @@ custom_constants/margin_right = 20
 custom_constants/margin_top = 20
 custom_constants/margin_left = 20
 custom_constants/margin_bottom = 20
+script = ExtResource( 1 )
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="TopBar" type="VBoxContainer" parent="."]
 margin_left = 20.0
 margin_top = 20.0
 margin_right = 1004.0
 margin_bottom = 580.0
 mouse_filter = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="TopBarHBar" type="HBoxContainer" parent="TopBar"]
 editor/display_folded = true
 margin_right = 984.0
 margin_bottom = 40.0
+custom_constants/separation = 20
 alignment = 2
 
-[node name="BuildModalToggleButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+[node name="CurrentOptionLabel" type="Label" parent="TopBar/TopBarHBar"]
+margin_left = 809.0
+margin_top = 13.0
+margin_right = 904.0
+margin_bottom = 27.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "Current Option"
+
+[node name="BuildModalToggleButton" type="Button" parent="TopBar/TopBarHBar"]
 margin_left = 924.0
 margin_right = 984.0
 margin_bottom = 40.0
@@ -38,24 +49,26 @@ rect_min_size = Vector2( 60, 40 )
 size_flags_stretch_ratio = 0.0
 theme = SubResource( 1 )
 text = "Build"
-script = ExtResource( 1 )
+script = ExtResource( 2 )
+modal_path = NodePath("../../BuildModal")
 
-[node name="BuildModal" type="HBoxContainer" parent="VBoxContainer"]
+[node name="BuildModal" type="HBoxContainer" parent="TopBar"]
+visible = false
 margin_top = 44.0
 margin_right = 984.0
 margin_bottom = 560.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-script = ExtResource( 2 )
+script = ExtResource( 3 )
 
-[node name="Panel" type="Panel" parent="VBoxContainer/BuildModal"]
+[node name="Panel" type="Panel" parent="TopBar/BuildModal"]
 margin_right = 984.0
 margin_bottom = 516.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = SubResource( 2 )
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/BuildModal/Panel"]
+[node name="MarginContainer" type="MarginContainer" parent="TopBar/BuildModal/Panel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 size_flags_horizontal = 3
@@ -64,27 +77,29 @@ custom_constants/margin_top = 20
 custom_constants/margin_left = 20
 custom_constants/margin_bottom = 20
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/BuildModal/Panel/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="TopBar/BuildModal/Panel/MarginContainer"]
 margin_left = 20.0
 margin_top = 20.0
 margin_right = 964.0
 margin_bottom = 496.0
 custom_constants/separation = 10
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="TopBar/BuildModal/Panel/MarginContainer/VBoxContainer"]
+editor/display_folded = true
 margin_right = 944.0
 margin_bottom = 30.0
 size_flags_horizontal = 3
 alignment = 2
 
-[node name="BuildModalCloseButton" type="Button" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="BuildModalCloseButton" type="Button" parent="TopBar/BuildModal/Panel/MarginContainer/VBoxContainer/HBoxContainer"]
 margin_left = 914.0
 margin_right = 944.0
 margin_bottom = 30.0
 rect_min_size = Vector2( 30, 30 )
 text = "X"
 
-[node name="GridContainer" type="GridContainer" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer"]
+[node name="GridContainer" type="GridContainer" parent="TopBar/BuildModal/Panel/MarginContainer/VBoxContainer"]
+editor/display_folded = true
 margin_top = 40.0
 margin_right = 944.0
 margin_bottom = 476.0
@@ -94,7 +109,7 @@ custom_constants/vseparation = 10
 custom_constants/hseparation = 10
 columns = 3
 
-[node name="BOptDirectionalTileButton" type="Button" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer" groups=[
+[node name="BOptDirectionalTileButton" type="Button" parent="TopBar/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer" groups=[
 "BuildOptionButton",
 ]]
 margin_right = 109.0
@@ -102,7 +117,7 @@ margin_bottom = 100.0
 rect_min_size = Vector2( 100, 100 )
 text = "Directional Tile"
 
-[node name="BOptEntranceButton" type="Button" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer" groups=[
+[node name="BOptEntranceButton" type="Button" parent="TopBar/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer" groups=[
 "BuildOptionButton",
 ]]
 margin_left = 119.0
@@ -111,7 +126,7 @@ margin_bottom = 100.0
 rect_min_size = Vector2( 100, 100 )
 text = "Entrance"
 
-[node name="BOptExitButton" type="Button" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer" groups=[
+[node name="BOptExitButton" type="Button" parent="TopBar/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer" groups=[
 "BuildOptionButton",
 ]]
 margin_left = 229.0
@@ -120,7 +135,7 @@ margin_bottom = 100.0
 rect_min_size = Vector2( 100, 100 )
 text = "Exit"
 
-[node name="Button6" type="Button" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer" groups=[
+[node name="Button6" type="Button" parent="TopBar/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer" groups=[
 "BuildOptionButton",
 ]]
 margin_top = 110.0
@@ -129,7 +144,7 @@ margin_bottom = 210.0
 rect_min_size = Vector2( 100, 100 )
 text = "Option1"
 
-[node name="Button3" type="Button" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer" groups=[
+[node name="Button3" type="Button" parent="TopBar/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer" groups=[
 "BuildOptionButton",
 ]]
 margin_left = 119.0
@@ -139,7 +154,7 @@ margin_bottom = 210.0
 rect_min_size = Vector2( 100, 100 )
 text = "Option1"
 
-[node name="Button5" type="Button" parent="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer" groups=[
+[node name="Button5" type="Button" parent="TopBar/BuildModal/Panel/MarginContainer/VBoxContainer/GridContainer" groups=[
 "BuildOptionButton",
 ]]
 margin_left = 229.0
@@ -148,5 +163,4 @@ margin_right = 329.0
 margin_bottom = 210.0
 rect_min_size = Vector2( 100, 100 )
 text = "Option1"
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/BuildModalToggleButton" to="VBoxContainer/BuildModal" method="_on_BuildModalToggleButton_pressed"]
-[connection signal="pressed" from="VBoxContainer/BuildModal/Panel/MarginContainer/VBoxContainer/HBoxContainer/BuildModalCloseButton" to="VBoxContainer/BuildModal" method="_on_BuildModalCloseButton_pressed"]
+[connection signal="pressed" from="TopBar/BuildModal/Panel/MarginContainer/VBoxContainer/HBoxContainer/BuildModalCloseButton" to="TopBar/BuildModal" method="_on_BuildModalCloseButton_pressed"]
