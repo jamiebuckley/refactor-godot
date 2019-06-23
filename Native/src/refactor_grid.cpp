@@ -168,4 +168,13 @@ void Grid::step() {
     temp_worker->entity->grid_tile = temp_worker->new_grid_tile->grid_tile;
     temp_worker->entity->grid_tile->entity = temp_worker->entity;
   }
+
+  // clean up
+  for(auto temp_worker : temp_workers) {
+    delete temp_worker;
+  }
+
+  for(auto grid_tile : temp_grid) {
+    delete grid_tile;
+  }
 }
