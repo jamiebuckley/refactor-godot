@@ -21,3 +21,12 @@ bool Grid::delete_entity(std::string& id) {
 void Grid::step() {
 
 }
+
+bool Grid::is_blocked(int x, int z) {
+  auto grid_tile = this->internal_grid[x * size + z];
+  if (grid_tile.entity == NULL) {
+    return false;
+  }
+
+  return grid_tile.entity->is_blocking;
+}

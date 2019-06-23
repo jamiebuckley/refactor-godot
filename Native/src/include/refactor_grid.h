@@ -23,12 +23,24 @@ namespace Refactor {
     bool is_blocking;
     godot::Vector3 orientation;
     GridTile* grid_tile;
+
+    GridEntity(std::string id, bool is_blocking, godot::Vector3 orientation) {
+      this->id = id;
+      this->is_blocking = is_blocking;
+      this->grid_tile = nullptr;
+    }
   };
 
   struct GridTile {
     int x;
     int z;
     GridEntity* entity;
+
+    GridTile(int x, int z) {
+      this->x = x;
+      this->z = z;
+      this->entity = nullptr;
+    }
   };
 
 
@@ -39,6 +51,7 @@ namespace Refactor {
 
       std::string add_entity(int x, int z, EntityType entity_type);
       bool delete_entity(std::string& name);
+      bool is_blocked(int x, int z);
       void step();
 
     private:
