@@ -27,6 +27,8 @@ func _ready():
 		button.connect("pressed", self, "_on_build_option_button_press", [button])
 	print($MyGrid.add_entity(0, 0, "Worker"))
 	print($MyGrid.add_entity(0, 1, "Worker"))
+	print($MyGrid.is_blocked(0, 0))
+	print($MyGrid.is_blocked(5, 5))
 
 func _process(delta):
 	_place_picker()
