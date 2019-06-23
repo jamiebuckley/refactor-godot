@@ -2,8 +2,8 @@
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 [ext_resource path="res://UI.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Assets/RefactorTheme.tres" type="Theme" id=3]
-[ext_resource path="res://Assets/Textures/factory_floor.png" type="Texture" id=4]
+[ext_resource path="res://Assets/Textures/factory_floor.png" type="Texture" id=3]
+[ext_resource path="res://Native/gdexample.gdns" type="Script" id=4]
 
 [sub_resource type="QuadMesh" id=1]
 
@@ -22,7 +22,7 @@ ambient_light_color = Color( 1, 1, 1, 1 )
 
 [sub_resource type="SpatialMaterial" id=6]
 albedo_color = Color( 0.529412, 0.529412, 0.529412, 1 )
-albedo_texture = ExtResource( 4 )
+albedo_texture = ExtResource( 3 )
 
 [node name="RootSpatial" type="Spatial"]
 script = ExtResource( 1 )
@@ -46,7 +46,6 @@ current = true
 fov = 51.4
 
 [node name="UI" parent="." instance=ExtResource( 2 )]
-theme = ExtResource( 3 )
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource( 4 )
@@ -77,3 +76,6 @@ light_energy = 0.99
 light_indirect_energy = 1.85
 light_specular = 0.25
 omni_range = 24.9
+
+[node name="MySpatial" type="Spatial" parent="."]
+script = ExtResource( 4 )

@@ -1,0 +1,4 @@
+
+[submodule "Native/godot-cpp"]
+	path = Native/godot-cpp
+	url = https://github.com/GodotNativeTools/godot-cpp.git
