@@ -38,12 +38,11 @@ namespace Refactor {
   struct GridTile {
     int x;
     int z;
-    GridEntity* entity;
+    std::vector<GridEntity*> entities;
 
     GridTile(int x, int z) {
       this->x = x;
       this->z = z;
-      this->entity = nullptr;
     }
   };
 
