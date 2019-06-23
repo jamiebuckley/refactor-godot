@@ -86,7 +86,7 @@ env.Append(CPPPATH=['src/'])
 sources = Glob('src/*.cpp')
 
 library = env.SharedLibrary(target=env['target_path'] + env['target_name'] , source=sources)
-program = env.Program(target=env['target_path'] + 'tests', source=Glob('test/*.cpp'))
+program = env.Program(target=env['target_path'] + 'tests', source=[Glob('test/*.cpp'), sources])
 
 Default(library, program)
 

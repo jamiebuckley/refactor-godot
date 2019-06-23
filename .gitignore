@@ -10,4 +10,4 @@ export_presets.cfg
 .directory
 *~
 *.o
-Native/bin/*
+Native/bin

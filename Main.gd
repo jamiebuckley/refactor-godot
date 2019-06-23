@@ -25,6 +25,8 @@ func _ready():
 	add_child(picker)
 	for button in $UI.get_tree().get_nodes_in_group("BuildOptionButton"):
 		button.connect("pressed", self, "_on_build_option_button_press", [button])
+	print($MyGrid.add_entity(0, 0, "Worker"))
+	print($MyGrid.add_entity(0, 1, "Worker"))
 
 func _process(delta):
 	_place_picker()

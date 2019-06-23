@@ -4,7 +4,7 @@
 
 [resource]
 
-resource_name = "gdexample"
-class_name = "GDExample"
+resource_name = "RefactorGridSpatial"
+class_name = "RefactorGridSpatial"
 library = ExtResource( 1 )
 _sections_unfolded = [ "Resource" ]
