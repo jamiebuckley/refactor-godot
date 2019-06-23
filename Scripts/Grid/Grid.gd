@@ -8,6 +8,7 @@ class GridTile:
 var size = 0
 var main
 var grid = []
+var workers = []
 
 func _init(size, main):
 	self.size = size
@@ -45,6 +46,11 @@ func get_world_coords(gridX, gridZ):
 	}
 
 func handle_pulse():
+	main.step()
+	for worker in workers:
+		worker.prev_coordinates = worker.destination
+		worker.destination = main.get_coords(worker.id)
+	
 	for x in range(0, size):
 		for z in range(0, size):
 			handle_tile_pulse(x, z)
@@ -61,11 +67,15 @@ func handle_tile_pulse(x, z):
 	if instance.get_meta("build_option") == BuildOptionType.ENTRANCE:
 		if instance.count == 0:
 			return
-		var workerWorldCoords = get_world_coords(x, z)
-		var worker = main.add_worker(workerWorldCoords.x, workerWorldCoords.z)
-		worker.destination = Vector3(x, 0, z) + instance.orientation
-		worker.grid = self
-		instance.count -= 1
+		if !main.is_blocked(x, z):
+			var workerWorldCoords = get_world_coords(x, z)
+			var worker = main.add_worker(workerWorldCoords.x, workerWorldCoords.z, x, z, instance.orientation)
+			if worker != null:
+				worker.destination = Vector3(x, 0, z)
+				worker.prev_coordinates = worker.destination
+				worker.grid = self
+				instance.count -= 1
+				workers.push_back(worker)
 
 static func get_tile_position(position):
 	var xToTile = floor(position.x / TILE_SIZE) * TILE_SIZE  + (TILE_SIZE / 2)

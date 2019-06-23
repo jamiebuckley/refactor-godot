@@ -15,20 +15,18 @@ var WorkerScene = preload("res://Prototypes/Worker.tscn")
 var picker: Spatial;
 var buildOption;
 var grid;
+var native_grid;
 
 var pulseTimer = 0.0;
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	grid = Grid.new(20, self)
+	native_grid = load("res://Native/refactor_grid_spatial.gdns").new()
 	picker = pickerScene.instance()
 	add_child(picker)
 	for button in $UI.get_tree().get_nodes_in_group("BuildOptionButton"):
 		button.connect("pressed", self, "_on_build_option_button_press", [button])
-	print($MyGrid.add_entity(0, 0, "Worker"))
-	print($MyGrid.add_entity(0, 1, "Worker"))
-	print($MyGrid.is_blocked(0, 0))
-	print($MyGrid.is_blocked(5, 5))
 
 func _process(delta):
 	_place_picker()
@@ -57,7 +55,7 @@ func _handle_grid_coords_click(grid_coords):
 				add_child(instance)
 				grid.set_blocked(grid_coords.x, grid_coords.z, instance)
 		else:
-			print("Blocked")
+			pass
 
 #
 # Build Entrances and Exits
@@ -114,10 +112,21 @@ func _handle_time(delta):
 		# pulse
 		grid.handle_pulse()
 		pulseTimer = fmod(pulseTimer, 1.0)
+		
+func is_blocked(x, z):
+	print("Checking if blocked " +  str(x) + " " + str(z))
+	return native_grid.is_blocked(x, z)
 
-func add_worker(x, z):
+func add_worker(worldX, worldZ, x, z, orientation):
 	var worker = WorkerScene.instance()
-	worker.translation.x = x
-	worker.translation.z = z
+	worker.translation.x = worldX
+	worker.translation.z = worldZ
 	add_child(worker)
+	worker.id = native_grid.add_entity(x, z, "Worker", orientation)
 	return worker
+
+func get_coords(id):
+	return native_grid.get_entity_coordinates(id)
+
+func step():
+	native_grid.step()

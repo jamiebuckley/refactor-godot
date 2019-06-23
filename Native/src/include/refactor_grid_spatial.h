@@ -39,6 +39,7 @@ namespace godot
         String add_entity(int x, int z, String entity_type, Vector3);
         bool delete_entity(String id);
         bool is_blocked(int x, int z);
+        Vector3 get_entity_coordinates(String id);
         void step();
     };
 

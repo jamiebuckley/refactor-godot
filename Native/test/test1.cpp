@@ -47,6 +47,32 @@ TEST_CASE( "Workers block worker", "[Grid]" ) {
     REQUIRE( coords2.z == 1.0f );
 }
 
+TEST_CASE( "Blocking cascades", "[Grid]" ) {
+    auto grid = Refactor::Grid(3);
+    auto id1 = grid.add_entity(0, 0, Refactor::EntityType::WORKER, godot::Vector3(0, 0, 1));
+    auto id2 = grid.add_entity(0, 1, Refactor::EntityType::WORKER, godot::Vector3(0, 0, 1));
+    auto id3 = grid.add_entity(0, 2, Refactor::EntityType::WORKER, godot::Vector3(0, 0, 1));
+    grid.step();
+
+    // Worker 1 is blocked by 2
+    auto coords1 = grid.get_entity_coordinates(id1);
+    REQUIRE( coords1.x == 0.0f );
+    REQUIRE( coords1.y == 0.0f );
+    REQUIRE( coords1.z == 0.0f );
+
+    // Worker 2 is blocked by 3
+    auto coords2 = grid.get_entity_coordinates(id2);
+    REQUIRE( coords2.x == 0.0f );
+    REQUIRE( coords2.y == 0.0f );
+    REQUIRE( coords2.z == 1.0f );
+
+    // Worker 3 can't go anywhere
+    auto coords3 = grid.get_entity_coordinates(id3);
+    REQUIRE( coords3.x == 0.0f );
+    REQUIRE( coords3.y == 0.0f );
+    REQUIRE( coords3.z == 2.0f );
+}
+
 TEST_CASE( "Move onto vacated square", "[Grid]" ) {
     auto grid = Refactor::Grid(2);
     auto id1 = grid.add_entity(0, 0, Refactor::EntityType::WORKER, godot::Vector3(0, 0, 1));

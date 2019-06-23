@@ -150,17 +150,26 @@ void Grid::step() {
 
   while(!invalid_stack.empty()) {
     GridTileTemp* tile = invalid_stack.top();
-    std::vector<TempWorker*> cut;
-    std::copy_if (tile->next_entities.begin(), tile->next_entities.end(), std::back_inserter(cut), [](TempWorker* tw){return tw->new_grid_tile != tw->old_grid_tile; } );
+    invalid_stack.pop();
 
-    tile->next_entities.erase(tile->next_entities.begin() + 1, tile->next_entities.end());
+    std::vector<TempWorker*> cut;
+    auto it = tile->next_entities.begin();
+    while(it != tile->next_entities.end() && tile->next_entities.size() != 1) {
+      auto e = *it;
+      if(e->new_grid_tile != e->old_grid_tile) {
+        it = tile->next_entities.erase(it);
+        cut.push_back(e);
+      } else {
+        ++it;
+      }
+    }
+
     for(auto temp_worker : cut) {
       temp_worker->new_grid_tile = temp_worker->old_grid_tile;
       temp_worker->old_grid_tile->next_entities.push_back(temp_worker);
       if(temp_worker->old_grid_tile->next_entities.size() > 1) 
         invalid_stack.push(temp_worker->old_grid_tile);
     }
-    invalid_stack.pop();
   }
 
   // commit

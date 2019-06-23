@@ -10,12 +10,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e74fb82f-4aff-40d1-9d69-0393ae205656" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../.gitmodules" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/godot-cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gdexample.gdnlib" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gdexample.gdns" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Assets/RefactorTheme.tres" beforeDir="false" afterPath="$PROJECT_DIR$/../Assets/RefactorTheme.tres" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Main.gd" beforeDir="false" afterPath="$PROJECT_DIR$/../Main.gd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Main.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/../Main.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.sconsign.dblite" beforeDir="false" afterPath="$PROJECT_DIR$/.sconsign.dblite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/refactor_grid_spatial.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/refactor_grid_spatial.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Scripts/Grid/Grid.gd" beforeDir="false" afterPath="$PROJECT_DIR$/../Scripts/Grid/Grid.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Scripts/Prototypes/Worker.gd" beforeDir="false" afterPath="$PROJECT_DIR$/../Scripts/Prototypes/Worker.gd" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -28,7 +28,7 @@
     <option name="formatViaClangd" value="false" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/include/library.h">
           <provider selected="true" editor-type-id="text-editor">
@@ -41,8 +41,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/library.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="945">
-              <caret line="63" column="58" selection-start-line="63" selection-start-column="58" selection-end-line="63" selection-end-column="58" />
+            <state relative-caret-position="165">
+              <caret line="11" column="58" selection-start-line="11" selection-start-column="58" selection-end-line="11" selection-end-column="58" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
@@ -54,7 +54,7 @@
         <entry file="file://$PROJECT_DIR$/SConstruct">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="285">
-              <caret line="19" column="28" lean-forward="true" selection-start-line="19" selection-start-column="28" selection-end-line="19" selection-end-column="28" />
+              <caret line="19" column="28" selection-start-line="19" selection-start-column="28" selection-end-line="19" selection-end-column="28" />
             </state>
           </provider>
         </entry>
@@ -103,7 +103,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -115,9 +114,11 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.advertisement.text.has.clang-format" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -157,25 +158,19 @@
       <option name="presentableId" value="Default" />
       <updated>1561284850551</updated>
       <workItem from="1561284852405" duration="4868000" />
+      <workItem from="1561317282419" duration="352000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4868000" />
+    <option name="totallyTimeSpent" value="5220000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="27" width="1853" height="1053" extended-state="6" />
     <layout>
-      <window_info id="Favorites" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.21472053" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.21693414" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="LuaCheck" />
-      <window_info anchor="bottom" id="Database Changes" />
-      <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Messages" weight="0.2955289" />
-      <window_info anchor="bottom" id="Terminal" weight="0.23118865" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
-      <window_info anchor="bottom" id="CMake" visible="true" weight="0.28462377" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" />
@@ -183,10 +178,17 @@
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="Database" />
+      <window_info anchor="bottom" id="LuaCheck" order="7" />
+      <window_info anchor="bottom" id="Database Changes" order="8" />
+      <window_info anchor="bottom" id="Messages" order="9" weight="0.2955289" />
+      <window_info anchor="bottom" id="Terminal" order="10" weight="0.23118865" />
+      <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
+      <window_info anchor="bottom" id="Version Control" order="12" />
+      <window_info active="true" anchor="bottom" id="CMake" order="13" visible="true" weight="0.28462377" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Database" order="3" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -227,13 +229,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/include/library.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" selection-start-line="2" selection-end-line="2" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/gdexample.gdns">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
@@ -258,17 +253,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt" />
+    <entry file="file://$PROJECT_DIR$/src/include/library.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="80" selection-start-line="5" selection-start-column="80" selection-end-line="5" selection-end-column="80" />
+        <state relative-caret-position="30">
+          <caret line="2" selection-start-line="2" selection-end-line="2" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/library.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="945">
-          <caret line="63" column="58" selection-start-line="63" selection-start-column="58" selection-end-line="63" selection-end-column="58" />
+        <state relative-caret-position="165">
+          <caret line="11" column="58" selection-start-line="11" selection-start-column="58" selection-end-line="11" selection-end-column="58" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>
@@ -278,7 +274,7 @@
     <entry file="file://$PROJECT_DIR$/SConstruct">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
-          <caret line="19" column="28" lean-forward="true" selection-start-line="19" selection-start-column="28" selection-end-line="19" selection-end-column="28" />
+          <caret line="19" column="28" selection-start-line="19" selection-start-column="28" selection-end-line="19" selection-end-column="28" />
         </state>
       </provider>
     </entry>

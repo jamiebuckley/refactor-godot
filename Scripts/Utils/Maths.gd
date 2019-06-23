@@ -22,19 +22,15 @@ static func get_edge_orientation(x, z, minVal, maxVal):
 static func get_rotation_from_vector(vector):
     if vector.x == 0 && vector.z == 1:
         #north
-        print("north")
         return 0
     elif vector.x == 1 && vector.z == 0:
         #north
-        print("east")
         return PI / 2
     elif vector.x == 0 && vector.z == -1:
         #north
-        print("south")
         return PI
     elif vector.x == -1 && vector.z == 0:
         #north
-        print("west")
         return - PI / 2
     else:
         return 0
