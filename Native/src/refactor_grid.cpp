@@ -2,6 +2,7 @@
 #include <Godot.hpp>
 #include <string>
 #include <stack>
+#include <algorithm>
 
 using namespace Refactor;
 
@@ -127,6 +128,7 @@ void Grid::step() {
     if(is_out_of_bounds || is_blocked) {
       // this throws errors, not sure why
       //worker.new_grid_tile = worker.old_grid_tile;
+      worker->new_grid_tile = worker->old_grid_tile;
       auto next_entities = worker->new_grid_tile->next_entities;
       next_entities.push_back(worker);
 
@@ -148,7 +150,9 @@ void Grid::step() {
 
   while(!invalid_stack.empty()) {
     GridTileTemp* tile = invalid_stack.top();
-    std::vector<TempWorker*> cut(tile->next_entities.begin() + 1, tile->next_entities.end());
+    std::vector<TempWorker*> cut;
+    std::copy_if (tile->next_entities.begin(), tile->next_entities.end(), std::back_inserter(cut), [](TempWorker* tw){return tw->new_grid_tile != tw->old_grid_tile; } );
+
     tile->next_entities.erase(tile->next_entities.begin() + 1, tile->next_entities.end());
     for(auto temp_worker : cut) {
       temp_worker->new_grid_tile = temp_worker->old_grid_tile;
