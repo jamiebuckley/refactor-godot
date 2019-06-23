@@ -10,4 +10,5 @@ export_presets.cfg
 .directory
 *~
 *.o
+*.os
 Native/bin
