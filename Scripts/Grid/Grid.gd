@@ -10,9 +10,12 @@ var main
 var grid = []
 var workers = []
 
+var native_grid;
+
 func _init(size, main):
 	self.size = size
 	self.main = main
+	native_grid = load("res://Native/refactor_grid_spatial.gdns").new()
 	grid.resize(size * size)
 	for x in range(0, size):
 		for z in range(0, size):
@@ -46,10 +49,10 @@ func get_world_coords(gridX, gridZ):
 	}
 
 func handle_pulse():
-	main.step()
+	native_grid.step()
 	for worker in workers:
 		worker.prev_coordinates = worker.destination
-		worker.destination = main.get_coords(worker.id)
+		worker.destination = native_grid.get_entity_coordinates(worker.id)
 	
 	for x in range(0, size):
 		for z in range(0, size):
@@ -67,10 +70,11 @@ func handle_tile_pulse(x, z):
 	if instance.get_meta("build_option") == BuildOptionType.ENTRANCE:
 		if instance.count == 0:
 			return
-		if !main.is_blocked(x, z):
+		if !native_grid.is_blocked(x, z):
 			var workerWorldCoords = get_world_coords(x, z)
 			var worker = main.add_worker(workerWorldCoords.x, workerWorldCoords.z, x, z, instance.orientation)
 			if worker != null:
+				worker.id = native_grid.add_entity(x, z, "Worker", instance.orientation)
 				worker.destination = Vector3(x, 0, z)
 				worker.prev_coordinates = worker.destination
 				worker.grid = self
