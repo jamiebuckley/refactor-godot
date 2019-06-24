@@ -8,7 +8,8 @@ set(SRC_FILES
         ${PROJECT_SOURCE_DIR}/refactor_grid.cpp
         ${PROJECT_SOURCE_DIR}/refactor_grid_spatial.cpp
         ${PROJECT_SOURCE_DIR}/library.cpp
-        )
+        ${PROJECT_SOURCE_DIR}/GridEntity.cpp
+        ${PROJECT_SOURCE_DIR}/grid_tile.cpp)
 
 include_directories(godot-cpp/godot_headers)
 include_directories(godot-cpp/include)

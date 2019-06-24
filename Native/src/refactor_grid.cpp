@@ -1,4 +1,4 @@
-#include "include/refactor_grid.h"
+#include "refactor_grid.h"
 #include <Godot.hpp>
 #include <string>
 #include <stack>
@@ -20,7 +20,7 @@ Grid::~Grid() {
   for(auto p: this->internal_grid) {
     delete p;
   }
-  for(auto p: this->entity_map) {
+  for(const auto& p: this->entity_map) {
     delete p.second;
   }
 }
@@ -48,7 +48,7 @@ std::string Grid::add_entity(int x, int z, godot::Vector3 orientation, EntityTyp
   return padded_id_string;
 }
 
-bool Grid::delete_entity(std::string id) {
+bool Grid::delete_entity(const std::string& id) {
   auto entity = entity_map[id];
   auto grid_tile = entity->grid_tile;
   
@@ -69,10 +69,10 @@ bool Grid::is_blocked(int x, int z) {
   });
 }
 
-godot::Vector3 Grid::get_entity_coordinates(std::string entity_id) {
+godot::Vector3 Grid::get_entity_coordinates(const std::string& entity_id) {
   auto entity = this->entity_map[entity_id];
   auto grid_tile = entity->grid_tile;
-  return godot::Vector3(grid_tile->x, 0, grid_tile->z);
+  return {static_cast<real_t>(grid_tile->x), 0, static_cast<real_t>(grid_tile->z)};
 }
 
 void Grid::step() {
@@ -139,8 +139,8 @@ std::vector<GridTileTemp*> temp_grid;
   clear_grid(this->internal_grid, temp_grid, temp_workers, size);
 
   for(TempWorker* worker : temp_workers) {
-    int newX = worker->old_grid_tile->grid_tile->x + worker->entity->orientation.x;
-    int newZ = worker->old_grid_tile->grid_tile->z + worker->entity->orientation.z;
+    int newX = worker->old_grid_tile->grid_tile->x + static_cast<int>(floor(worker->entity->orientation.x));
+    int newZ = worker->old_grid_tile->grid_tile->z + static_cast<int>(floor(worker->entity->orientation.z));
 
     // if is off the map or can't move
     bool is_out_of_bounds = newX < 0 || newX >= size || newZ < 0 || newZ >= size;
@@ -176,7 +176,7 @@ std::vector<GridTileTemp*> temp_grid;
 
     std::vector<TempWorker*> cut;
     auto it = tile->next_entities.begin();
-    while(it != tile->next_entities.end() && tile->next_entities.size() != 0) {
+    while(it != tile->next_entities.end() && !tile->next_entities.empty()) {
       auto e = *it;
       if(e->new_grid_tile != e->old_grid_tile) {
         it = tile->next_entities.erase(it);

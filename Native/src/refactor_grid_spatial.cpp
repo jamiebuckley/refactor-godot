@@ -1,4 +1,4 @@
-#include "include/refactor_grid_spatial.h"
+#include "refactor_grid_spatial.h"
 
 using namespace godot;
 

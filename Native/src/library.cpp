@@ -1,7 +1,7 @@
 #include <Godot.hpp>
 
-#include "include/library.h"
-#include "include/refactor_grid_spatial.h"
+#include "library.h"
+#include "refactor_grid_spatial.h"
 
 #include <iostream>
 
