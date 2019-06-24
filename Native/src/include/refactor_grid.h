@@ -25,13 +25,15 @@ namespace Refactor {
     EntityType entity_type;
     godot::Vector3 orientation;
     GridTile* grid_tile;
+    void* godot_entity;
 
-    GridEntity(std::string id, bool is_blocking, godot::Vector3 orientation, EntityType entity_type) {
+    GridEntity(std::string id, bool is_blocking, godot::Vector3 orientation, EntityType entity_type, void* godot_entity) {
       this->id = id;
       this->is_blocking = is_blocking;
       this->entity_type = entity_type;
       this->orientation = orientation;
       this->grid_tile = nullptr;
+      this->godot_entity = godot_entity;
     }
   };
 
@@ -53,7 +55,7 @@ namespace Refactor {
       Grid(int size);
       ~Grid();
 
-      std::string add_entity(int x, int z, EntityType entity_type, godot::Vector3 orientation);
+      std::string add_entity(int x, int z, godot::Vector3 orientation, EntityType entity_type, void* godot_entity);
       bool delete_entity(std::string name);
       godot::Vector3 get_entity_coordinates(std::string entity_id);
       bool is_blocked(int x, int z);
@@ -64,6 +66,9 @@ namespace Refactor {
       int last_number = 0;
       std::vector<GridTile*> internal_grid;
       std::map<std::string, GridEntity*> entity_map;
+      void step_workers();
+      void step_entrances();
+      std::vector<GridEntity*> query_type(EntityType);
   };
 }
 

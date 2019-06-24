@@ -25,7 +25,7 @@ Grid::~Grid() {
   }
 }
 
-std::string Grid::add_entity(int x, int z, EntityType entity_type, godot::Vector3 orientation) {
+std::string Grid::add_entity(int x, int z, godot::Vector3 orientation, EntityType entity_type, void* variant) {
   if(is_blocked(x, z)) {
     return nullptr;
   }
@@ -38,7 +38,7 @@ std::string Grid::add_entity(int x, int z, EntityType entity_type, godot::Vector
     || entity_type == EntityType::ENTRANCE
     || entity_type == EntityType::EXIT;
 
-  GridEntity* grid_entity = new GridEntity(padded_id_string, blocking, orientation, entity_type);
+  GridEntity* grid_entity = new GridEntity(padded_id_string, blocking, orientation, entity_type, variant);
   this->entity_map.insert(std::pair<std::string, GridEntity*>(padded_id_string, grid_entity));
 
   GridTile* tile = internal_grid[x * size + z];
@@ -73,6 +73,11 @@ godot::Vector3 Grid::get_entity_coordinates(std::string entity_id) {
   auto entity = this->entity_map[entity_id];
   auto grid_tile = entity->grid_tile;
   return godot::Vector3(grid_tile->x, 0, grid_tile->z);
+}
+
+void Grid::step() {
+  step_workers();
+  step_entrances();
 }
 
 struct TempWorker;
@@ -126,8 +131,8 @@ void clear_grid(std::vector<GridTile*>& grid, std::vector<GridTileTemp*>& temp_g
   }
 }
 
-void Grid::step() {
-  std::vector<GridTileTemp*> temp_grid;
+void Grid::step_workers() {
+std::vector<GridTileTemp*> temp_grid;
   std::vector<TempWorker*> temp_workers;
 
   // Clear all workers from the grid
@@ -203,4 +208,25 @@ void Grid::step() {
   for(auto grid_tile : temp_grid) {
     delete grid_tile;
   }
+}
+
+void Grid::step_entrances() {
+  std::vector<GridEntity*> entrances = query_type(EntityType::ENTRANCE);
+  std::for_each(entrances.begin(), entrances.end(), [](GridEntity* entrance) {
+    
+  });
+}
+
+std::vector<GridEntity *> Grid::query_type(EntityType entity_type) {
+    std::vector<GridEntity*> result;
+    for(int x = 0; x < size; x++) {
+        for(int z = 0; z < size; z++) {
+            auto tile = internal_grid[x * size + z];
+            auto entity_or_end = std::find_if(tile->entities.begin(), tile->entities.end(), [&](GridEntity* entity) { return entity->entity_type == entity_type; });
+            if (entity_or_end != tile->entities.end()) {
+                result.push_back(*entity_or_end);
+            }
+        }
+    }
+    return result;
 }

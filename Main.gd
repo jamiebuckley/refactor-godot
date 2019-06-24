@@ -51,7 +51,6 @@ func _handle_grid_coords_click(grid_coords):
 				instance.set_meta("build_option", buildOption)
 				instance.translation = picker.translation
 				add_child(instance)
-				grid.set_blocked(grid_coords.x, grid_coords.z, instance)
 		else:
 			pass
 
@@ -70,10 +69,9 @@ func _handle_build_exit_entrance(grid_coords, is_exit):
 	instance.set_meta("build_option", buildOption)
 	instance.translation = picker.translation
 	instance.orientation = Maths.get_edge_orientation(grid_coords.x, grid_coords.z, minAxis, maxAxis)
-	print(instance.orientation)
+	grid.add_entity(grid_coords.x, grid_coords.z, instance.orientation, "Entrance", instance)
 	instance.rotate(Vector3(0, 1, 0), Maths.get_rotation_from_vector(instance.orientation))
 	add_child(instance)
-	grid.set_blocked(grid_coords.x, grid_coords.z, instance)
 
 func _get_build_option_instance():
 	if buildOption == BuildOptionType.ENTRANCE:

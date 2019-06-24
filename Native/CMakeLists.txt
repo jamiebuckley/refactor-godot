@@ -1,0 +1,19 @@
+cmake_minimum_required(VERSION 2.8.9)
+project (refactor_native)
+
+set(PROJECT_SOURCE_DIR src)
+
+
+set(SRC_FILES
+        ${PROJECT_SOURCE_DIR}/refactor_grid.cpp
+        ${PROJECT_SOURCE_DIR}/refactor_grid_spatial.cpp
+        ${PROJECT_SOURCE_DIR}/library.cpp
+        )
+
+include_directories(godot-cpp/godot_headers)
+include_directories(godot-cpp/include)
+include_directories(godot-cpp/include/core)
+include_directories(godot-cpp/include/gen)
+
+add_library(refactor_native SHARED ${SRC_FILES})
+target_link_libraries(refactor_native ${CMAKE_SOURCE_DIR}/godot-cpp/bin/libgodot-cpp.linux.debug.64.a)

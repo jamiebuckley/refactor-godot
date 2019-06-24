@@ -36,7 +36,7 @@ namespace godot
         void _init(); // our initializer called by Godot
         void _process(float delta);
 
-        String add_entity(int x, int z, String entity_type, Vector3);
+        String add_entity(int x, int z, Vector3, String, Variant);
         bool delete_entity(String id);
         bool is_blocked(int x, int z);
         Vector3 get_entity_coordinates(String id);

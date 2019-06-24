@@ -12,3 +12,8 @@ export_presets.cfg
 *.o
 *.os
 Native/bin
+.idea/
+**/idea/
+.vscode/
+**/cmake-build-debug/
+**/cmake-build-release/

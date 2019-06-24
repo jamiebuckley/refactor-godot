@@ -9,7 +9,7 @@ reloadable=false
 
 OSX.64="res://bin/osx/libgdexample.dylib"
 Windows.64="res://bin/win64/libgdexample.dll"
-X11.64="res://Native/bin/x11/libgdexample.so"
+X11.64="res://Native/cmake-build-debug/librefactor_native.so"
 
 [dependencies]
 

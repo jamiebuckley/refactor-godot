@@ -28,14 +28,14 @@ void RefactorGridSpatial::_process(float delta) {
     Godot::print("process");
 }
 
-String RefactorGridSpatial::add_entity(int x, int z, String entity_type, Vector3 orientation) {
+String RefactorGridSpatial::add_entity(int x, int z, Vector3 orientation, String entity_type, Variant entity) {
     Godot::print("add_entity");
     auto grid_entity_type = entity_type_map.find(entity_type);
     if (grid_entity_type == entity_type_map.end()) {
         Godot::print_error("Could not look up entity_type " + entity_type, "add_entity", "refactor_grid_spatial.cpp", 30);
         return String("");
     }
-    auto c_string = this->grid.add_entity(x, z, grid_entity_type->second, orientation);
+    auto c_string = this->grid.add_entity(x, z, orientation, grid_entity_type->second, &entity);
     return String(c_string.data());
 }
 
