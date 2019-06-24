@@ -213,7 +213,7 @@ std::vector<GridTileTemp*> temp_grid;
 void Grid::step_entrances() {
   std::vector<GridEntity*> entrances = query_type(EntityType::ENTRANCE);
   std::for_each(entrances.begin(), entrances.end(), [](GridEntity* entrance) {
-    
+
   });
 }
 
