@@ -4,7 +4,7 @@
 #include <map>
 #include <Godot.hpp>
 #include <Spatial.hpp>
-#include "refactor_grid.h"
+#include "grid.h"
 
 namespace godot
 {

@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "refactor_grid.h"
+#include "grid.h"
 #include <iostream>
 #include <Vector3.hpp>
 

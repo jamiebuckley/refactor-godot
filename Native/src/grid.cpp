@@ -1,4 +1,4 @@
-#include "refactor_grid.h"
+#include "grid.h"
 #include <Godot.hpp>
 #include <string>
 #include <stack>
@@ -64,7 +64,7 @@ bool Grid::delete_entity(const std::string& id) {
  */
 bool Grid::is_blocked(int x, int z) {
   auto grid_tile = this->internal_grid[x * size + z];
-  return std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](GridEntity* entity){ 
+  return std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](GridEntity* entity){
     return entity->is_blocking;
   });
 }

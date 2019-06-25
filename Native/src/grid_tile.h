@@ -5,7 +5,7 @@
 #ifndef REFACTOR_NATIVE_GRID_TILE_H
 #define REFACTOR_NATIVE_GRID_TILE_H
 
-#include "GridEntity.h"
+#include "grid_entity.h"
 #include <vector>
 
 namespace Refactor {

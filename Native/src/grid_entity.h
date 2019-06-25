@@ -2,8 +2,8 @@
 // Created by jamie on 24/06/19.
 //
 
-#ifndef REFACTOR_NATIVE_GRIDENTITY_H
-#define REFACTOR_NATIVE_GRIDENTITY_H
+#ifndef REFACTOR_NATIVE_GRID_ENTITY_H
+#define REFACTOR_NATIVE_GRID_ENTITY_H
 
 
 #include <string>
@@ -37,4 +37,4 @@ namespace Refactor {
 }
 
 
-#endif //REFACTOR_NATIVE_GRIDENTITY_H
+#endif //REFACTOR_NATIVE_GRID_ENTITY_H
