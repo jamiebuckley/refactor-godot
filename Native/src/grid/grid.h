@@ -23,14 +23,17 @@ namespace Refactor {
       bool is_blocked(int x, int z);
       void step();
 
-    private:
+      int getSize() const;
+
+      std::vector<GridTile *> &getInternalGrid();
+
+      GodotInterface* getGodotInterface();
+
+  private:
       int size;
       int last_number = 0;
       std::vector<GridTile*> internal_grid;
       std::map<std::string, GridEntity*> entity_map;
-      void step_workers();
-      void step_entrances();
-      std::vector<GridEntity*> query_type(EntityType);
       GodotInterface* godot_interface;
   };
 }

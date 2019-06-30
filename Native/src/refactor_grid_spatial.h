@@ -4,7 +4,7 @@
 #include <map>
 #include <Godot.hpp>
 #include <Spatial.hpp>
-#include "grid.h"
+#include "grid/grid.h"
 #include "godot_interface.h"
 
 namespace godot
