@@ -18,9 +18,13 @@ var grid;
 
 var pulseTimer = 0.0;
 
+var native_grid;
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	grid = Grid.new(20, self)
+	native_grid = load("res://Native/refactor_grid_spatial.gdns").new()
+	native_grid.set_main_entity(self)
+	grid = Grid.new(20)
 	picker = pickerScene.instance()
 	add_child(picker)
 	for button in $UI.get_tree().get_nodes_in_group("BuildOptionButton"):
@@ -43,7 +47,7 @@ func _handle_mouse_click(event: InputEventMouseButton):
 func _handle_grid_coords_click(grid_coords):
 	print(str(grid_coords.x) + " " + str(grid_coords.z))
 	if buildOption != null:
-		if !grid.get_blocked(grid_coords.x, grid_coords.z):
+		if !native_grid.is_blocked(grid_coords.x, grid_coords.z):
 			if buildOption == BuildOptionType.ENTRANCE || buildOption == BuildOptionType.EXIT:
 				_handle_build_exit_entrance(grid_coords, buildOption == BuildOptionType.EXIT)
 			else:
@@ -69,7 +73,7 @@ func _handle_build_exit_entrance(grid_coords, is_exit):
 	instance.set_meta("build_option", buildOption)
 	instance.translation = picker.translation
 	instance.orientation = Maths.get_edge_orientation(grid_coords.x, grid_coords.z, minAxis, maxAxis)
-	grid.add_entity(grid_coords.x, grid_coords.z, instance.orientation, "Entrance", instance)
+	native_grid.add_entity(grid_coords.x, grid_coords.z, instance.orientation, "Entrance", instance)
 	instance.rotate(Vector3(0, 1, 0), Maths.get_rotation_from_vector(instance.orientation))
 	add_child(instance)
 
@@ -106,12 +110,27 @@ func _handle_time(delta):
 	pulseTimer += delta
 	if pulseTimer > 1.0:
 		# pulse
-		grid.handle_pulse()
+		native_grid.step()
 		pulseTimer = fmod(pulseTimer, 1.0)
 
-func add_worker(worldX, worldZ, x, z, orientation):
+# Comes from native
+func add_worker(x, z, orientation):
+	print("adding worker")
+	var workerWorldCoords = grid.get_world_coords(x, z)
+
 	var worker = WorkerScene.instance()
-	worker.translation.x = worldX
-	worker.translation.z = worldZ
+	worker.translation.x = workerWorldCoords.x
+	worker.translation.z = workerWorldCoords.z
 	add_child(worker)
+
+	worker.destination = Vector3(x, 0, z)
+	worker.grid = grid
 	return worker
+
+# Comes from game
+func add_entrance(worldX, worldZ, x, z, orientation):
+	var entrance = EntranceScene.instance()
+	entrance.translation.x = worldX
+	entrance.translation.z = worldZ
+	add_child(entrance)
+	return entrance

@@ -3,14 +3,27 @@
 #include <iostream>
 #include <Vector3.hpp>
 
+class FakeGodotInterface: public GodotInterface {
+public:
+    void print(const char *message) override {
+
+    }
+
+    void print_error(const char *message, const char *function, const char *file, int line) override {
+
+    }
+};
+
+auto godot_interface = new GodotInterface();
+
 TEST_CASE( "New entity blocks grid tile", "[Grid]" ) {
-    auto grid = Refactor::Grid(5);
+    auto grid = Refactor::Grid(5, godot_interface);
     grid.add_entity(0, 0,godot::Vector3(0, 0, 0), Refactor::EntityType::WORKER, nullptr);
     REQUIRE( grid.is_blocked(0, 0) == true );
 }
 
 TEST_CASE( "Query position by ID", "[Grid]" ) {
-    auto grid = Refactor::Grid(5);
+    auto grid = Refactor::Grid(5, godot_interface);
     auto id = grid.add_entity(1, 1,godot::Vector3(0, 0, 0), Refactor::EntityType::WORKER, nullptr);
     auto coords = grid.get_entity_coordinates(id);
     REQUIRE( coords.x == 1.0f );
@@ -19,7 +32,7 @@ TEST_CASE( "Query position by ID", "[Grid]" ) {
 }
 
 TEST_CASE( "Step moves workers", "[Grid]" ) {
-    auto grid = Refactor::Grid(5);
+    auto grid = Refactor::Grid(5, godot_interface);
     auto id = grid.add_entity(0, 0, godot::Vector3(0, 0, 1), Refactor::EntityType::WORKER, nullptr);
     grid.step();
     auto coords = grid.get_entity_coordinates(id);
@@ -29,7 +42,7 @@ TEST_CASE( "Step moves workers", "[Grid]" ) {
 }
 
 TEST_CASE( "Workers block worker", "[Grid]" ) {
-    auto grid = Refactor::Grid(2);
+    auto grid = Refactor::Grid(2, godot_interface);
     auto id1 = grid.add_entity(0, 0, godot::Vector3(0, 0, 1), Refactor::EntityType::WORKER, nullptr);
     auto id2 = grid.add_entity(0, 1, godot::Vector3(0, 0, 1), Refactor::EntityType::WORKER, nullptr);
     grid.step();
@@ -48,7 +61,7 @@ TEST_CASE( "Workers block worker", "[Grid]" ) {
 }
 
 TEST_CASE( "Blocking cascades", "[Grid]" ) {
-    auto grid = Refactor::Grid(3);
+    auto grid = Refactor::Grid(3, godot_interface);
     auto id1 = grid.add_entity(0, 0, godot::Vector3(0, 0, 1), Refactor::EntityType::WORKER, nullptr);
     auto id2 = grid.add_entity(0, 1, godot::Vector3(0, 0, 1), Refactor::EntityType::WORKER, nullptr);
     auto id3 = grid.add_entity(0, 2, godot::Vector3(0, 0, 1), Refactor::EntityType::WORKER, nullptr);
@@ -74,7 +87,7 @@ TEST_CASE( "Blocking cascades", "[Grid]" ) {
 }
 
 TEST_CASE( "Move onto vacated square", "[Grid]" ) {
-    auto grid = Refactor::Grid(2);
+    auto grid = Refactor::Grid(2, godot_interface);
     auto id1 = grid.add_entity(0, 0, godot::Vector3(0, 0, 1), Refactor::EntityType::WORKER, nullptr);
     auto id2 = grid.add_entity(0, 1, godot::Vector3(1, 0, 0), Refactor::EntityType::WORKER, nullptr);
     grid.step();

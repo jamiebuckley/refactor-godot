@@ -1,14 +1,20 @@
 #include "grid.h"
+#include "vector_util.h"
 #include <Godot.hpp>
 #include <string>
 #include <stack>
 #include <algorithm>
+#include <entities/entrance.h>
+#include <entities/worker.h>
+#include <sstream>
 
 using namespace Refactor;
 
-Grid::Grid(int size) {
+Grid::Grid(int size, GodotInterface* godot_interface) {
   this->size = size;
   this->internal_grid.reserve(size * size);
+  this->godot_interface = godot_interface;
+
   for(int x = 0; x < size; x++) {
     for(int z = 0; z < size; z++) {
       this->internal_grid[x * size + z] = new GridTile(x, z);
@@ -25,7 +31,7 @@ Grid::~Grid() {
   }
 }
 
-std::string Grid::add_entity(int x, int z, godot::Vector3 orientation, EntityType entity_type, void* variant) {
+std::string Grid::add_entity(int x, int z, godot::Vector3 orientation, EntityType entity_type, godot::Spatial* variant) {
   if(is_blocked(x, z)) {
     return nullptr;
   }
@@ -38,20 +44,29 @@ std::string Grid::add_entity(int x, int z, godot::Vector3 orientation, EntityTyp
     || entity_type == EntityType::ENTRANCE
     || entity_type == EntityType::EXIT;
 
-  GridEntity* grid_entity = new GridEntity(padded_id_string, blocking, orientation, entity_type, variant);
+  GridEntity* grid_entity;
+  if (entity_type == EntityType::ENTRANCE) {
+    grid_entity = new Entrance(padded_id_string, orientation, variant);
+  }
+  else if (entity_type == EntityType::WORKER) {
+    grid_entity = new Worker(padded_id_string, orientation, variant);
+  }
+  else {
+    grid_entity = new GridEntity(padded_id_string, blocking, orientation, entity_type, variant);
+  }
   this->entity_map.insert(std::pair<std::string, GridEntity*>(padded_id_string, grid_entity));
 
   GridTile* tile = internal_grid[x * size + z];
   tile->entities.push_back(grid_entity);
-  grid_entity->grid_tile = tile;
+  grid_entity->setGridTile(tile);
 
   return padded_id_string;
 }
 
 bool Grid::delete_entity(const std::string& id) {
   auto entity = entity_map[id];
-  auto grid_tile = entity->grid_tile;
-  
+  auto grid_tile = entity->getGridTile();
+
   auto ets = grid_tile->entities;
   ets.erase(std::remove(ets.begin(), ets.end(), entity));
   entity_map.erase(id);
@@ -63,15 +78,18 @@ bool Grid::delete_entity(const std::string& id) {
  * Test if the grid tile at x,z contains a blocking entity
  */
 bool Grid::is_blocked(int x, int z) {
+  if (x < 0 || x >= size || z == 0 || z >= size) {
+    return true;
+  }
   auto grid_tile = this->internal_grid[x * size + z];
   return std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](GridEntity* entity){
-    return entity->is_blocking;
+    return entity->isBlocking();
   });
 }
 
 godot::Vector3 Grid::get_entity_coordinates(const std::string& entity_id) {
   auto entity = this->entity_map[entity_id];
-  auto grid_tile = entity->grid_tile;
+  auto grid_tile = entity->getGridTile();
   return {static_cast<real_t>(grid_tile->x), 0, static_cast<real_t>(grid_tile->z)};
 }
 
@@ -94,7 +112,7 @@ struct TempWorker {
 };
 
 bool isWorker(GridEntity* entity) {
-  return entity->entity_type == EntityType::WORKER;
+  return entity->getEntityType() == EntityType::WORKER;
 }
 
 void clear_grid(std::vector<GridTile*>& grid, std::vector<GridTileTemp*>& temp_grid, std::vector<TempWorker*>& temp_workers, int size) {
@@ -139,8 +157,8 @@ std::vector<GridTileTemp*> temp_grid;
   clear_grid(this->internal_grid, temp_grid, temp_workers, size);
 
   for(TempWorker* worker : temp_workers) {
-    int newX = worker->old_grid_tile->grid_tile->x + static_cast<int>(floor(worker->entity->orientation.x));
-    int newZ = worker->old_grid_tile->grid_tile->z + static_cast<int>(floor(worker->entity->orientation.z));
+    int newX = worker->old_grid_tile->grid_tile->x + static_cast<int>(floor(worker->entity->getOrientation().x));
+    int newZ = worker->old_grid_tile->grid_tile->z + static_cast<int>(floor(worker->entity->getOrientation().z));
 
     // if is off the map or can't move
     bool is_out_of_bounds = newX < 0 || newX >= size || newZ < 0 || newZ >= size;
@@ -175,14 +193,14 @@ std::vector<GridTileTemp*> temp_grid;
     invalid_stack.pop();
 
     std::vector<TempWorker*> cut;
-    auto it = tile->next_entities.begin();
-    while(it != tile->next_entities.end() && !tile->next_entities.empty()) {
-      auto e = *it;
-      if(e->new_grid_tile != e->old_grid_tile) {
-        it = tile->next_entities.erase(it);
-        cut.push_back(e);
+    auto iterator = tile->next_entities.begin();
+    while(iterator != tile->next_entities.end() && tile->next_entities.size() > 1) {
+      auto next_entity = *iterator;
+      if(next_entity->new_grid_tile != next_entity->old_grid_tile) {
+        iterator = tile->next_entities.erase(iterator);
+        cut.push_back(next_entity);
       } else {
-        ++it;
+        ++iterator;
       }
     }
 
@@ -196,8 +214,11 @@ std::vector<GridTileTemp*> temp_grid;
 
   // commit
   for(auto temp_worker : temp_workers) {
-    temp_worker->entity->grid_tile = temp_worker->new_grid_tile->grid_tile;
-    temp_worker->entity->grid_tile->entities.push_back(temp_worker->entity);
+    auto grid_tile = temp_worker->new_grid_tile->grid_tile;
+    grid_tile->entities.push_back(temp_worker->entity);
+    temp_worker->entity->setGridTile(grid_tile);
+    auto godot_worker = static_cast<godot::Spatial *>(temp_worker->entity->getGodotEntity());
+    godot_worker->set("destination", godot::Vector3(grid_tile->x, 0, grid_tile->z));
   }
 
   // clean up
@@ -211,9 +232,20 @@ std::vector<GridTileTemp*> temp_grid;
 }
 
 void Grid::step_entrances() {
+  auto function_name = __FUNCTION__;
   std::vector<GridEntity*> entrances = query_type(EntityType::ENTRANCE);
-  std::for_each(entrances.begin(), entrances.end(), [](GridEntity* entrance) {
+  std::for_each(entrances.begin(), entrances.end(), [&](GridEntity* entrance) {
+    auto entrance_orientation = entrance->getOrientation();
+    auto entrance_grid_tile = entrance->getGridTile();
 
+    if(is_blocked(entrance_grid_tile->x, entrance_grid_tile->z)) {
+      std::ostringstream message;
+      message << "Blocked entrance creating worker " << entrance_grid_tile->x << " " << entrance_grid_tile->z << std::endl;
+      godot_interface->print(message.str().c_str());
+    } else {
+      godot_interface->create_worker(entrance_grid_tile->x, entrance_grid_tile->z, entrance_orientation);
+      // create worker
+    }
   });
 }
 
@@ -222,7 +254,7 @@ std::vector<GridEntity *> Grid::query_type(EntityType entity_type) {
     for(int x = 0; x < size; x++) {
         for(int z = 0; z < size; z++) {
             auto tile = internal_grid[x * size + z];
-            auto entity_or_end = std::find_if(tile->entities.begin(), tile->entities.end(), [&](GridEntity* entity) { return entity->entity_type == entity_type; });
+            auto entity_or_end = std::find_if(tile->entities.begin(), tile->entities.end(), [&](GridEntity* entity) { return entity->getEntityType() == entity_type; });
             if (entity_or_end != tile->entities.end()) {
                 result.push_back(*entity_or_end);
             }

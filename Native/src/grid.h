@@ -7,16 +7,17 @@
 #include <Vector3.hpp>
 #include "common.h"
 #include "grid_tile.h"
+#include "godot_interface.h"
 
 namespace Refactor {
 
   class Grid {
     
     public:
-      Grid(int size);
+      Grid(int size, GodotInterface* godot_interface);
       ~Grid();
 
-      std::string add_entity(int x, int z, godot::Vector3 orientation, EntityType entity_type, void* godot_entity);
+      std::string add_entity(int x, int z, godot::Vector3 orientation, EntityType entity_type, godot::Spatial* godot_entity);
       bool delete_entity(const std::string& name);
       godot::Vector3 get_entity_coordinates(const std::string& entity_id);
       bool is_blocked(int x, int z);
@@ -30,6 +31,7 @@ namespace Refactor {
       void step_workers();
       void step_entrances();
       std::vector<GridEntity*> query_type(EntityType);
+      GodotInterface* godot_interface;
   };
 }
 
