@@ -33,7 +33,7 @@ Grid::~Grid() {
 
 std::string Grid::add_entity(int x, int z, godot::Vector3 orientation, EntityType entity_type, godot::Spatial* variant) {
   if(is_blocked(x, z)) {
-    return nullptr;
+    return "error_is_blocked";
   }
   auto id_string = std::to_string(this->last_number);
   auto padded_id_string = std::string().append(24 - id_string.length(), '0').append(id_string);
@@ -78,7 +78,7 @@ bool Grid::delete_entity(const std::string& id) {
  * Test if the grid tile at x,z contains a blocking entity
  */
 bool Grid::is_blocked(int x, int z) {
-  if (x < 0 || x >= size || z == 0 || z >= size) {
+  if (x < 0 || x >= size || z < 0 || z >= size) {
     return true;
   }
   auto grid_tile = this->internal_grid[x * size + z];
@@ -218,7 +218,7 @@ std::vector<GridTileTemp*> temp_grid;
     grid_tile->entities.push_back(temp_worker->entity);
     temp_worker->entity->setGridTile(grid_tile);
     auto godot_worker = static_cast<godot::Spatial *>(temp_worker->entity->getGodotEntity());
-    godot_worker->set("destination", godot::Vector3(grid_tile->x, 0, grid_tile->z));
+    godot_interface->call(godot_worker, "set_destination", godot::Vector3(grid_tile->x, 0, grid_tile->z));
   }
 
   // clean up
@@ -232,7 +232,6 @@ std::vector<GridTileTemp*> temp_grid;
 }
 
 void Grid::step_entrances() {
-  auto function_name = __FUNCTION__;
   std::vector<GridEntity*> entrances = query_type(EntityType::ENTRANCE);
   std::for_each(entrances.begin(), entrances.end(), [&](GridEntity* entrance) {
     auto entrance_orientation = entrance->getOrientation();

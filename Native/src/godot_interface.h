@@ -19,6 +19,16 @@ namespace Refactor {
       virtual void create_worker(int grid_x, int grid_z, godot::Vector3) {
 
       };
+
+      template <class... Args> void call(godot::Spatial * spatial, const char* function_name, Args... args) {
+        if(call_godot()) {
+          spatial->call(function_name, godot::Array::make(args...));
+        }
+      }
+
+      virtual bool call_godot() {
+        return true;
+      }
     };
 }
 
