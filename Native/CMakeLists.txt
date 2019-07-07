@@ -15,7 +15,7 @@ include_directories(godot-cpp/include/core)
 include_directories(godot-cpp/include/gen)
 include_directories(${PROJECT_SOURCE_DIR})
 
-add_library(refactor_native SHARED ${SRC_FILES} src/vector_util.h src/godot_interface.h src/grid/grid_stepper.h)
+add_library(refactor_native SHARED ${SRC_FILES} src/vector_util.h src/godot_interface.h src/grid/grid_stepper.h src/grid/grid_queries.h)
 target_link_libraries(refactor_native ${CMAKE_SOURCE_DIR}/godot-cpp/bin/libgodot-cpp.linux.debug.64.a)
 
 add_executable(refactor_tests ${SRC_FILES} test/test_main.cpp test/test1.cpp)

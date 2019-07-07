@@ -9,7 +9,9 @@
 #include <algorithm>
 #include <stack>
 #include "grid.h"
+#include "grid_queries.h"
 #include <sstream>
+#include <vector_util.h>
 
 bool isWorker(GridEntity* entity) {
   return entity->getEntityType() == EntityType::WORKER;
@@ -32,7 +34,7 @@ namespace Refactor {
 
     class GridStepper {
     public:
-        GridStepper(Grid* grid) {
+        explicit GridStepper(Grid* grid) {
           this->grid = grid;
         }
 
@@ -48,8 +50,8 @@ namespace Refactor {
 
 
               // Remove all the workers
-              std::vector < GridEntity * > workers;
-              std::vector < GridEntity * > non_workers;
+              std::vector <GridEntity*> workers;
+              std::vector <GridEntity*> non_workers;
 
               int n = std::count_if(grid_tile->entities.begin(), grid_tile->entities.end(), isWorker);
               workers.resize(n);
@@ -72,20 +74,6 @@ namespace Refactor {
           }
         }
 
-        std::vector<GridEntity *> query_type(EntityType entity_type) {
-          std::vector<GridEntity*> result;
-          for(int x = 0; x < grid->getSize(); x++) {
-            for(int z = 0; z < grid->getSize(); z++) {
-              auto tile = grid->getInternalGrid()[x * grid->getSize() + z];
-              auto entity_or_end = std::find_if(tile->entities.begin(), tile->entities.end(), [&](GridEntity* entity) { return entity->getEntityType() == entity_type; });
-              if (entity_or_end != tile->entities.end()) {
-                result.push_back(*entity_or_end);
-              }
-            }
-          }
-          return result;
-        }
-
         void step_workers() {
           std::vector < GridTileTemp * > temp_grid;
           std::vector < TempWorker * > temp_workers;
@@ -94,14 +82,13 @@ namespace Refactor {
           clear_grid(this->grid->getInternalGrid(), temp_grid, temp_workers, grid->getSize());
 
           for (TempWorker *worker : temp_workers) {
-            int newX =
-                    worker->old_grid_tile->grid_tile->x + static_cast<int>(floor(worker->entity->getOrientation().x));
-            int newZ =
-                    worker->old_grid_tile->grid_tile->z + static_cast<int>(floor(worker->entity->getOrientation().z));
+            auto orientation_pt3 = Point3::from_vector3(worker->entity->getOrientation());
+            auto worker_pt3 = worker->old_grid_tile->grid_tile->getPosition();
+            auto new_position = Point3::add(orientation_pt3, worker_pt3);
 
             // if is off the map or can't move
-            bool is_out_of_bounds = newX < 0 || newX >= grid->getSize() || newZ < 0 || newZ >= grid->getSize();
-            bool is_blocked = !is_out_of_bounds && grid->is_blocked(newX, newZ);
+            bool is_out_of_bounds = !grid->is_in_bounds(new_position.x, new_position.z);
+            bool is_blocked = !is_out_of_bounds && grid->is_blocked(new_position.x, new_position.z);
 
             // stays on same tile
             if (is_out_of_bounds || is_blocked) {
@@ -110,10 +97,10 @@ namespace Refactor {
               worker->new_grid_tile = worker->old_grid_tile;
               auto next_entities = worker->new_grid_tile->next_entities;
               next_entities.push_back(worker);
-
               worker->new_grid_tile->next_entities.push_back(worker);
-            } else {
-              auto next_tile = temp_grid[newX * grid->getSize() + newZ];
+            }
+            else {
+              auto next_tile = temp_grid[new_position.x * grid->getSize() + new_position.z];
               worker->new_grid_tile = next_tile;
               next_tile->next_entities.push_back(worker);
             }
@@ -171,7 +158,7 @@ namespace Refactor {
         }
 
         void step_entrances() {
-          std::vector < GridEntity * > entrances = query_type(EntityType::ENTRANCE);
+          std::vector < GridEntity * > entrances = GridQueries::query_type(grid, EntityType::ENTRANCE);
           std::for_each(entrances.begin(), entrances.end(), [&](GridEntity *entrance) {
               auto entrance_orientation = entrance->getOrientation();
               auto entrance_grid_tile = entrance->getGridTile();
@@ -183,7 +170,6 @@ namespace Refactor {
                 grid->getGodotInterface()->print(message.str().c_str());
               } else {
                 grid->getGodotInterface()->create_worker(entrance_grid_tile->x, entrance_grid_tile->z, entrance_orientation);
-                // create worker
               }
           });
         }

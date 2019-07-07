@@ -8,6 +8,8 @@
 #include <entities/entrance.h>
 #include <entities/worker.h>
 #include <sstream>
+#include <unordered_map>
+#include <functional>
 
 using namespace Refactor;
 
@@ -40,11 +42,6 @@ std::string Grid::add_entity(int x, int z, godot::Vector3 orientation, EntityTyp
   auto padded_id_string = std::string().append(24 - id_string.length(), '0').append(id_string);
   this->last_number++;
 
-  auto blocking = entity_type == EntityType::WORKER 
-    || entity_type == EntityType::BLOCK
-    || entity_type == EntityType::ENTRANCE
-    || entity_type == EntityType::EXIT;
-
   GridEntity* grid_entity;
   if (entity_type == EntityType::ENTRANCE) {
     grid_entity = new Entrance(padded_id_string, orientation, variant);
@@ -53,7 +50,7 @@ std::string Grid::add_entity(int x, int z, godot::Vector3 orientation, EntityTyp
     grid_entity = new Worker(padded_id_string, orientation, variant);
   }
   else {
-    grid_entity = new GridEntity(padded_id_string, blocking, orientation, entity_type, variant);
+    grid_entity = new GridEntity(padded_id_string, false, orientation, entity_type, variant);
   }
   this->entity_map.insert(std::pair<std::string, GridEntity*>(padded_id_string, grid_entity));
 
@@ -79,13 +76,17 @@ bool Grid::delete_entity(const std::string& id) {
  * Test if the grid tile at x,z contains a blocking entity
  */
 bool Grid::is_blocked(int x, int z) {
-  if (x < 0 || x >= size || z < 0 || z >= size) {
-    return true;
+  if (is_in_bounds(x, z)) {
+    auto grid_tile = this->internal_grid[x * size + z];
+    return std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](GridEntity* entity){
+        return entity->isBlocking();
+    });
   }
-  auto grid_tile = this->internal_grid[x * size + z];
-  return std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](GridEntity* entity){
-    return entity->isBlocking();
-  });
+  return true;
+}
+
+bool Grid::is_in_bounds(int x, int z) {
+  return !(x < 0 || x >= size || z < 0 || z >= size);
 }
 
 godot::Vector3 Grid::get_entity_coordinates(const std::string& entity_id) {

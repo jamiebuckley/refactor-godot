@@ -21,12 +21,11 @@ namespace Refactor {
       bool delete_entity(const std::string& name);
       godot::Vector3 get_entity_coordinates(const std::string& entity_id);
       bool is_blocked(int x, int z);
+      bool is_in_bounds(int x, int z);
       void step();
 
       int getSize() const;
-
       std::vector<GridTile *> &getInternalGrid();
-
       GodotInterface* getGodotInterface();
 
   private:
@@ -35,6 +34,7 @@ namespace Refactor {
       std::vector<GridTile*> internal_grid;
       std::map<std::string, GridEntity*> entity_map;
       GodotInterface* godot_interface;
+
   };
 }
 

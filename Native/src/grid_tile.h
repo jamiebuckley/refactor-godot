@@ -6,6 +6,7 @@
 #define REFACTOR_NATIVE_GRID_TILE_H
 
 #include "entities/grid_entity.h"
+#include "vector_util.h"
 #include <vector>
 
 using namespace Refactor;
@@ -20,6 +21,10 @@ struct GridTile {
     GridTile(int x, int z) {
         this->x = x;
         this->z = z;
+    }
+
+    Point3 getPosition() {
+      return Point3(this->x, 0, this->z);
     }
 };
 

@@ -23,6 +23,10 @@ namespace Refactor {
         static Point3 from_vector3(godot::Vector3 vector3) {
           return {static_cast<int>(vector3.x), static_cast<int>(vector3.y), static_cast<int>(vector3.z)};
         }
+
+        static Point3 add(Point3 a, Point3 b) {
+          return {a.x + b.x, a.y + b.y, a.z + b.z};
+        }
     };
 }
 
