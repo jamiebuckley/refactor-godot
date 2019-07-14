@@ -4,7 +4,7 @@
 
 [resource]
 
-resource_name = "RefactorGridSpatial"
-class_name = "RefactorGridSpatial"
+resource_name = "Game"
+class_name = "Game"
 library = ExtResource( 1 )
 _sections_unfolded = [ "Resource" ]

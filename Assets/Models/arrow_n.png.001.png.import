@@ -2,8 +2,8 @@
 
 importer="texture"
 type="StreamTexture"
-path.s3tc="res://.import/picker.svg-e9d90d9207c55460267935fb11cc2db3.s3tc.stex"
-path.etc2="res://.import/picker.svg-e9d90d9207c55460267935fb11cc2db3.etc2.stex"
+path.s3tc="res://.import/arrow_n.png.001.png-855d5c92c1a626619a5fee771e753244.s3tc.stex"
+path.etc2="res://.import/arrow_n.png.001.png-855d5c92c1a626619a5fee771e753244.etc2.stex"
 metadata={
 "imported_formats": [ "s3tc", "etc2" ],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Assets/Textures/picker.svg"
-dest_files=[ "res://.import/picker.svg-e9d90d9207c55460267935fb11cc2db3.s3tc.stex", "res://.import/picker.svg-e9d90d9207c55460267935fb11cc2db3.etc2.stex" ]
+source_file="res://Assets/Models/arrow_n.png.001.png"
+dest_files=[ "res://.import/arrow_n.png.001.png-855d5c92c1a626619a5fee771e753244.s3tc.stex", "res://.import/arrow_n.png.001.png-855d5c92c1a626619a5fee771e753244.etc2.stex" ]
 
 [params]
 

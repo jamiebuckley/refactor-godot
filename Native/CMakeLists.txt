@@ -3,9 +3,8 @@ project (refactor_native)
 
 set(PROJECT_SOURCE_DIR src)
 
-
 set(SRC_FILES
-        ${PROJECT_SOURCE_DIR}/refactor_grid_spatial.cpp
+        ${PROJECT_SOURCE_DIR}/game.cpp
         ${PROJECT_SOURCE_DIR}/library.cpp
         ${PROJECT_SOURCE_DIR}/grid/grid.cpp)
 
@@ -15,8 +14,8 @@ include_directories(godot-cpp/include/core)
 include_directories(godot-cpp/include/gen)
 include_directories(${PROJECT_SOURCE_DIR})
 
-add_library(refactor_native SHARED ${SRC_FILES} src/vector_util.h src/godot_interface.h src/grid/grid_stepper.h src/grid/grid_queries.h)
-target_link_libraries(refactor_native ${CMAKE_SOURCE_DIR}/godot-cpp/bin/libgodot-cpp.linux.debug.64.a)
+link_libraries(${CMAKE_SOURCE_DIR}/godot-cpp/bin/libgodot-cpp.linux.debug.64.a)
+
+add_library(refactor_native SHARED ${SRC_FILES} src/Maths.h)
 
 add_executable(refactor_tests ${SRC_FILES} test/test_main.cpp test/test1.cpp)
-target_link_libraries(refactor_tests ${CMAKE_SOURCE_DIR}/godot-cpp/bin/libgodot-cpp.linux.debug.64.a)

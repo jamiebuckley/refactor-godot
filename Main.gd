@@ -4,7 +4,6 @@ const BuildOption = preload("res://Scripts/BuildOption.gd")
 const BuildOptionType = BuildOption.BuildOptionType
 
 var Maths = preload("res://Scripts/Utils/Maths.gd")
-var pickerScene = preload("res://Picker.tscn")
 const Grid = preload("res://Scripts/Grid/Grid.gd")
 
 var EntranceScene = preload("res://Prototypes/Entrance.tscn")
@@ -25,18 +24,18 @@ func _ready():
 	native_grid = load("res://Native/refactor_grid_spatial.gdns").new()
 	native_grid.set_main_entity(self)
 	grid = Grid.new(20)
-	picker = pickerScene.instance()
-	add_child(picker)
-	for button in $UI.get_tree().get_nodes_in_group("BuildOptionButton"):
-		button.connect("pressed", self, "_on_build_option_button_press", [button])
+	add_child(native_grid)
 
 func _process(delta):
-	_place_picker()
 	_handle_time(delta)
 
 func _unhandled_input(event):
 	if event is InputEventMouseButton && event.pressed:
 		_handle_mouse_click(event)
+	if event is InputEventKey && event.scancode == KEY_ESCAPE:
+		if buildOption != null:
+			buildOption = null
+			$UI.current_option_label.text = ""
 		
 func _handle_mouse_click(event: InputEventMouseButton):
 	var result = _get_world_mouse_position()
@@ -55,8 +54,6 @@ func _handle_grid_coords_click(grid_coords):
 				instance.set_meta("build_option", buildOption)
 				instance.translation = picker.translation
 				add_child(instance)
-		else:
-			pass
 
 #
 # Build Entrances and Exits
@@ -90,15 +87,6 @@ func _get_build_option_instance():
 
 func _on_build_option_button_press(button):
 	buildOption = BuildOption.get_build_option_from_button_name(button.name)
-	
-func _place_picker():
-	var result = _get_world_mouse_position()
-	if result:
-		picker.visible = true
-		picker.translation = Grid.get_tile_position(result.position)
-		picker.translation.y = 0.05;
-	else:
-		picker.visible = false
 
 func _get_world_mouse_position():
 	var rays = Maths.get_camera_rays(get_viewport().get_mouse_position(), $Camera)

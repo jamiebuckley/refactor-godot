@@ -21,7 +21,7 @@ public:
     }
 };
 
-TEST_CASE( "New entity blocks grid tile", "[Grid]" ) {
+TEST_CASE( "New real_entity blocks grid tile", "[Grid]" ) {
     auto grid = Refactor::Grid(5, new FakeGodotInterface());
     grid.add_entity(0, 0,godot::Vector3(0, 0, 0), Refactor::EntityType::WORKER, nullptr);
     REQUIRE( grid.is_blocked(0, 0) == true );

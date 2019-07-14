@@ -1,9 +1,20 @@
 #ifndef REFACTOR_GRID_SPATIAL_H
 #define REFACTOR_GRID_SPATIAL_H
 
-#include <map>
 #include <Godot.hpp>
-#include <Spatial.hpp>
+#include <Node.hpp>
+#include <PackedScene.hpp>
+#include <ResourceLoader.hpp>
+#include <SceneTree.hpp>
+#include <Viewport.hpp>
+#include <InputEvent.hpp>
+#include <World.hpp>
+#include <PhysicsDirectSpaceState.hpp>
+#include <gen/InputEventMouseButton.hpp>
+#include <stdexcept>
+#include <gen/Button.hpp>
+#include <map>
+
 #include "grid/grid.h"
 #include "godot_interface.h"
 
@@ -12,9 +23,9 @@ namespace godot
     /*
      * Represents the grid component brought into the Godot engine
      */
-    class RefactorGridSpatial : public Spatial, public GodotInterface
+    class Game : public Spatial, public GodotInterface
     {
-        GODOT_CLASS(RefactorGridSpatial, Spatial)
+        GODOT_CLASS(Game, Spatial)
 
     private:
         float time_passed;
@@ -31,22 +42,30 @@ namespace godot
     public:
         static void _register_methods();
 
-        RefactorGridSpatial();
-        ~RefactorGridSpatial();
+        Game();
+        ~Game();
 
-        void _init(); // our initializer called by Godot
+        void _init();
+        void _ready();
         void _process(float delta);
+        void _unhandled_input(const InputEvent* event);
+        void _on_build_option_button_press(Button* button);
+
         void set_main_entity(Spatial* _main_entity);
 
         String add_entity(int x, int z, Vector3, String, Object*);
         bool delete_entity(String id);
         bool is_blocked(int x, int z);
         Vector3 get_entity_coordinates(String id);
+        Vector3 get_grid_coords(Vector3 real_coords);
         void step();
 
         void create_worker(int grid_x, int grid_z, Vector3 orientation) override;
-
         Spatial* main_entity;
+
+    private:
+        Spatial* picker;
+        Node* ui;
     };
 
 } // namespace godot
