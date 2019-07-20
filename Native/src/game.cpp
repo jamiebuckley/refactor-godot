@@ -7,12 +7,11 @@
 #include <godot_entities/godot_worker.h>
 #include "game.h"
 #include "Maths.h"
-//#include <Spatial.hpp>
-//#include <ResourceLoader.hpp>
-//#include <PackedScene.hpp>
 
 using namespace godot;
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 void Game::_register_methods() {
     register_method("init", &Game::_init);
     register_method("_ready", &Game::_ready);
@@ -20,12 +19,12 @@ void Game::_register_methods() {
     register_method("_unhandled_input", &Game::_unhandled_input);
     register_method("_on_build_option_button_press", &Game::_on_build_option_button_press);
     register_method("add_entity", &Game::add_entity);
-    register_method("delete_entity", &Game::delete_entity);
     register_method("is_blocked", &Game::is_blocked);
     register_method("step", &Game::step);
     register_method("get_entity_coordinates", &Game::get_entity_coordinates);
     register_method("set_main_entity", &Game::set_main_entity);
 }
+#pragma clang diagnostic pop
 
 Game::Game(): GodotInterface() {
 
@@ -48,9 +47,8 @@ void Game::_ready() {
   // wire up option buttons
   auto buildOptionButtons = this->ui->get_tree()->get_nodes_in_group("BuildOptionButton");
   for(int i = 0; i < buildOptionButtons.size(); i++) {
-    Variant v = buildOptionButtons[i];
-    auto obj = godot::Object::___get_from_variant(v);
-    Button* buildOptionButton = reinterpret_cast<Button*>(obj);
+    auto button_variant = godot::Object::___get_from_variant(buildOptionButtons[i]);
+    auto buildOptionButton = cast_to<Button>(button_variant);
     buildOptionButton->connect("pressed", this, "_on_build_option_button_press", Array::make(buildOptionButton));
   }
 
@@ -75,10 +73,11 @@ void Game::_process(float delta) {
     this->picker->set_translation(closest_grid_position(position));
   }
 
+  // Increase pulse timer and step if necessary
   pulse_timer += delta;
   if (pulse_timer > 1.0) {
     grid->step();
-    pulse_timer = fmod(pulse_timer, 1.0f);
+    pulse_timer = fmodf(pulse_timer, 1.0f);
   }
 }
 
@@ -106,26 +105,19 @@ void Game::set_main_entity(Spatial* spatial) {
   print(spatial->get_name().alloc_c_string());
 }
 
-Refactor::GridEntity * Game::add_entity(int x, int z, Vector3 orientation, String entity_type, Object* entity) {
+Refactor::GridEntity * Game::add_entity(int x, int z, Vector3 orientation, String selected_entity_type, Object* entity) {
     Godot::print("add_entity");
-    auto grid_entity_type = entity_type_map.find(entity_type);
+    auto grid_entity_type = entity_type_map.find(selected_entity_type);
     if (grid_entity_type == entity_type_map.end()) {
-        Godot::print_error("Could not look up entity_type " + entity_type, "add_entity", "refactor_grid_spatial.cpp", 30);
-        throw std::logic_error("Tried to add en entity of type " + std::string(entity_type.alloc_c_string()) + " which does not exist");
+        Godot::print_error("Could not look up entity_type " + selected_entity_type, "add_entity", "refactor_grid_spatial.cpp", 30);
+        throw std::logic_error("Tried to add en entity of type " + std::string(selected_entity_type.alloc_c_string()) + " which does not exist");
     }
     auto created_entity = this->grid->add_entity(x, z, orientation, grid_entity_type->second,
                                            reinterpret_cast<Spatial *>(entity));
     return created_entity;
 }
 
-bool Game::delete_entity(String id) {
-    char* string = id.alloc_c_string();
-    std::string c_string = std::string(string);
-    return true;
-}
-
 bool Game::is_blocked(int x, int z) {
-    Godot::print("is blocked");
     return grid->is_blocked(x, z);
 }
 
@@ -141,19 +133,19 @@ Vector3 Game::get_entity_coordinates(String id) {
 }
 
 Vector3 Game::closest_grid_position(Vector3 real_coords) {
-  auto xToTile = floor(real_coords.x / TILE_SIZE) * TILE_SIZE  + (TILE_SIZE / 2);
-  auto zToTile = floor(real_coords.z / TILE_SIZE) * TILE_SIZE  + (TILE_SIZE / 2);
-  return Vector3(xToTile, real_coords.y, zToTile);
+  auto xToTile = floorf(real_coords.x / TILE_SIZE) * TILE_SIZE  + (TILE_SIZE / 2);
+  auto zToTile = floorf(real_coords.z / TILE_SIZE) * TILE_SIZE  + (TILE_SIZE / 2);
+  return {xToTile, real_coords.y, zToTile};
 }
 
 Vector3 Game::get_grid_coords(godot::Vector3 real_coords) {
   auto offsetWorldX = real_coords.x + (grid->getSize() * TILE_SIZE) / 2;
   auto offsetWorldZ = real_coords.z + (grid->getSize() * TILE_SIZE) / 2;
-  return Vector3(
-            floor(offsetWorldX / TILE_SIZE),
+  return {
+            floorf(offsetWorldX / TILE_SIZE),
             real_coords.y,
-            floor(offsetWorldZ / TILE_SIZE)
-          );
+            floorf(offsetWorldZ / TILE_SIZE)
+          };
 }
 
 void Game::create_worker(int grid_x, int grid_z, Vector3 orientation) {
@@ -170,6 +162,7 @@ void Game::create_worker(int grid_x, int grid_z, Vector3 orientation) {
 }
 
 void Game::handle_mouse_click(const InputEventMouseButton *mouse_event) {
+  // todo: Bug in godot prevents doing this in c++
   Dictionary result = main_entity->call("_get_world_mouse_position");
   if (result.empty()) return;
 
@@ -191,6 +184,7 @@ void Game::handle_grid_coords_click(Vector3 grid_coords) {
   int grid_coords_x = (int)grid_coords.x;
   int grid_coords_z = (int)grid_coords.z;
 
+  // check validity of entrance and exit entity placement
   int minAxis = 0;
   int maxAxis = 19;
   if (entity_type == Refactor::EntityType::ENTRANCE || entity_type == Refactor::EntityType::EXIT) {

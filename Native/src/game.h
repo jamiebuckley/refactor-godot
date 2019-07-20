@@ -55,7 +55,6 @@ class Game : public Spatial, public Refactor::GodotInterface
         void set_main_entity(Spatial* _main_entity);
 
         Refactor::GridEntity * add_entity(int x, int z, Vector3, String, Object*);
-        bool delete_entity(String id);
         bool is_blocked(int x, int z);
         Vector3 get_entity_coordinates(String id);
         Vector3 closest_grid_position(Vector3 real_coords);
