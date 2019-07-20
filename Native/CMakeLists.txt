@@ -7,7 +7,7 @@ set(SRC_FILES
         ${PROJECT_SOURCE_DIR}/game.cpp
         ${PROJECT_SOURCE_DIR}/library.cpp
         ${PROJECT_SOURCE_DIR}/grid/grid.cpp
-        ${PROJECT_SOURCE_DIR}/godot_entities/GodotWorker.cpp)
+        ${PROJECT_SOURCE_DIR}/godot_entities/godot_worker.cpp)
 
 include_directories(godot-cpp/godot_headers)
 include_directories(godot-cpp/include)

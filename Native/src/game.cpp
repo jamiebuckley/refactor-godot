@@ -4,7 +4,7 @@
 
 #include <sstream>
 #include <entities/worker.h>
-#include <godot_entities/GodotWorker.h>
+#include <godot_entities/godot_worker.h>
 #include "game.h"
 #include "Maths.h"
 //#include <Spatial.hpp>

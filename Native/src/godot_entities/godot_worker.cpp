@@ -3,7 +3,7 @@
 //
 
 #include <Maths.h>
-#include "GodotWorker.h"
+#include "godot_worker.h"
 
 using namespace godot;
 

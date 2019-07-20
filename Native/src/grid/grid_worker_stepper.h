@@ -7,7 +7,7 @@
 
 
 #include <memory>
-#include "godot_entities/GodotWorker.h"
+#include "godot_entities/godot_worker.h"
 
 namespace Refactor {
 
@@ -140,7 +140,9 @@ namespace Refactor {
             auto grid_tile = temp_worker->new_grid_tile->grid_tile;
             grid_tile->entities.push_back(temp_worker->real_entity);
             temp_worker->real_entity->setGridTile(grid_tile);
-            auto godot_worker = static_cast<godot::GodotWorker *>(temp_worker->real_entity->getGodotEntity());
+
+            auto godot_entity = temp_worker->real_entity->getGodotEntity();
+            auto godot_worker = static_cast<godot::GodotWorker *>(godot_entity);
             godot_worker->set_destination(godot::Vector3(grid_tile->x, 0, grid_tile->z));
           }
         }

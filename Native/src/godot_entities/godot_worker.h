@@ -2,8 +2,8 @@
 // Created by jamie on 20/07/19.
 //
 
-#ifndef REFACTOR_NATIVE_GODOTWORKER_H
-#define REFACTOR_NATIVE_GODOTWORKER_H
+#ifndef REFACTOR_NATIVE_GODOT_WORKER_H
+#define REFACTOR_NATIVE_GODOT_WORKER_H
 
 #include <Godot.hpp>
 #include <gen/Spatial.hpp>
@@ -29,4 +29,4 @@ namespace godot {
     };
 }
 
-#endif //REFACTOR_NATIVE_GODOTWORKER_H
+#endif //REFACTOR_NATIVE_GODOT_WORKER_H

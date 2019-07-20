@@ -19,7 +19,6 @@ namespace Refactor {
     class Grid;
 
     class GridEntity {
-
     private:
         std::string id;
         std::weak_ptr<Grid> grid;
@@ -45,10 +44,6 @@ namespace Refactor {
 
         const std::string &getId() const {
           return id;
-        }
-
-        void setId(const std::string &id) {
-          GridEntity::id = id;
         }
 
         bool isBlocking() const {

@@ -39,19 +39,23 @@ GridEntity * Grid::add_entity(int x, int z, godot::Vector3 orientation, EntityTy
     throw std::logic_error("Tried to add an entity to a blocked tile, call is_blocked first");
   }
 
+  auto id_string = std::to_string(this->last_number);
+  auto padded_id_string = std::string().append(24 - id_string.length(), '0').append(id_string);
+  this->last_number++;
+
   GridEntity* grid_entity;
   auto shared_this = shared_from_this();
   auto weak_grid = std::weak_ptr<Grid>(shared_this);
   if (entity_type == EntityType::ENTRANCE) {
-    grid_entity = new Entrance("", weak_grid, orientation, variant);
+    grid_entity = new Entrance(id_string, weak_grid, orientation, variant);
   }
   else if (entity_type == EntityType::WORKER) {
-    grid_entity = new Worker("", weak_grid, orientation, variant);
+    grid_entity = new Worker(id_string, weak_grid, orientation, variant);
   }
   else {
-    grid_entity = new GridEntity("", weak_grid, false, orientation, entity_type, variant);
+    grid_entity = new GridEntity(id_string, weak_grid, false, orientation, entity_type, variant);
   }
-  this->entity_map.insert(std::pair<std::string, GridEntity*>("", grid_entity));
+  this->entity_map.insert(std::pair<std::string, GridEntity*>(id_string, grid_entity));
 
   GridTile* tile = internal_grid[x * size + z];
   tile->entities.push_back(grid_entity);

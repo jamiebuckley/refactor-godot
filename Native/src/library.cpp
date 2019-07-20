@@ -4,7 +4,7 @@
 #include "game.h"
 
 #include <iostream>
-#include <godot_entities/GodotWorker.h>
+#include <godot_entities/godot_worker.h>
 
 using namespace godot;
 
