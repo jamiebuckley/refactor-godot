@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "grid/grid.h"
+#include "entities/grid_entity.h"
 #include "godot_interface.h"
 
 namespace godot
@@ -71,6 +72,8 @@ class Game : public Spatial, public Refactor::GodotInterface
         Spatial* picker;
         Node* ui;
         Refactor::EntityType entity_type = Refactor::EntityType::NONE;
+        std::shared_ptr<Refactor::GridEntity> selected_entity;
+
         void handle_mouse_click(const InputEventMouseButton *mouse_event);
 
         void handle_grid_coords_selection(Vector3 grid_coords);

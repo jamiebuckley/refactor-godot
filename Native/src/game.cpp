@@ -93,6 +93,18 @@ void Game::_unhandled_input(const InputEvent* event) {
       entity_type = EntityType::NONE;
       main_entity->call("clear_current_option_label");
     }
+    else if (key_event->get_scancode() == GlobalConstants::KEY_P && !key_event->is_pressed()) {
+      if(selected_entity != nullptr) {
+        selected_entity->setOrientation(OrientationUtils::clockwise_of(selected_entity->getOrientation()));
+        static_cast<Spatial*>(selected_entity->getGodotEntity())->set_rotation(Vector3(0, Maths::get_rotation_from_vector(selected_entity->getOrientation()), 0));
+      }
+    }
+    else if (key_event->get_scancode() == GlobalConstants::KEY_O && !key_event->is_pressed()) {
+      if(selected_entity != nullptr) {
+        selected_entity->setOrientation(OrientationUtils::anti_clockwise_of(selected_entity->getOrientation()));
+        static_cast<Spatial*>(selected_entity->getGodotEntity())->set_rotation(Vector3(0, Maths::get_rotation_from_vector(selected_entity->getOrientation()), 0));
+      }
+    }
   }
 }
 
@@ -178,7 +190,7 @@ void Game::handle_mouse_click(const InputEventMouseButton *mouse_event) {
   Vector3 position = result["position"];
   auto grid_coords = get_grid_coords(position);
 
-  if(!entity_type) {
+  if(entity_type == EntityType::NONE) {
     handle_grid_coords_selection(grid_coords);
   } else {
     this->handle_grid_coords_build(grid_coords);
@@ -188,7 +200,20 @@ void Game::handle_mouse_click(const InputEventMouseButton *mouse_event) {
 void Game::handle_grid_coords_selection(Vector3 grid_coords) {
   auto opt_grid_tile = grid->get_grid_tile((int)grid_coords.x, (int)grid_coords.z);
   if(!opt_grid_tile.has_value()) return;
+  auto grid_tile = *opt_grid_tile;
 
+  // todo: select tile by default, this needs improving
+  auto tile = std::find_if(grid_tile->entities.begin(), grid_tile->entities.end(), [&](std::shared_ptr<Refactor::GridEntity> grid_entity) { return grid_entity->getEntityType() == EntityType::TILE; });
+  if (tile != grid_tile->entities.end()) {
+    if(this->selected_entity != nullptr) {
+      auto old_godot_entity = static_cast<Spatial *>(this->selected_entity->getGodotEntity());
+      old_godot_entity->call("_set_unselected");
+    }
+
+    this->selected_entity = *tile;
+    auto godot_entity = static_cast<Spatial *>(this->selected_entity->getGodotEntity());
+    godot_entity->call("_set_selected");
+  }
 }
 
 void Game::handle_grid_coords_build(Vector3 grid_coords) {

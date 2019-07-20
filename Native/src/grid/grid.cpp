@@ -17,7 +17,6 @@ Grid::Grid(int size, GodotInterface* godot_interface) {
   godot_interface->print("Starting");
   this->size = size;
   this->internal_grid = std::vector<std::shared_ptr<GridTile>>(size * size);
-  //this->internal_grid.reserve(size * size);
   this->godot_interface = godot_interface;
 
   for(int x = 0; x < size; x++) {
