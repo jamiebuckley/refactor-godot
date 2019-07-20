@@ -88,6 +88,13 @@ void Game::_unhandled_input(const InputEvent* event) {
       this->handle_mouse_click(mouse_event);
     }
   }
+  else if (event->get_class() == "InputEventKey") {
+    auto key_event = cast_to<InputEventKey>(event);
+    if (key_event->get_scancode() == GlobalConstants::KEY_ESCAPE) {
+      entity_type = EntityType::NONE;
+      main_entity->call("clear_current_option_label");
+    }
+  }
 }
 
 void Game::_on_build_option_button_press(Button* button) {

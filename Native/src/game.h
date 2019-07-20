@@ -11,6 +11,8 @@
 #include <World.hpp>
 #include <PhysicsDirectSpaceState.hpp>
 #include <gen/InputEventMouseButton.hpp>
+#include <gen/InputEventKey.hpp>
+#include <GlobalConstants.hpp>
 #include <stdexcept>
 #include <gen/Button.hpp>
 #include <map>
@@ -68,7 +70,7 @@ class Game : public Spatial, public Refactor::GodotInterface
     private:
         Spatial* picker;
         Node* ui;
-        Refactor::EntityType entity_type;
+        Refactor::EntityType entity_type = Refactor::EntityType::NONE;
         void handle_mouse_click(const InputEventMouseButton *mouse_event);
         void handle_grid_coords_click(Vector3 grid_coords);
 

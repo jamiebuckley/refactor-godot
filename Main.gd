@@ -28,14 +28,8 @@ func _ready():
 func _process(delta):
 	pass
 
-func _unhandled_input(event):
-	pass
-	#if event is InputEventMouseButton && event.pressed:
-	#	_handle_mouse_click(event)
-	#if event is InputEventKey && eventscancode == KEY_ESCAPE:
-	#	#if buildOption != null:
-		#		buildOption = null
-		#		$UI.current_option_label.text = ""
+func clear_current_option_label():
+	$UI.current_option_label.text = ""
 
 func _get_world_mouse_position():
 	var rays = Maths.get_camera_rays(get_viewport().get_mouse_position(), $Camera)

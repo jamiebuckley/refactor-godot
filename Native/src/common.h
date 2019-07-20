@@ -11,7 +11,8 @@ namespace Refactor {
         ENTRANCE,
         EXIT,
         TILE,
-        BLOCK
+        BLOCK,
+        NONE
     };
 }
 
