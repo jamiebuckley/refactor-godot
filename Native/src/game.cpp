@@ -204,13 +204,13 @@ void Game::handle_grid_coords_click(Vector3 grid_coords) {
 
   Spatial *instance = nullptr;
   if (entity_type == Refactor::EntityType::ENTRANCE) {
-    instance = reinterpret_cast<Spatial *>(entrance_scene->instance());
+    instance = cast_to<Spatial>(entrance_scene->instance());
   }
   else if (entity_type == Refactor::EntityType::EXIT) {
-    instance = reinterpret_cast<Spatial *>(exit_scene->instance());
+    instance = cast_to<Spatial>(exit_scene->instance());
   }
   else if (entity_type == Refactor::EntityType::TILE) {
-    instance = reinterpret_cast<Spatial *>(tile_scene->instance());
+    instance = cast_to<Spatial>(tile_scene->instance());
   }
 
   if (instance == nullptr) {
