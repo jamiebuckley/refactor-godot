@@ -14,27 +14,25 @@
 using namespace Refactor;
 
 Grid::Grid(int size, GodotInterface* godot_interface) {
+  godot_interface->print("Starting");
   this->size = size;
-  this->internal_grid.reserve(size * size);
+  this->internal_grid = std::vector<std::shared_ptr<GridTile>>(size * size);
+  //this->internal_grid.reserve(size * size);
   this->godot_interface = godot_interface;
 
   for(int x = 0; x < size; x++) {
     for(int z = 0; z < size; z++) {
-      this->internal_grid[x * size + z] = new GridTile(x, z);
+      this->internal_grid[x * size + z] = std::make_shared<GridTile>(x, z);
     }
   }
+  godot_interface->print("Done");
 }
 
 Grid::~Grid() {
-  for(auto p: this->internal_grid) {
-    delete p;
-  }
-  for(const auto& p: this->entity_map) {
-    delete p.second;
-  }
+
 }
 
-GridEntity * Grid::add_entity(int x, int z, godot::Vector3 orientation, EntityType entity_type, godot::Spatial* variant) {
+std::shared_ptr<GridEntity> Grid::add_entity(int x, int z, godot::Vector3 orientation, EntityType entity_type, godot::Spatial* variant) {
   if(!can_place_entity_type(x, z, entity_type)) {
     throw std::logic_error("Tried to add an entity to a blocked tile, call is_blocked first");
   }
@@ -43,35 +41,35 @@ GridEntity * Grid::add_entity(int x, int z, godot::Vector3 orientation, EntityTy
   auto padded_id_string = std::string().append(24 - id_string.length(), '0').append(id_string);
   this->last_number++;
 
-  GridEntity* grid_entity;
+  std::shared_ptr<GridEntity> grid_entity;
   auto shared_this = shared_from_this();
   auto weak_grid = std::weak_ptr<Grid>(shared_this);
+
   if (entity_type == EntityType::ENTRANCE) {
-    grid_entity = new Entrance(id_string, weak_grid, orientation, variant);
+    grid_entity = std::make_shared<Entrance>(id_string, weak_grid, orientation, variant);
   }
   else if (entity_type == EntityType::WORKER) {
-    grid_entity = new Worker(id_string, weak_grid, orientation, variant);
+    grid_entity = std::make_shared<Worker>(id_string, weak_grid, orientation, variant);
   }
   else {
-    grid_entity = new GridEntity(id_string, weak_grid, false, orientation, entity_type, variant);
+    grid_entity = std::make_shared<GridEntity>(id_string, weak_grid, false, orientation, entity_type, variant);
   }
-  this->entity_map.insert(std::pair<std::string, GridEntity*>(id_string, grid_entity));
+  this->entity_map.insert(std::pair<std::string, std::shared_ptr<GridEntity>>(id_string, grid_entity));
 
-  GridTile* tile = internal_grid[x * size + z];
+  auto tile = internal_grid[x * size + z];
   tile->entities.push_back(grid_entity);
-  grid_entity->setGridTile(tile);
+  grid_entity->setGridTile(std::weak_ptr(tile));
 
   return grid_entity;
 }
 
 bool Grid::delete_entity(const std::string& id) {
   auto entity = entity_map[id];
-  auto grid_tile = entity->getGridTile();
+  auto grid_tile = entity->getGridTile().lock();
 
   auto ets = grid_tile->entities;
   ets.erase(std::remove(ets.begin(), ets.end(), entity));
   entity_map.erase(id);
-  delete entity;
   return true;
 }
 
@@ -81,7 +79,7 @@ bool Grid::delete_entity(const std::string& id) {
 bool Grid::is_blocked(int x, int z) {
   if (is_in_bounds(x, z)) {
     auto grid_tile = this->internal_grid[x * size + z];
-    return std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](GridEntity* entity){
+    return std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](std::shared_ptr<GridEntity> entity){
         return entity->isBlocking();
     });
   }
@@ -99,17 +97,17 @@ bool Grid::can_place_entity_type(int x, int z, EntityType entity_type) {
   if (is_in_bounds(x, z)) {
     auto grid_tile = this->internal_grid[x * size + z];
     if(entity_type == EntityType::ENTRANCE || entity_type == EntityType::EXIT) {
-      return !std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](GridEntity* entity){
+      return !std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](std::shared_ptr<GridEntity> entity){
           return entity->isBlocking();
       });
     }
     else if (entity_type == EntityType::TILE) {
-      return !std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](GridEntity* entity){
+      return !std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](std::shared_ptr<GridEntity> entity){
           return entity->getEntityType() == EntityType::TILE;
       });
     }
     else if (entity_type == EntityType::WORKER) {
-      return !std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](GridEntity* entity){
+      return !std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](std::shared_ptr<GridEntity> entity){
           return entity->getEntityType() != ENTRANCE && entity->isBlocking();
       });
     }
@@ -123,8 +121,17 @@ bool Grid::is_in_bounds(int x, int z) {
 
 godot::Vector3 Grid::get_entity_coordinates(const std::string& entity_id) {
   auto entity = this->entity_map[entity_id];
-  auto grid_tile = entity->getGridTile();
+  auto grid_tile = entity->getGridTile().lock();
   return {static_cast<real_t>(grid_tile->x), 0, static_cast<real_t>(grid_tile->z)};
+}
+
+std::optional<std::shared_ptr<GridTile>> Grid::get_grid_tile(int x, int z) {
+  if (!is_in_bounds(x, z)) {
+    return {};
+  }
+
+  auto grid_tile = internal_grid[x * size + z];
+  return grid_tile;
 }
 
 void Grid::step() {
@@ -136,7 +143,7 @@ int Grid::getSize() const {
   return size;
 }
 
-std::vector<GridTile *> &Grid::getInternalGrid() {
+std::vector<std::shared_ptr<GridTile>> &Grid::getInternalGrid() {
   return internal_grid;
 }
 

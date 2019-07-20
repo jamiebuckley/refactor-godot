@@ -56,7 +56,7 @@ class Game : public Spatial, public Refactor::GodotInterface
 
         void set_main_entity(Spatial* _main_entity);
 
-        Refactor::GridEntity * add_entity(int x, int z, Vector3, String, Object*);
+        std::shared_ptr<Refactor::GridEntity> add_entity(int x, int z, Vector3, String, Object*);
         bool is_blocked(int x, int z);
         Vector3 get_entity_coordinates(String id);
         Vector3 closest_grid_position(Vector3 real_coords);
@@ -72,7 +72,9 @@ class Game : public Spatial, public Refactor::GodotInterface
         Node* ui;
         Refactor::EntityType entity_type = Refactor::EntityType::NONE;
         void handle_mouse_click(const InputEventMouseButton *mouse_event);
-        void handle_grid_coords_click(Vector3 grid_coords);
+
+        void handle_grid_coords_selection(Vector3 grid_coords);
+        void handle_grid_coords_build(Vector3 grid_coords);
 
         std::map<String, Refactor::EntityType> button_names_to_entity_types = {
                 { "BOptDirectionalTileButton", Refactor::EntityType::TILE },

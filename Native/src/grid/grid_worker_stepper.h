@@ -11,7 +11,7 @@
 
 namespace Refactor {
 
-    bool isWorker(GridEntity* entity) {
+    bool isWorker(std::shared_ptr<GridEntity> entity) {
       return entity->getEntityType() == EntityType::WORKER;
     }
 
@@ -20,31 +20,31 @@ namespace Refactor {
         struct TempWorker;
 
         struct GridTileTemp {
-            GridTile *grid_tile;
+            std::shared_ptr<GridTile> grid_tile;
             std::vector<std::shared_ptr<TempWorker>> next_entities;
         };
 
         struct TempWorker {
-            GridEntity *real_entity;
-            GridTileTemp *new_grid_tile;
-            GridTileTemp *old_grid_tile;
+            std::shared_ptr<GridEntity> real_entity;
+            std::weak_ptr<GridTileTemp> new_grid_tile;
+            std::weak_ptr<GridTileTemp> old_grid_tile;
         };
 
     public:
-        static void clear_grid(std::vector<GridTile *> &grid, int grid_size,
+        static void clear_grid(std::vector<std::shared_ptr<GridTile>> &grid, int grid_size,
                                std::vector<std::shared_ptr<TempWorker>> &temp_workers,
                                std::vector<std::shared_ptr<GridTileTemp>> &temp_grid) {
 
           for (auto x = 0; x < grid_size; x++) {
             for (auto z = 0; z < grid_size; z++) {
-              GridTile *grid_tile = grid[x * grid_size + z];
+              std::shared_ptr<GridTile> grid_tile = grid[x * grid_size + z];
               auto grid_tile_temp = std::make_shared<GridTileTemp>();
               grid_tile_temp->grid_tile = grid_tile;
               temp_grid.push_back(grid_tile_temp);
 
               // Remove all the workers
-              std::vector<GridEntity *> workers;
-              std::vector<GridEntity *> non_workers;
+              std::vector<std::shared_ptr<GridEntity>> workers;
+              std::vector<std::shared_ptr<GridEntity>> non_workers;
 
               int number_of_workers = std::count_if(grid_tile->entities.begin(), grid_tile->entities.end(), isWorker);
               workers.resize(number_of_workers);
@@ -54,11 +54,11 @@ namespace Refactor {
               grid_tile->entities = non_workers;
 
               // Push the workers to a temp workers list
-              std::for_each(workers.begin(), workers.end(), [&](GridEntity *real_entity) {
+              std::for_each(workers.begin(), workers.end(), [&](std::shared_ptr<GridEntity> real_entity) {
                   temp_workers.push_back(std::make_shared<TempWorker>(TempWorker{
                           real_entity,
-                          nullptr,
-                          grid_tile_temp.get()
+                          {},
+                          std::weak_ptr(grid_tile_temp)
                   }));
               });
             }
@@ -73,13 +73,13 @@ namespace Refactor {
           int grid_size = grid->getSize();
           for (auto x = 0; x < grid_size; x++) {
             for (auto z = 0; z < grid_size; z++) {
-              GridTile *grid_tile = grid->getInternalGrid()[x * grid_size + z];
+              std::shared_ptr<GridTile> grid_tile = grid->getInternalGrid()[x * grid_size + z];
               auto grid_entities = grid_tile->entities;
-              auto first_tile = std::find_if(grid_entities.begin(), grid_entities.end(), [&](GridEntity* grid_entity){
+              auto first_tile = std::find_if(grid_entities.begin(), grid_entities.end(), [&](std::shared_ptr<GridEntity> grid_entity){
                   return grid_entity->getEntityType() == EntityType::TILE;
               });
 
-              auto first_worker = std::find_if(grid_entities.begin(), grid_entities.end(), [&](GridEntity* grid_entity){
+              auto first_worker = std::find_if(grid_entities.begin(), grid_entities.end(), [&](std::shared_ptr<GridEntity> grid_entity){
                   return grid_entity->getEntityType() == EntityType::WORKER;
               });
 
@@ -102,7 +102,7 @@ namespace Refactor {
 
           for (const auto &temp_worker : temp_workers) {
             auto orientation_pt3 = Point3::from_vector3(temp_worker->real_entity->getOrientation());
-            auto worker_pt3 = temp_worker->old_grid_tile->grid_tile->getPosition();
+            auto worker_pt3 = temp_worker->old_grid_tile.lock()->grid_tile->getPosition();
             auto new_position = Point3::add(orientation_pt3, worker_pt3);
 
             // if is off the map or can't move
@@ -114,21 +114,21 @@ namespace Refactor {
               // this throws errors, not sure why
               // worker.new_grid_tile = worker.old_grid_tile;
               temp_worker->new_grid_tile = temp_worker->old_grid_tile;
-              auto next_entities = temp_worker->new_grid_tile->next_entities;
+              auto next_entities = temp_worker->new_grid_tile.lock()->next_entities;
               next_entities.push_back(temp_worker);
-              temp_worker->new_grid_tile->next_entities.push_back(temp_worker);
+              temp_worker->new_grid_tile.lock()->next_entities.push_back(temp_worker);
             } else {
               auto next_tile = temp_grid[new_position.x * grid->getSize() + new_position.z];
-              temp_worker->new_grid_tile = next_tile.get();
+              temp_worker->new_grid_tile = std::weak_ptr(next_tile);
               next_tile->next_entities.push_back(temp_worker);
             }
           }
 
           // check if any temp grid tiles are invalid and add them to stack
-          std::stack<GridTileTemp *> invalid_stack;
+          std::stack<std::weak_ptr<GridTileTemp>> invalid_stack;
           for (const auto &grid_tile : temp_grid) {
             if (grid_tile->next_entities.size() > 1) {
-              invalid_stack.push(grid_tile.get());
+              invalid_stack.push(grid_tile);
             }
           }
 
@@ -139,11 +139,13 @@ namespace Refactor {
             // if there are more than 1 entities on a tile
             // make one a winner, and move the losers back to their old tile
             std::vector<std::shared_ptr<TempWorker>> cut;
-            auto iterator = tile->next_entities.begin();
-            while (iterator != tile->next_entities.end() && tile->next_entities.size() > 1) {
+            auto iterator = tile.lock()->next_entities.begin();
+            while (iterator != tile.lock()->next_entities.end() && tile.lock()->next_entities.size() > 1) {
               auto next_entity = *iterator;
-              if (next_entity->new_grid_tile != next_entity->old_grid_tile) {
-                iterator = tile->next_entities.erase(iterator);
+              auto new_grid_tile = next_entity->new_grid_tile.lock();
+              auto old_grid_tile = next_entity->old_grid_tile.lock();
+              if (new_grid_tile != old_grid_tile) {
+                iterator = tile.lock()->next_entities.erase(iterator);
                 cut.push_back(next_entity);
               } else {
                 ++iterator;
@@ -153,18 +155,18 @@ namespace Refactor {
             // move the losers back to their old tile
             for (const auto &temp_worker : cut) {
               temp_worker->new_grid_tile = temp_worker->old_grid_tile;
-              temp_worker->old_grid_tile->next_entities.push_back(temp_worker);
+              temp_worker->old_grid_tile.lock()->next_entities.push_back(temp_worker);
 
               // if that caused multiple workers on the old tile, mark that tile as invalid
-              if (temp_worker->old_grid_tile->next_entities.size() > 1) {
-                invalid_stack.push(temp_worker->old_grid_tile);
+              if (temp_worker->old_grid_tile.lock()->next_entities.size() > 1) {
+                invalid_stack.push(temp_worker->old_grid_tile.lock());
               }
             }
           }
 
           // commit
           for (const auto &temp_worker : temp_workers) {
-            auto grid_tile = temp_worker->new_grid_tile->grid_tile;
+            auto grid_tile = temp_worker->new_grid_tile.lock()->grid_tile;
             grid_tile->entities.push_back(temp_worker->real_entity);
             temp_worker->real_entity->setGridTile(grid_tile);
 

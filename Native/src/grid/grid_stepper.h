@@ -22,10 +22,11 @@ namespace Refactor {
         }
 
         void step_entrances() {
-          std::vector < GridEntity * > entrances = GridQueries::query_type(grid, EntityType::ENTRANCE);
-          std::for_each(entrances.begin(), entrances.end(), [&](GridEntity *entrance) {
+          std::vector <std::weak_ptr<GridEntity>> entrances = GridQueries::query_type(grid, EntityType::ENTRANCE);
+          std::for_each(entrances.begin(), entrances.end(), [&](std::weak_ptr<GridEntity> entrance_weak) {
+              auto entrance = entrance_weak.lock();
               auto entrance_orientation = entrance->getOrientation();
-              auto entrance_grid_tile = entrance->getGridTile();
+              auto entrance_grid_tile = entrance->getGridTile().lock();
 
               if (grid->is_blocked(entrance_grid_tile->x, entrance_grid_tile->z)) {
                 std::ostringstream message;

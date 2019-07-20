@@ -18,7 +18,6 @@ void Game::_register_methods() {
     register_method("_process", &Game::_process);
     register_method("_unhandled_input", &Game::_unhandled_input);
     register_method("_on_build_option_button_press", &Game::_on_build_option_button_press);
-    register_method("add_entity", &Game::add_entity);
     register_method("is_blocked", &Game::is_blocked);
     register_method("step", &Game::step);
     register_method("get_entity_coordinates", &Game::get_entity_coordinates);
@@ -112,7 +111,7 @@ void Game::set_main_entity(Spatial* spatial) {
   print(spatial->get_name().alloc_c_string());
 }
 
-Refactor::GridEntity * Game::add_entity(int x, int z, Vector3 orientation, String selected_entity_type, Object* entity) {
+std::shared_ptr<Refactor::GridEntity> Game::add_entity(int x, int z, Vector3 orientation, String selected_entity_type, Object* entity) {
     Godot::print("add_entity");
     auto grid_entity_type = entity_type_map.find(selected_entity_type);
     if (grid_entity_type == entity_type_map.end()) {
@@ -178,10 +177,21 @@ void Game::handle_mouse_click(const InputEventMouseButton *mouse_event) {
 
   Vector3 position = result["position"];
   auto grid_coords = get_grid_coords(position);
-  this->handle_grid_coords_click(grid_coords);
+
+  if(!entity_type) {
+    handle_grid_coords_selection(grid_coords);
+  } else {
+    this->handle_grid_coords_build(grid_coords);
+  }
 }
 
-void Game::handle_grid_coords_click(Vector3 grid_coords) {
+void Game::handle_grid_coords_selection(Vector3 grid_coords) {
+  auto opt_grid_tile = grid->get_grid_tile((int)grid_coords.x, (int)grid_coords.z);
+  if(!opt_grid_tile.has_value()) return;
+
+}
+
+void Game::handle_grid_coords_build(Vector3 grid_coords) {
   Godot::print("Handle grid coords click");
   if (!entity_type) {
     return;
@@ -236,9 +246,7 @@ void Game::handle_grid_coords_click(Vector3 grid_coords) {
 }
 
 Vector3 Game::get_world_coords(int x, int z) {
-  return {
-          (x * TILE_SIZE) - (grid->getSize() * TILE_SIZE) / 2 + (TILE_SIZE / 2),
+  return {(x * TILE_SIZE) - (grid->getSize() * TILE_SIZE) / 2 + (TILE_SIZE / 2),
           0.0f,
-          (z * TILE_SIZE) - (grid->getSize() * TILE_SIZE) / 2 + (TILE_SIZE / 2)
-          };
+          (z * TILE_SIZE) - (grid->getSize() * TILE_SIZE) / 2 + (TILE_SIZE / 2)};
 }

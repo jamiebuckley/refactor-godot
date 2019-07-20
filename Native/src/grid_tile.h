@@ -15,7 +15,7 @@ namespace Refactor {
     struct GridTile {
         int x;
         int z;
-        std::vector<GridEntity *> entities;
+        std::vector<std::shared_ptr<GridEntity>> entities;
 
         GridTile(int x, int z) {
           this->x = x;

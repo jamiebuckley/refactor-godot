@@ -25,7 +25,7 @@ namespace Refactor {
         bool is_blocking;
         EntityType entity_type;
         godot::Vector3 orientation;
-        GridTile *grid_tile;
+        std::weak_ptr<GridTile> grid_tile;
         godot::Spatial *godot_entity;
 
     public:
@@ -36,7 +36,7 @@ namespace Refactor {
           this->is_blocking = is_blocking;
           this->entity_type = entity_type;
           this->orientation = orientation;
-          this->grid_tile = nullptr;
+          this->grid_tile = {};
           this->godot_entity = godot_entity;
         }
 
@@ -70,11 +70,11 @@ namespace Refactor {
           GridEntity::orientation = orientation;
         }
 
-        GridTile *getGridTile() const {
+        std::weak_ptr<GridTile> getGridTile() const {
           return grid_tile;
         }
 
-        void setGridTile(GridTile *gridTile) {
+        void setGridTile(std::weak_ptr<GridTile> gridTile) {
           grid_tile = gridTile;
         }
 

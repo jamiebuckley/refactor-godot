@@ -13,14 +13,15 @@
 namespace Refactor {
     class GridQueries {
     public:
-        static std::vector<GridEntity *> query_type(Grid* grid, EntityType entity_type) {
-          std::vector<GridEntity*> result;
+        static std::vector<std::weak_ptr<GridEntity>> query_type(Grid* grid, EntityType entity_type) {
+          std::vector<std::weak_ptr<GridEntity>> result;
           for(int x = 0; x < grid->getSize(); x++) {
             for(int z = 0; z < grid->getSize(); z++) {
               auto tile = grid->getInternalGrid()[x * grid->getSize() + z];
-              auto entity_or_end = std::find_if(tile->entities.begin(), tile->entities.end(), [&](GridEntity* entity) { return entity->getEntityType() == entity_type; });
+              auto entity_or_end = std::find_if(tile->entities.begin(), tile->entities.end(), [&](std::shared_ptr<GridEntity> entity) { return entity->getEntityType() == entity_type; });
               if (entity_or_end != tile->entities.end()) {
-                result.push_back(*entity_or_end);
+                auto grid_entity = *entity_or_end;
+                result.push_back(grid_entity);
               }
             }
           }

@@ -16,7 +16,8 @@ include_directories(godot-cpp/include/gen)
 include_directories(${PROJECT_SOURCE_DIR})
 
 link_libraries(${CMAKE_SOURCE_DIR}/godot-cpp/bin/libgodot-cpp.linux.debug.64.a)
-
 add_library(refactor_native SHARED ${SRC_FILES})
+set_property(TARGET refactor_native PROPERTY CXX_STANDARD 17)
 
 add_executable(refactor_tests ${SRC_FILES} test/test_main.cpp test/test1.cpp)
+set_property(TARGET refactor_tests PROPERTY CXX_STANDARD 17)
