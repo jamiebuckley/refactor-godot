@@ -65,6 +65,33 @@ namespace Refactor {
           }
         }
 
+        /**
+         * Read new orientations for each worker where necessary
+         * @param grid
+         */
+        static void step_worker_orientations(Grid* grid) {
+          int grid_size = grid->getSize();
+          for (auto x = 0; x < grid_size; x++) {
+            for (auto z = 0; z < grid_size; z++) {
+              GridTile *grid_tile = grid->getInternalGrid()[x * grid_size + z];
+              auto grid_entities = grid_tile->entities;
+              auto first_tile = std::find_if(grid_entities.begin(), grid_entities.end(), [&](GridEntity* grid_entity){
+                  return grid_entity->getEntityType() == EntityType::TILE;
+              });
+
+              auto first_worker = std::find_if(grid_entities.begin(), grid_entities.end(), [&](GridEntity* grid_entity){
+                  return grid_entity->getEntityType() == EntityType::WORKER;
+              });
+
+              if (first_tile != grid_entities.end() && first_worker != grid_entities.end()) {
+                auto tile = *first_tile;
+                auto worker = *first_worker;
+                worker->setOrientation(tile->getOrientation());
+              }
+            }
+          }
+        }
+
 
         static void step_workers(Grid *grid) {
           auto temp_workers = std::vector<std::shared_ptr<TempWorker>>();

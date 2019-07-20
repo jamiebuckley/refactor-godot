@@ -39,6 +39,7 @@ namespace Refactor {
         }
 
         void step() {
+          GridWorkerStepper::step_worker_orientations(this->grid);
           GridWorkerStepper::step_workers(this->grid);
           step_entrances();
         }
