@@ -22,6 +22,7 @@ namespace Refactor {
       bool delete_entity(const std::string& name);
       godot::Vector3 get_entity_coordinates(const std::string& entity_id);
       bool is_blocked(int x, int z);
+      bool can_place_entity_type(int x, int z, EntityType entity_type);
       bool is_in_bounds(int x, int z);
       void step();
 

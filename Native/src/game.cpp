@@ -149,10 +149,13 @@ Vector3 Game::get_grid_coords(godot::Vector3 real_coords) {
 }
 
 void Game::create_worker(int grid_x, int grid_z, Vector3 orientation) {
+  if(!grid->can_place_entity_type(grid_x, grid_z, EntityType::WORKER)) {
+    return;
+  }
+
   auto worker_instance = GodotWorker::cast_to<GodotWorker>(worker_scene->instance());
   auto world_coords = get_world_coords(grid_x, grid_z);
   worker_instance->set_translation(Vector3(world_coords.x, 0.0f, world_coords.z));
-
   auto grid_entity = add_entity(grid_x, grid_z, orientation, "Worker", worker_instance);
   grid_entity->setGodotEntity(worker_instance);
 
@@ -177,7 +180,7 @@ void Game::handle_grid_coords_click(Vector3 grid_coords) {
     return;
   }
 
-  if(grid->is_blocked((int)grid_coords.x, (int)grid_coords.z)) {
+  if(!grid->can_place_entity_type((int)grid_coords.x, (int)grid_coords.z, entity_type)) {
     return;
   }
 

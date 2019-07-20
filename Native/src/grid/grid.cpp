@@ -35,7 +35,7 @@ Grid::~Grid() {
 }
 
 GridEntity * Grid::add_entity(int x, int z, godot::Vector3 orientation, EntityType entity_type, godot::Spatial* variant) {
-  if(is_blocked(x, z)) {
+  if(!can_place_entity_type(x, z, entity_type)) {
     throw std::logic_error("Tried to add an entity to a blocked tile, call is_blocked first");
   }
 
@@ -86,6 +86,35 @@ bool Grid::is_blocked(int x, int z) {
     });
   }
   return true;
+}
+
+/**
+ * Test if you can place a particular entity on a tile
+ * @param x The x position of the tile
+ * @param z The z position of the tile
+ * @param entityType The entity type to place
+ * @return True if can be placed else false
+ */
+bool Grid::can_place_entity_type(int x, int z, EntityType entity_type) {
+  if (is_in_bounds(x, z)) {
+    auto grid_tile = this->internal_grid[x * size + z];
+    if(entity_type == EntityType::ENTRANCE || entity_type == EntityType::EXIT) {
+      return !std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](GridEntity* entity){
+          return entity->isBlocking();
+      });
+    }
+    else if (entity_type == EntityType::TILE) {
+      return !std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](GridEntity* entity){
+          return entity->getEntityType() == EntityType::TILE;
+      });
+    }
+    else if (entity_type == EntityType::WORKER) {
+      return !std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](GridEntity* entity){
+          return entity->getEntityType() != ENTRANCE && entity->isBlocking();
+      });
+    }
+  }
+  return false;
 }
 
 bool Grid::is_in_bounds(int x, int z) {
