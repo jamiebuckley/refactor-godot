@@ -9,14 +9,15 @@
 
 #include <entities/grid_entity.h>
 
-using namespace Refactor;
+namespace Refactor {
+    class Entrance : public GridEntity {
 
-class Entrance : public GridEntity {
+    public:
+        Entrance(std::string id, std::weak_ptr<Grid> grid, godot::Vector3 orientation, godot::Spatial *godot_entity)
+                : GridEntity(std::move(id), grid, false, orientation, EntityType::ENTRANCE, godot_entity) {};
 
-public:
-    Entrance(std::string id, godot::Vector3 orientation, godot::Spatial* godot_entity)
-            : GridEntity(std::move(id), false, orientation, EntityType::ENTRANCE, godot_entity) {};
-    ~Entrance() override = default;;
-};
+        ~Entrance() override = default;;
+    };
+}
 
 #endif //REFACTOR_NATIVE_ENTRANCE_H

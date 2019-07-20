@@ -34,31 +34,30 @@ Grid::~Grid() {
   }
 }
 
-std::string Grid::add_entity(int x, int z, godot::Vector3 orientation, EntityType entity_type, godot::Spatial* variant) {
+GridEntity * Grid::add_entity(int x, int z, godot::Vector3 orientation, EntityType entity_type, godot::Spatial* variant) {
   if(is_blocked(x, z)) {
-    return "error_is_blocked";
+    throw std::logic_error("Tried to add an entity to a blocked tile, call is_blocked first");
   }
-  auto id_string = std::to_string(this->last_number);
-  auto padded_id_string = std::string().append(24 - id_string.length(), '0').append(id_string);
-  this->last_number++;
 
   GridEntity* grid_entity;
+  auto shared_this = shared_from_this();
+  auto weak_grid = std::weak_ptr<Grid>(shared_this);
   if (entity_type == EntityType::ENTRANCE) {
-    grid_entity = new Entrance(padded_id_string, orientation, variant);
+    grid_entity = new Entrance("", weak_grid, orientation, variant);
   }
   else if (entity_type == EntityType::WORKER) {
-    grid_entity = new Worker(padded_id_string, orientation, variant);
+    grid_entity = new Worker("", weak_grid, orientation, variant);
   }
   else {
-    grid_entity = new GridEntity(padded_id_string, false, orientation, entity_type, variant);
+    grid_entity = new GridEntity("", weak_grid, false, orientation, entity_type, variant);
   }
-  this->entity_map.insert(std::pair<std::string, GridEntity*>(padded_id_string, grid_entity));
+  this->entity_map.insert(std::pair<std::string, GridEntity*>("", grid_entity));
 
   GridTile* tile = internal_grid[x * size + z];
   tile->entities.push_back(grid_entity);
   grid_entity->setGridTile(tile);
 
-  return padded_id_string;
+  return grid_entity;
 }
 
 bool Grid::delete_entity(const std::string& id) {

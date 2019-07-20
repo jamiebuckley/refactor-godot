@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include <gen/Button.hpp>
 #include <map>
+#include <memory>
 
 #include "grid/grid.h"
 #include "godot_interface.h"
@@ -23,13 +24,13 @@ namespace godot
     /*
      * Represents the grid component brought into the Godot engine
      */
-    class Game : public Spatial, public GodotInterface
+class Game : public Spatial, public Refactor::GodotInterface
     {
         GODOT_CLASS(Game, Spatial)
 
     private:
         float time_passed;
-        Refactor::Grid* grid;
+        std::shared_ptr<Refactor::Grid> grid;
 
         const std::map<String, Refactor::EntityType> entity_type_map = {
             { String("Worker"), Refactor::EntityType::WORKER },
@@ -53,11 +54,13 @@ namespace godot
 
         void set_main_entity(Spatial* _main_entity);
 
-        String add_entity(int x, int z, Vector3, String, Object*);
+        Refactor::GridEntity * add_entity(int x, int z, Vector3, String, Object*);
         bool delete_entity(String id);
         bool is_blocked(int x, int z);
         Vector3 get_entity_coordinates(String id);
+        Vector3 closest_grid_position(Vector3 real_coords);
         Vector3 get_grid_coords(Vector3 real_coords);
+        Vector3 get_world_coords(int x, int z);
         void step();
 
         void create_worker(int grid_x, int grid_z, Vector3 orientation) override;
@@ -66,7 +69,25 @@ namespace godot
     private:
         Spatial* picker;
         Node* ui;
-    };
+        Refactor::EntityType entity_type;
+        void handle_mouse_click(const InputEventMouseButton *mouse_event);
+        void handle_grid_coords_click(Vector3 grid_coords);
+
+        std::map<String, Refactor::EntityType> button_names_to_entity_types = {
+                { "BOptDirectionalTileButton", Refactor::EntityType::TILE },
+                { "BOptEntranceButton", Refactor::EntityType::ENTRANCE },
+                { "BOptExitButton", Refactor::EntityType::EXIT }
+        };
+
+        Ref<PackedScene> picker_scene;
+        Ref<PackedScene> entrance_scene;
+        Ref<PackedScene> exit_scene;
+        Ref<PackedScene> tile_scene;
+        Ref<PackedScene> worker_scene;
+
+        float TILE_SIZE = 1.0f;
+        float pulse_timer = 0.0f;
+};
 
 } // namespace godot
 

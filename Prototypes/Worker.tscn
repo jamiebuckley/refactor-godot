@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://Scripts/Prototypes/Worker.gd" type="Script" id=1]
+[ext_resource path="res://Native/worker.gdns" type="Script" id=1]
 [ext_resource path="res://Assets/Models/ModifiedWorker.tscn" type="PackedScene" id=2]
 
 [node name="WorkerRoot" type="Spatial"]

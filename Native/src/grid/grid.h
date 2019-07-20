@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <memory>
 #include <Godot.hpp>
 #include <Vector3.hpp>
 #include "common.h"
@@ -11,13 +12,13 @@
 
 namespace Refactor {
 
-  class Grid {
+  class Grid: public std::enable_shared_from_this<Grid> {
     
     public:
       Grid(int size, GodotInterface* godot_interface);
       ~Grid();
 
-      std::string add_entity(int x, int z, godot::Vector3 orientation, EntityType entity_type, godot::Spatial* godot_entity);
+      GridEntity * add_entity(int x, int z, godot::Vector3 orientation, EntityType entity_type, godot::Spatial* godot_entity);
       bool delete_entity(const std::string& name);
       godot::Vector3 get_entity_coordinates(const std::string& entity_id);
       bool is_blocked(int x, int z);

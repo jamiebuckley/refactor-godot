@@ -7,85 +7,91 @@
 
 
 #include <string>
+#include <memory>
 #include <core/Vector3.hpp>
 #include <gen/Spatial.hpp>
+#include <grid/grid.h>
 #include "common.h"
 #include "grid_tile.h"
 
-using namespace Refactor;
+namespace Refactor {
+    class GridTile;
+    class Grid;
 
-class GridTile;
+    class GridEntity {
 
-class GridEntity {
-private:
-    std::string id;
-    bool is_blocking;
-    EntityType entity_type;
-    godot::Vector3 orientation;
-    GridTile *grid_tile;
-    godot::Spatial* godot_entity;
+    private:
+        std::string id;
+        std::weak_ptr<Grid> grid;
+        bool is_blocking;
+        EntityType entity_type;
+        godot::Vector3 orientation;
+        GridTile *grid_tile;
+        godot::Spatial *godot_entity;
 
-public:
-    GridEntity(std::string id, bool is_blocking, godot::Vector3 orientation, EntityType entity_type,
-               godot::Spatial* godot_entity) {
-      this->id = id;
-      this->is_blocking = is_blocking;
-      this->entity_type = entity_type;
-      this->orientation = orientation;
-      this->grid_tile = nullptr;
-      this->godot_entity = godot_entity;
-    }
+    public:
+        GridEntity(std::string id, const std::weak_ptr<Grid> grid, bool is_blocking, godot::Vector3 orientation,
+                   EntityType entity_type, godot::Spatial *godot_entity) {
+          this->id = id;
+          this->grid = grid;
+          this->is_blocking = is_blocking;
+          this->entity_type = entity_type;
+          this->orientation = orientation;
+          this->grid_tile = nullptr;
+          this->godot_entity = godot_entity;
+        }
 
-    virtual ~GridEntity() = default;
+        virtual ~GridEntity() = default;
 
-    const std::string &getId() const {
-      return id;
-    }
+        const std::string &getId() const {
+          return id;
+        }
 
-    void setId(const std::string &id) {
-      GridEntity::id = id;
-    }
+        void setId(const std::string &id) {
+          GridEntity::id = id;
+        }
 
-    bool isBlocking() const {
-      return is_blocking;
-    }
+        bool isBlocking() const {
+          return is_blocking;
+        }
 
-    void setIsBlocking(bool isBlocking) {
-      is_blocking = isBlocking;
-    }
+        void setIsBlocking(bool isBlocking) {
+          is_blocking = isBlocking;
+        }
 
-    EntityType getEntityType() const {
-      return entity_type;
-    }
+        EntityType getEntityType() const {
+          return entity_type;
+        }
 
-    void setEntityType(EntityType entityType) {
-      entity_type = entityType;
-    }
+        void setEntityType(EntityType entityType) {
+          entity_type = entityType;
+        }
 
-    const godot::Vector3 &getOrientation() const {
-      return orientation;
-    }
+        const godot::Vector3 &getOrientation() const {
+          return orientation;
+        }
 
-    void setOrientation(const godot::Vector3 &orientation) {
-      GridEntity::orientation = orientation;
-    }
+        void setOrientation(const godot::Vector3 &orientation) {
+          GridEntity::orientation = orientation;
+        }
 
-    GridTile *getGridTile() const {
-      return grid_tile;
-    }
+        GridTile *getGridTile() const {
+          return grid_tile;
+        }
 
-    void setGridTile(GridTile *gridTile) {
-      grid_tile = gridTile;
-    }
+        void setGridTile(GridTile *gridTile) {
+          grid_tile = gridTile;
+        }
 
-    void *getGodotEntity() const {
-      return godot_entity;
-    }
+        void *getGodotEntity() const {
+          return godot_entity;
+        }
 
-    void setGodotEntity(godot::Spatial* godotEntity) {
-      godot_entity = godotEntity;
-    }
-};
+        void setGodotEntity(godot::Spatial *godotEntity) {
+          godot_entity = godotEntity;
+        }
+    };
+}
 
 
 #endif //REFACTOR_NATIVE_GRID_ENTITY_H

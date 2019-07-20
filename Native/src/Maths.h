@@ -22,6 +22,40 @@ namespace godot {
             auto ray_to = ray_from + camera->project_ray_normal(mouse_position) * 200;
             return RayInfo { ray_from, ray_to };
         }
+
+        static float get_rotation_from_vector(Vector3 vector) {
+          // north
+          if (vector.x == 0 && vector.z == 1) {
+            return 0.0f;
+          }
+          else if(vector.x == 1 && vector.z == 0) {
+            return Math_PI / 2.0f;
+          }
+          else if (vector.x == 0 && vector.z == -1) {
+            return Math_PI;
+          }
+          else if (vector.x == -1 && vector.z == 0) {
+            return - Math_PI / 2;
+          }
+          return 0;
+        }
+
+        static Vector3 get_edge_orientation(int x, int z, int min_val, int max_val) {
+          Vector3 result;
+          if(x == min_val) {
+            result.x = 1;
+          }
+          if (x == max_val) {
+            result.x = -1;
+          }
+          if (z == min_val) {
+            result.z = 1;
+          }
+          if (z == max_val) {
+            result.z = -1;
+          }
+          return result;
+        }
     };
 }
 

@@ -9,24 +9,24 @@
 #include "vector_util.h"
 #include <vector>
 
-using namespace Refactor;
+namespace Refactor {
+    class GridEntity;
 
-class GridEntity;
+    struct GridTile {
+        int x;
+        int z;
+        std::vector<GridEntity *> entities;
 
-struct GridTile {
-    int x;
-    int z;
-    std::vector<GridEntity *> entities;
+        GridTile(int x, int z) {
+          this->x = x;
+          this->z = z;
+        }
 
-    GridTile(int x, int z) {
-        this->x = x;
-        this->z = z;
-    }
-
-    Point3 getPosition() {
-      return Point3(this->x, 0, this->z);
-    }
-};
+        Point3 getPosition() {
+          return Point3(this->x, 0, this->z);
+        }
+    };
+}
 
 
 #endif //REFACTOR_NATIVE_GRID_TILE_H
