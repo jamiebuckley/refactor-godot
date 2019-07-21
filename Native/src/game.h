@@ -82,7 +82,8 @@ class Game : public Spatial, public Refactor::GodotInterface
         std::map<String, Refactor::EntityType> button_names_to_entity_types = {
                 { "BOptDirectionalTileButton", Refactor::EntityType::TILE },
                 { "BOptEntranceButton", Refactor::EntityType::ENTRANCE },
-                { "BOptExitButton", Refactor::EntityType::EXIT }
+                { "BOptExitButton", Refactor::EntityType::EXIT },
+                { "BOptLogicButton", Refactor::EntityType::LOGIC }
         };
 
         Ref<PackedScene> picker_scene;
@@ -90,6 +91,7 @@ class Game : public Spatial, public Refactor::GodotInterface
         Ref<PackedScene> exit_scene;
         Ref<PackedScene> tile_scene;
         Ref<PackedScene> worker_scene;
+        Ref<PackedScene> logic_scene;
 
         float TILE_SIZE = 1.0f;
         float pulse_timer = 0.0f;

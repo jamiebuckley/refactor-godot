@@ -12,6 +12,7 @@ namespace Refactor {
         EXIT,
         TILE,
         BLOCK,
+        LOGIC,
         NONE
     };
 

@@ -58,6 +58,7 @@ void Game::_ready() {
   exit_scene = resource_loader->load("res://Prototypes/Exit.tscn");
   tile_scene = resource_loader->load("res://Prototypes/DirectionalTile.tscn");
   worker_scene = resource_loader->load("res://Prototypes/Worker.tscn");
+  logic_scene = resource_loader->load("res://Prototypes/LogicTile.tscn");
 
   this->picker = reinterpret_cast<Spatial*>(picker_scene->instance());
   get_parent()->add_child(picker);
@@ -203,7 +204,10 @@ void Game::handle_grid_coords_selection(Vector3 grid_coords) {
   auto grid_tile = *opt_grid_tile;
 
   // todo: select tile by default, this needs improving
-  auto tile = std::find_if(grid_tile->entities.begin(), grid_tile->entities.end(), [&](std::shared_ptr<Refactor::GridEntity> grid_entity) { return grid_entity->getEntityType() == EntityType::TILE; });
+  auto tile = std::find_if(grid_tile->entities.begin(), grid_tile->entities.end(), [&](std::shared_ptr<Refactor::GridEntity> grid_entity) {
+    return grid_entity->getEntityType() == EntityType::TILE || grid_entity->getEntityType() == EntityType::LOGIC;
+  });
+
   if (tile != grid_tile->entities.end()) {
     if(this->selected_entity != nullptr) {
       auto old_godot_entity = static_cast<Spatial *>(this->selected_entity->getGodotEntity());
@@ -213,6 +217,11 @@ void Game::handle_grid_coords_selection(Vector3 grid_coords) {
     this->selected_entity = *tile;
     auto godot_entity = static_cast<Spatial *>(this->selected_entity->getGodotEntity());
     godot_entity->call("_set_selected");
+
+    if(this->selected_entity->getEntityType() == EntityType::LOGIC) {
+      auto ui = get_node("/root/RootSpatial/UI");
+      ui->call("show_logic_modal");
+    }
   }
 }
 
@@ -250,6 +259,9 @@ void Game::handle_grid_coords_build(Vector3 grid_coords) {
   }
   else if (entity_type == Refactor::EntityType::TILE) {
     instance = cast_to<Spatial>(tile_scene->instance());
+  }
+  else if (entity_type == Refactor::EntityType::LOGIC) {
+    instance = cast_to<Spatial>(logic_scene->instance());
   }
 
   if (instance == nullptr) {

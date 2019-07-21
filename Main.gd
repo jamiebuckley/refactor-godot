@@ -29,7 +29,7 @@ func _process(delta):
 	pass
 
 func clear_current_option_label():
-	$UI.current_option_label.text = ""
+	$UI.option_label.text = ""
 
 func _get_world_mouse_position():
 	var rays = Maths.get_camera_rays(get_viewport().get_mouse_position(), $Camera)

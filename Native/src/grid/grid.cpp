@@ -100,9 +100,9 @@ bool Grid::can_place_entity_type(int x, int z, EntityType entity_type) {
           return entity->isBlocking();
       });
     }
-    else if (entity_type == EntityType::TILE) {
+    else if (entity_type == EntityType::TILE || entity_type == EntityType::LOGIC) {
       return !std::any_of(grid_tile->entities.begin(), grid_tile->entities.end(), [](std::shared_ptr<GridEntity> entity){
-          return entity->getEntityType() == EntityType::TILE;
+          return entity->getEntityType() == EntityType::TILE || entity->getEntityType() == EntityType ::LOGIC;
       });
     }
     else if (entity_type == EntityType::WORKER) {
