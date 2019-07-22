@@ -3,6 +3,16 @@ project (refactor_native)
 
 set(PROJECT_SOURCE_DIR src)
 
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(WINDOWS TRUE)
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    set(lib_name linux)
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(CMAKE_MACOSX_RPATH 1)
+    set(lib_name osx)
+endif()
+
+
 set(SRC_FILES
         ${PROJECT_SOURCE_DIR}/game.cpp
         ${PROJECT_SOURCE_DIR}/library.cpp
@@ -15,7 +25,7 @@ include_directories(godot-cpp/include/core)
 include_directories(godot-cpp/include/gen)
 include_directories(${PROJECT_SOURCE_DIR})
 
-link_libraries(${CMAKE_SOURCE_DIR}/godot-cpp/bin/libgodot-cpp.linux.debug.64.a)
+link_libraries(${CMAKE_SOURCE_DIR}/godot-cpp/bin/libgodot-cpp.${lib_name}.debug.64.a)
 add_library(refactor_native SHARED ${SRC_FILES})
 set_property(TARGET refactor_native PROPERTY CXX_STANDARD 17)
 

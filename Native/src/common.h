@@ -41,6 +41,7 @@ namespace Refactor {
             godot::Godot::print("north");
             return ORIENTATION_NORTH;
           }
+          return ORIENTATION_NORTH;
         }
 
         static godot::Vector3 anti_clockwise_of(godot::Vector3 orientation) {
@@ -57,6 +58,7 @@ namespace Refactor {
           else if (orientation == ORIENTATION_EAST) {
             return ORIENTATION_NORTH;
           }
+          return ORIENTATION_NORTH;
         }
     };
 }

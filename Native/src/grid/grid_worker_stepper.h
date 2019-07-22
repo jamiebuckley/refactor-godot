@@ -58,7 +58,7 @@ namespace Refactor {
                   temp_workers.push_back(std::make_shared<TempWorker>(TempWorker{
                           real_entity,
                           {},
-                          std::weak_ptr(grid_tile_temp)
+                          std::weak_ptr<GridTileTemp>(grid_tile_temp)
                   }));
               });
             }
@@ -119,7 +119,7 @@ namespace Refactor {
               temp_worker->new_grid_tile.lock()->next_entities.push_back(temp_worker);
             } else {
               auto next_tile = temp_grid[new_position.x * grid->getSize() + new_position.z];
-              temp_worker->new_grid_tile = std::weak_ptr(next_tile);
+              temp_worker->new_grid_tile = std::weak_ptr<GridTileTemp>(next_tile);
               next_tile->next_entities.push_back(temp_worker);
             }
           }
