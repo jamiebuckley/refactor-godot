@@ -25,12 +25,12 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="160.67248"
-     inkscape:cy="181.13109"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="48.685891"
+     inkscape:cy="262.24715"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
-     showgrid="true"
+     showgrid="false"
      units="px"
      inkscape:window-width="1853"
      inkscape:window-height="1016"
@@ -772,5 +772,54 @@
              width="48"
              id="rect3024-6" /></flowRegion><flowPara
            id="flowPara3026-5">AND</flowPara></flowRoot>    </g>
-  </g>
+    <rect
+       style="opacity:1;vector-effect:none;fill:#b3b3b3;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:2142.72436523;stroke-opacity:1;paint-order:normal"
+       id="rect2038-4-69"
+       width="4.2333331"
+       height="12.7"
+       x="-4.2333331"
+       y="182.69998"
+       ry="0.26458597" />
+    <path
+       style="opacity:1;vector-effect:none;fill:#b3b3b3;fill-opacity:1;stroke:none;stroke-width:7.55905533;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:2142.72436523;stroke-opacity:1;paint-order:normal"
+       d="M 1 80 C 0.44599448 80 0 80.445994 0 81 L 0 127 C 0 127.55401 0.44599448 128 1 128 L 15 128 C 15.554006 128 16 127.55401 16 127 L 16 107.5625 L 10 107.5625 L 10 111.78125 L 4 104.28125 L 10 96.78125 L 10 101 L 16 101 L 16 81 C 16 80.445994 15.554006 80 15 80 L 1 80 z "
+       transform="matrix(0.26458333,0,0,0.26458333,0,161.53332)"
+       id="rect2038-4-69-3" />
+    <g
+       id="g2090"
+       transform="translate(-8.4666666,0.07441406)">
+      <path
+         transform="matrix(0.26458333,0,0,0.26458333,0,161.53332)"
+         id="path1996"
+         d="m 48,80 c -0.554007,0 -1,0.445997 -1,1 v 19.71875 H 42 V 96.5 l -6,7.5 6,7.5 v -4.21875 h 5 V 127 c 0,0.554 0.445993,1 1,1 h 110 c 0.55401,0 1,-0.446 1,-1 v -15.85742 a 7.9999994,7.9999994 0 0 1 -2.95703,0.56836 7.9999994,7.9999994 0 0 1 -8,-8 7.9999994,7.9999994 0 0 1 8,-8.000002 A 7.9999994,7.9999994 0 0 1 159,96.285156 V 81 c 0,-0.554003 -0.44599,-1 -1,-1 z"
+         style="fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:0.41926283px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         inkscape:connector-curvature="0" />
+      <flowRoot
+         transform="matrix(0.26458333,0,0,0.26458333,5.9732715,128.20119)"
+         style="font-style:normal;font-weight:normal;font-size:10.66666698px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+         id="flowRoot2048-5-4"
+         xml:space="preserve"><flowRegion
+           style="fill:#ffffff"
+           id="flowRegion2050-8-7"><rect
+             style="fill:#ffffff"
+             y="224"
+             x="48"
+             height="16"
+             width="96"
+             id="rect2052-7-4" /></flowRegion><flowPara
+           id="flowPara2054-0-4">TOGGLE IF</flowPara></flowRoot>    </g>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot2040-9-3"
+       style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       transform="matrix(0,-0.26458333,0.26458333,0,-43.423978,192.44805)"><flowRegion
+         id="flowRegion2042-1-0"
+         style="font-size:16px"><rect
+           id="rect2044-0-78"
+           width="96"
+           height="64"
+           x="0"
+           y="128"
+           style="font-size:16px" /></flowRegion><flowPara
+         id="flowPara2046-7-6">Tile</flowPara></flowRoot>  </g>
 </svg>

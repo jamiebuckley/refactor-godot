@@ -18,12 +18,13 @@ logic_modal_path = NodePath("LogicDialog")
 option_label_path = NodePath("MarginContainer/VBoxContainer/HBoxContainer/BuildLabel")
 
 [node name="LogicDialog" type="WindowDialog" parent="."]
+visible = true
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 183.0
-margin_top = 163.0
-margin_right = -249.0
-margin_bottom = -113.0
+margin_left = 48.6871
+margin_top = 71.5987
+margin_right = -156.313
+margin_bottom = -48.4014
 size_flags_horizontal = 0
 size_flags_vertical = 0
 resizable = true
@@ -37,8 +38,8 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="ViewportContainer" type="ViewportContainer" parent="LogicDialog/MarginContainer"]
-margin_right = 592.0
-margin_bottom = 324.0
+margin_right = 819.0
+margin_bottom = 479.0
 mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -46,13 +47,13 @@ size_flags_stretch_ratio = 0.0
 stretch = true
 
 [node name="LogicMinigame" type="Viewport" parent="LogicDialog/MarginContainer/ViewportContainer"]
-size = Vector2( 1024, 768 )
-own_world = true
+size = Vector2( 819, 479 )
 world = SubResource( 1 )
 transparent_bg = true
+handle_input_locally = false
 disable_3d = true
 usage = 0
-render_target_update_mode = 0
+render_target_update_mode = 3
 
 [node name="Node2D" parent="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" instance=ExtResource( 3 )]
 
