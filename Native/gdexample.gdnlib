@@ -7,7 +7,7 @@ reloadable=false
 
 [entry]
 
-OSX.64="res://bin/osx/libgdexample.dylib"
+OSX.64="res://Native/cmake-build-debug/librefactor_native.dylib"
 Windows.64="res://bin/win64/libgdexample.dll"
 X11.64="res://Native/cmake-build-debug/librefactor_native.so"
 

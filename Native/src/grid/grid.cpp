@@ -57,7 +57,7 @@ std::shared_ptr<GridEntity> Grid::add_entity(int x, int z, godot::Vector3 orient
 
   auto tile = internal_grid[x * size + z];
   tile->entities.push_back(grid_entity);
-  grid_entity->setGridTile(std::weak_ptr(tile));
+  grid_entity->setGridTile(std::weak_ptr<GridTile>(tile));
 
   return grid_entity;
 }
