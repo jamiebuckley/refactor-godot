@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <godot_entities/godot_worker.h>
+#include <logic/logic_editor.h>
 
 using namespace godot;
 
@@ -22,4 +23,5 @@ extern "C" void GDN_EXPORT godot_nativescript_init(void *handle) {
     godot::Godot::nativescript_init(handle);
     godot::register_class<Game>();
     godot::register_class<GodotWorker>();
+    godot::register_class<Refactor::LogicEditor>();
 }

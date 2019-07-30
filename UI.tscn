@@ -1,11 +1,7 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Scripts/UI/UI.gd" type="Script" id=1]
-[ext_resource path="res://default_env.tres" type="Environment" id=2]
-[ext_resource path="res://LogicMiniGame.tscn" type="PackedScene" id=3]
-
-[sub_resource type="World" id=1]
-environment = ExtResource( 2 )
+[ext_resource path="res://LogicMiniGame.tscn" type="PackedScene" id=2]
 
 [node name="Control" type="Control"]
 anchor_right = 1.0
@@ -27,6 +23,7 @@ margin_right = -156.313
 margin_bottom = -48.4014
 size_flags_horizontal = 0
 size_flags_vertical = 0
+window_title = "Logic"
 resizable = true
 
 [node name="MarginContainer" type="MarginContainer" parent="LogicDialog"]
@@ -38,7 +35,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="ViewportContainer" type="ViewportContainer" parent="LogicDialog/MarginContainer"]
-margin_right = 819.0
+margin_right = 818.0
 margin_bottom = 479.0
 mouse_filter = 2
 size_flags_horizontal = 3
@@ -47,15 +44,14 @@ size_flags_stretch_ratio = 0.0
 stretch = true
 
 [node name="LogicMinigame" type="Viewport" parent="LogicDialog/MarginContainer/ViewportContainer"]
-size = Vector2( 819, 479 )
-world = SubResource( 1 )
+size = Vector2( 818, 479 )
 transparent_bg = true
 handle_input_locally = false
 disable_3d = true
 usage = 0
 render_target_update_mode = 3
 
-[node name="Node2D" parent="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" instance=ExtResource( 3 )]
+[node name="Node2D" parent="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" instance=ExtResource( 2 )]
 
 [node name="WindowDialog" type="WindowDialog" parent="."]
 margin_left = 206.852
@@ -151,35 +147,29 @@ anchor_bottom = 1.0
 mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_constants/margin_right = 32
-custom_constants/margin_top = 32
-custom_constants/margin_left = 32
-custom_constants/margin_bottom = 32
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
-margin_left = 32.0
-margin_top = 32.0
-margin_right = 992.0
-margin_bottom = 568.0
+margin_right = 1024.0
+margin_bottom = 600.0
 mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
-margin_right = 960.0
+margin_right = 1024.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 0, 50 )
 alignment = 2
 
 [node name="BuildLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-margin_left = 856.0
+margin_left = 920.0
 margin_top = 18.0
-margin_right = 856.0
+margin_right = 920.0
 margin_bottom = 32.0
 
 [node name="BuildButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-margin_left = 860.0
-margin_right = 960.0
+margin_left = 924.0
+margin_right = 1024.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 100, 0 )
 size_flags_horizontal = 0
