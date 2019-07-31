@@ -12,9 +12,7 @@ namespace Refactor {
 
     enum class LogicNodeConnection {
         BOOLEAN,
-        DATA_WORKER_HAS,
-        DATA_WORKER_IS,
-        DATA_COUNTER,
+        COUNTER,
         NUMERICAL_COMPARISON,
         NUMBER,
         WORKER_TYPE,
@@ -43,7 +41,12 @@ namespace Refactor {
         ~LogicNodeTypes() = default;
 
     public:
-        const LogicNodeType* AND = new LogicNodeType{
+        const LogicNodeType *NOT = new LogicNodeType{
+                .connections_out =  {NLNC{"Out", LNC::BOOLEAN}},
+                .connections_in = {NLNC{"Value 1 In", LNC::BOOLEAN}}
+        };
+
+        const LogicNodeType *AND = new LogicNodeType{
                 .connections_out =  {NLNC{"Out", LNC::BOOLEAN}},
                 .connections_in = {
                         NLNC{"Value 1 In", LNC::BOOLEAN},
@@ -59,9 +62,22 @@ namespace Refactor {
                 }
         };
 
+        const LogicNodeType *XOR = new LogicNodeType{
+                .connections_out =  {NLNC{"Out", LNC::BOOLEAN}},
+                .connections_in = {
+                        NLNC{"Value 1 In", LNC::BOOLEAN},
+                        NLNC{"Value 2 In", LNC::BOOLEAN}
+                }
+        };
+
         const LogicNodeType *WORKER_IS = new LogicNodeType{
                 .connections_out =  {NLNC{"Out", LNC::BOOLEAN}},
-                .connections_in = {NLNC{"Value is", LNC::NUMERICAL_COMPARISON}}
+                .connections_in = {NLNC{"Value is", LNC::WORKER_TYPE}}
+        };
+
+        const LogicNodeType *WORKER_HAS = new LogicNodeType{
+                .connections_out =  {NLNC{"Out", LNC::BOOLEAN}},
+                .connections_in = {NLNC{"Value is", LNC::INVENTORY_ITEM}, NLNC{"Value is", LNC::NUMERICAL_COMPARISON}}
         };
 
         const LogicNodeType *COUNTER_IS = new LogicNodeType{
