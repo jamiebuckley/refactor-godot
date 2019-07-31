@@ -1,8 +1,6 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=2 format=2]
 
 [ext_resource path="res://Native/logic_editor.gdns" type="Script" id=1]
-[ext_resource path="res://Prototypes/Logic/LogicEntrance.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Prototypes/Logic/LogicAction.tscn" type="PackedScene" id=3]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 1 )
@@ -15,15 +13,3 @@ position = Vector2( 514.687, 297.329 )
 scale = Vector2( -0.719768, 1.5158 )
 current = true
 editor_draw_limits = true
-
-[node name="EntranceBlock" parent="." instance=ExtResource( 2 )]
-position = Vector2( 137.738, 110 )
-scale = Vector2( 0.25, 0.25 )
-
-[node name="TileBlock" parent="." instance=ExtResource( 2 )]
-position = Vector2( 137.738, 250 )
-scale = Vector2( 0.25, 0.25 )
-
-[node name="Node2D" parent="." instance=ExtResource( 3 )]
-position = Vector2( 247.738, 110 )
-scale = Vector2( 0.25, 0.25 )
