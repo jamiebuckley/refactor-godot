@@ -1,6 +1,9 @@
 //
 // Created by jamie on 24/06/19.
 //
+#include <Godot.hpp>
+#include <map>
+#include <string>
 
 #ifndef REFACTOR_NATIVE_COMMON_H
 #define REFACTOR_NATIVE_COMMON_H
@@ -14,6 +17,16 @@ namespace Refactor {
         BLOCK,
         LOGIC,
         NONE
+    };
+
+    const std::map<EntityType, std::string> entity_type_names = {
+            {EntityType::WORKER, "Worker"},
+            {EntityType::ENTRANCE, "Entrance"},
+            {EntityType::EXIT, "Exit"},
+            {EntityType::TILE, "Tile"},
+            {EntityType::BLOCK, "Block"},
+            {EntityType::LOGIC, "Logic"},
+            {EntityType::NONE, "None"},
     };
 
     const godot::Vector3 ORIENTATION_NORTH = godot::Vector3(0, 0, -1);

@@ -5,6 +5,6 @@
 #include "logic/logic_node.h"
 
 TEST_CASE( "Things happen", "[LogicNode]" ) {
-  auto logic_node = Refactor::LogicNode();
-  REQUIRE(logic_node.stuff());
+
+
 }

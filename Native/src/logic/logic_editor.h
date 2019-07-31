@@ -7,7 +7,12 @@
 
 #include <Godot.hpp>
 #include <Node2D.hpp>
-#include "logic_root_node.h"
+
+#include <vector>
+#include <memory>
+#include <map>
+#include <gen/PackedScene.hpp>
+#include "logic_node.h"
 
 namespace Refactor {
 class LogicEditor: public godot::Node2D {
@@ -18,6 +23,14 @@ class LogicEditor: public godot::Node2D {
             void _init();
             void _ready();
             void _process(float delta);
+
+        private:
+          std::vector<std::shared_ptr<LogicRootNode>> root_nodes;
+          void redraw_tree();
+
+          std::map<Refactor::EntityType, godot::PackedScene> root_node_type_to_scene_map;
+
+          std::map<int, godot::PackedScene> node_type__to_scene_map;
     };
 }
 
