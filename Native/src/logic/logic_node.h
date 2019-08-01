@@ -95,9 +95,9 @@ static int logic_node_type_id = 0;
         const LogicNodeType *INVENTORY_ITEM = NODE_TYPE1_0("Inventory item", INVENTORY_ITEM("Out"));
 
         const LogicNodeType *COUNTER_IS = NODE_TYPE1_1("Counter is", BOOL("Out"), NUMERICAL_COMPARISON("In 1"));
-        const LogicNodeType *NUMERICAL_EQUALS = NODE_TYPE1_1("Numerical equals", NUMERICAL_COMPARISON("Out"), NUMBER("In 1"));
-        const LogicNodeType *NUMERICAL_GREATER_THAN = NODE_TYPE1_1("Numerical greater than", NUMERICAL_COMPARISON("Out"), NUMBER("In 1"));
-        const LogicNodeType *NUMERICAL_LESS_THAN = NODE_TYPE1_1("Numerical less than", NUMERICAL_COMPARISON("Out"), NUMBER("In 1"));
+        const LogicNodeType *NUMERICAL_EQUALS = NODE_TYPE1_1("Equals", NUMERICAL_COMPARISON("Out"), NUMBER("In 1"));
+        const LogicNodeType *NUMERICAL_GREATER_THAN = NODE_TYPE1_1("Greater than", NUMERICAL_COMPARISON("Out"), NUMBER("In 1"));
+        const LogicNodeType *NUMERICAL_LESS_THAN = NODE_TYPE1_1("Less than", NUMERICAL_COMPARISON("Out"), NUMBER("In 1"));
         const LogicNodeType *NUMBER = NODE_TYPE1_0("Number", NUMBER("Out"));
 
         static LogicNodeTypes *getInstance() {

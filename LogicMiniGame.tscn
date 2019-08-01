@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Native/logic_editor.gdns" type="Script" id=1]
+[ext_resource path="res://Assets/Textures/blueprints.jpg" type="Texture" id=2]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 1 )
@@ -13,3 +14,9 @@ position = Vector2( 514.687, 297.329 )
 scale = Vector2( -0.719768, 1.5158 )
 current = true
 editor_draw_limits = true
+
+[node name="TextureRect" type="TextureRect" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+mouse_filter = 2
+texture = ExtResource( 2 )

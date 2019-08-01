@@ -8,6 +8,7 @@
 #include <Godot.hpp>
 #include <Node2D.hpp>
 #include <Texture.hpp>
+#include <AtlasTexture.hpp>
 #include <Label.hpp>
 
 #include <vector>
@@ -31,11 +32,17 @@ class LogicEditor: public godot::Node2D {
           void redraw_tree();
 
           godot::Node2D* create_root_node(EntityType entity_type);
-          godot::Node2D* create_node(LogicNodeType logic_node_type);
+          godot::Node2D* create_node(const LogicNodeType* logic_node_type);
 
           std::map<Refactor::EntityType, godot::Ref<godot::PackedScene>> root_node_type_to_scene_map;
           std::map<int, godot::PackedScene> node_type__to_scene_map;
-    };
+
+          std::map<LogicNodeConnection, godot::AtlasTexture*> logic_in_atlas_map;
+          std::map<LogicNodeConnection, godot::AtlasTexture*> logic_out_atlas_map;
+          godot::AtlasTexture* main_body_atlas;
+
+    void create_atlas();
+};
 }
 
 
