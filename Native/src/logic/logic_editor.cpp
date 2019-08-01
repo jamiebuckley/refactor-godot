@@ -4,6 +4,8 @@
 
 #include <gen/ResourceLoader.hpp>
 #include <gen/Spatial.hpp>
+#include <gen/TextureRect.hpp>
+#include <gen/Label.hpp>
 #include "logic_editor.h"
 
 using namespace Refactor;
@@ -68,10 +70,29 @@ void LogicEditor::redraw_tree() {
       continue;
     }
 
-    auto root_node_scene = root_node_type_to_scene_map[root->get_type()];
-    auto instance = root_node_scene->instance();
-    auto spatial = cast_to<godot::Node2D>(instance);
-    spatial->set_position(godot::Vector2(200.0f, 100.0f));
-    add_child(spatial);
+    auto root_node_scene = create_root_node(root->get_type());
+    root_node_scene->set_position(godot::Vector2(200.0f, 100.0f));
+    add_child(root_node_scene);
   }
+}
+
+godot::Node2D *LogicEditor::create_root_node(EntityType entity_type) {
+    auto resource_loader = godot::ResourceLoader::get_singleton();
+    auto root_node = godot::Node2D::_new();
+    auto texture_rect = godot::TextureRect::_new();
+    texture_rect->set_texture(resource_loader->load("res://Assets/Textures/logic_input_nameless.png"));
+    root_node->add_child(texture_rect);
+
+    auto label = godot::Label::_new();
+    label->set_text("Tile");
+    label->set("custom_fonts/font", resource_loader->load("res://Assets/Fonts/Montserrat.tres"));
+    label->set_position(godot::Vector2(50, 50));
+    root_node->add_child(label);
+
+    root_node->set_scale(godot::Vector2(0.2f, 0.2f));
+    return root_node;
+}
+
+godot::Node2D *LogicEditor::create_node(LogicNodeType logic_node_type) {
+    return nullptr;
 }

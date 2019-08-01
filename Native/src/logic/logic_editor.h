@@ -7,6 +7,8 @@
 
 #include <Godot.hpp>
 #include <Node2D.hpp>
+#include <Texture.hpp>
+#include <Label.hpp>
 
 #include <vector>
 #include <memory>
@@ -28,8 +30,10 @@ class LogicEditor: public godot::Node2D {
           std::vector<std::shared_ptr<LogicRootNode>> root_nodes;
           void redraw_tree();
 
-          std::map<Refactor::EntityType, godot::Ref<godot::PackedScene>> root_node_type_to_scene_map;
+          godot::Node2D* create_root_node(EntityType entity_type);
+          godot::Node2D* create_node(LogicNodeType logic_node_type);
 
+          std::map<Refactor::EntityType, godot::Ref<godot::PackedScene>> root_node_type_to_scene_map;
           std::map<int, godot::PackedScene> node_type__to_scene_map;
     };
 }
