@@ -6,15 +6,22 @@
 #define REFACTOR_NATIVE_LOGIC_EDITOR_H
 
 #include <Godot.hpp>
+#include <SceneTree.hpp>
+#include <Viewport.hpp>
 #include <Node2D.hpp>
 #include <Texture.hpp>
 #include <AtlasTexture.hpp>
 #include <Label.hpp>
+#include <PackedScene.hpp>
+#include <HBoxContainer.hpp>
+#include <ResourceLoader.hpp>
+#include <Spatial.hpp>
+#include <TextureRect.hpp>
 
 #include <vector>
 #include <memory>
 #include <map>
-#include <gen/PackedScene.hpp>
+
 #include "logic_node.h"
 
 namespace Refactor {

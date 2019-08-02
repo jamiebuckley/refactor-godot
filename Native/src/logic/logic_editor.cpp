@@ -1,12 +1,6 @@
 //
 // Created by jamie on 30/07/19.
 //
-
-#include <gen/ResourceLoader.hpp>
-#include <gen/Spatial.hpp>
-#include <gen/TextureRect.hpp>
-#include <gen/Label.hpp>
-#include <gen/AtlasTexture.hpp>
 #include "logic_editor.h"
 
 using namespace Refactor;
@@ -25,13 +19,33 @@ void LogicEditor::_ready() {
   godot::Godot::print("LogicEditor::ready");
   this->create_atlas();
 
+  auto logic_node_types = LogicNodeTypes::getInstance();
+  auto all_types = logic_node_types->toVector();
+
+  auto logic_toolbox = get_tree()->get_root()->find_node("LogicToolbox", true, false);
+  if (logic_toolbox == nullptr) {
+    godot::Godot::print("failed to find logic toolbox");
+    return;
+  }
+
+  for(int i = 1; i < all_types.size(); i++) {
+    auto current_type = all_types[i];
+    auto visual_node = create_node(current_type);
+    visual_node->set_scale(godot::Vector2(0.1, 0.1));
+
+    auto control = godot::Control::_new();
+    control->add_child(visual_node);
+    visual_node->set_position(godot::Vector2(5, 5));
+    control->set_custom_minimum_size(godot::Vector2(150, 100));
+    logic_toolbox->add_child(control);
+  }
+
   auto resource_loader = godot::ResourceLoader::get_singleton();
 
   auto logic_entrance = resource_loader->load("res://Prototypes/Logic/LogicEntrance.tscn");
   root_node_type_to_scene_map.insert(
-          std::pair<EntityType, godot::Ref<godot::PackedScene>>(EntityType::TILE, logic_entrance));
+      std::pair<EntityType, godot::Ref<godot::PackedScene>>(EntityType::TILE, logic_entrance));
 
-  auto logic_node_types = LogicNodeTypes::getInstance();
   auto root = std::make_shared<LogicRootNode>(LogicRootNode(EntityType::TILE));
 
   auto node_toggle_if = std::make_shared<LogicNode>(logic_node_types->TOGGLE_IF);
@@ -69,13 +83,13 @@ void LogicEditor::redraw_tree() {
     auto root = root_nodes[i];
     if (root_node_type_to_scene_map.find(root->get_type()) == root_node_type_to_scene_map.end()) {
       std::string message =
-              "Could not find matching scene for root logic node " + entity_type_names.at(root->get_type());
+          "Could not find matching scene for root logic node " + entity_type_names.at(root->get_type());
       godot::Godot::print(message.c_str());
       continue;
     }
 
     auto logic_node_types = LogicNodeTypes::getInstance();
-    auto root_node_scene = create_node(logic_node_types->NUMERICAL_EQUALS);
+    auto root_node_scene = create_node(logic_node_types->WORKER_TYPE);
     root_node_scene->set_position(godot::Vector2(200.0f, 100.0f));
     add_child(root_node_scene);
   }
@@ -88,17 +102,6 @@ godot::Node2D *LogicEditor::create_root_node(EntityType entity_type) {
   auto main_block_texture_rect = godot::TextureRect::_new();
   main_block_texture_rect->set_texture(main_body_atlas);
   logic_background_node->add_child(main_block_texture_rect);
-
-  auto out_logic_texture_rect = godot::TextureRect::_new();
-  out_logic_texture_rect->set_texture(logic_out_atlas_map[LogicNodeConnection::BOOLEAN]);
-  out_logic_texture_rect->set_position(godot::Vector2(-16 * 3, 16 * 10));
-  logic_background_node->add_child(out_logic_texture_rect);
-
-  auto in_logic_texture_rect = godot::TextureRect::_new();
-  in_logic_texture_rect->set_texture(logic_in_atlas_map[LogicNodeConnection::BOOLEAN]);
-  in_logic_texture_rect->set_position(godot::Vector2(512 - 16 * 3, 16 * 10));
-  logic_background_node->add_child(in_logic_texture_rect);
-  logic_background_node->set_modulate(godot::Color::html("#eb4034"));
 
   auto root_node = godot::Node2D::_new();
   root_node->add_child(logic_background_node);
@@ -113,29 +116,55 @@ godot::Node2D *LogicEditor::create_root_node(EntityType entity_type) {
   return root_node;
 }
 
-godot::Node2D *LogicEditor::create_node(const LogicNodeType* logic_node_type) {
+godot::Node2D *LogicEditor::create_node(const LogicNodeType *logic_node_type) {
   auto resource_loader = godot::ResourceLoader::get_singleton();
   auto logic_background_node = godot::Node2D::_new();
+
+  const int grid_size = 16;
+  const int connector_width = grid_size * 3;
+
+  const int connector1_y_offset = grid_size * 10;
+  const int connector2_y_offset = grid_size * 26 + grid_size * 10;
+
+  const godot::Vector2 output_pos = godot::Vector2(-connector_width, connector1_y_offset);
+  const godot::Vector2 input_1_pos = godot::Vector2(512 - connector_width, connector1_y_offset);
+  const godot::Vector2 input_2_pos = godot::Vector2(512 - connector_width, connector2_y_offset);
+
+  int logic_node_num_inputs = logic_node_type->connections_in.size();
 
   auto main_block_texture_rect = godot::TextureRect::_new();
   main_block_texture_rect->set_texture(main_body_atlas);
   logic_background_node->add_child(main_block_texture_rect);
 
+  if (logic_node_num_inputs == 2) {
+    auto secondary_block_texture_rect = godot::TextureRect::_new();
+    secondary_block_texture_rect->set_position(godot::Vector2(0, 26 * 16));
+    secondary_block_texture_rect->set_texture(main_body_atlas);
+    logic_background_node->add_child(secondary_block_texture_rect);
+  }
+
   if (logic_node_type->connection_out.connection_type != LogicNodeConnection::NONE) {
     auto out_logic_texture_rect = godot::TextureRect::_new();
     out_logic_texture_rect->set_texture(logic_out_atlas_map[logic_node_type->connection_out.connection_type]);
-    out_logic_texture_rect->set_position(godot::Vector2(-16 * 3, 16 * 10));
+    out_logic_texture_rect->set_position(output_pos);
     logic_background_node->add_child(out_logic_texture_rect);
   }
 
-  if (logic_node_type->connections_in[0].connection_type != LogicNodeConnection::NONE) {
+  if (logic_node_num_inputs > 0 && logic_node_type->connections_in[0].connection_type != LogicNodeConnection::NONE) {
     auto in_logic_texture_rect = godot::TextureRect::_new();
     in_logic_texture_rect->set_texture(logic_in_atlas_map[logic_node_type->connections_in[0].connection_type]);
-    in_logic_texture_rect->set_position(godot::Vector2(512 - 16 * 3, 16 * 10));
+    in_logic_texture_rect->set_position(input_1_pos);
     logic_background_node->add_child(in_logic_texture_rect);
   }
 
-  logic_background_node->set_modulate(godot::Color::html("#eb4034"));
+  if (logic_node_num_inputs == 2 && logic_node_type->connections_in[1].connection_type != LogicNodeConnection::NONE) {
+    auto in_logic_texture_rect = godot::TextureRect::_new();
+    in_logic_texture_rect->set_texture(logic_in_atlas_map[logic_node_type->connections_in[1].connection_type]);
+    in_logic_texture_rect->set_position(input_2_pos);
+    logic_background_node->add_child(in_logic_texture_rect);
+  }
+
+  logic_background_node->set_modulate(godot::Color::html(godot::String(logic_node_type->color.c_str())));
 
   auto root_node = godot::Node2D::_new();
   root_node->add_child(logic_background_node);
