@@ -1,6 +1,8 @@
 //
 // Created by jamie on 30/07/19.
 //
+#include <gen/CollisionShape2D.hpp>
+#include <gen/RectangleShape2D.hpp>
 #include "logic_editor.h"
 
 using namespace Refactor;
@@ -9,6 +11,8 @@ void LogicEditor::_register_methods() {
   register_method("init", &LogicEditor::_init);
   register_method("_ready", &LogicEditor::_ready);
   register_method("_process", &LogicEditor::_process);
+  register_method("_unhandled_input", &LogicEditor::_unhandled_input);
+  register_method("on_logic_piece_input_event", &LogicEditor::on_logic_piece_input_event);
 }
 
 void LogicEditor::_init() {
@@ -28,16 +32,19 @@ void LogicEditor::_ready() {
     return;
   }
 
+  /**
+   * Create a node for each type
+   */
   for(int i = 1; i < all_types.size(); i++) {
     auto current_type = all_types[i];
     auto visual_node = create_node(current_type);
-    visual_node->set_scale(godot::Vector2(0.1, 0.1));
+    visual_node->set_scale(godot::Vector2(0.2, 0.2));
 
-    auto control = godot::Control::_new();
-    control->add_child(visual_node);
+    auto pickable_control = godot::Control::_new();
+    pickable_control->add_child(visual_node);
     visual_node->set_position(godot::Vector2(5, 5));
-    control->set_custom_minimum_size(godot::Vector2(150, 100));
-    logic_toolbox->add_child(control);
+    pickable_control->set_custom_minimum_size(godot::Vector2(150, 150));
+    logic_toolbox->add_child(pickable_control);
   }
 
   auto resource_loader = godot::ResourceLoader::get_singleton();
@@ -46,33 +53,78 @@ void LogicEditor::_ready() {
   root_node_type_to_scene_map.insert(
       std::pair<EntityType, godot::Ref<godot::PackedScene>>(EntityType::TILE, logic_entrance));
 
-  auto root = std::make_shared<LogicRootNode>(LogicRootNode(EntityType::TILE));
 
-  auto node_toggle_if = std::make_shared<LogicNode>(logic_node_types->TOGGLE_IF);
-  node_toggle_if->set_root_output(root);
-  root->put_root(node_toggle_if);
-
-  auto node_worker_has = std::make_shared<LogicNode>(logic_node_types->WORKER_HAS);
-  node_worker_has->set_output(node_toggle_if);
-  node_toggle_if->set_input_1(node_worker_has);
-
-  auto node_coal = std::make_shared<LogicNode>(logic_node_types->INVENTORY_ITEM);
-  node_coal->set_output(node_worker_has);
-  node_worker_has->set_input_1(node_coal);
-
-  auto node_equals = std::make_shared<LogicNode>(logic_node_types->NUMERICAL_EQUALS);
-  node_coal->set_output(node_worker_has);
-  node_worker_has->set_input_2(node_equals);
-
-  auto node_one = std::make_shared<LogicNode>(logic_node_types->NUMBER);
-  node_one->set_output(node_equals);
-
-  root_nodes.emplace_back(root);
+//  // constructing tree
+//  auto root = std::make_shared<LogicRootNode>(LogicRootNode(EntityType::TILE));
+//  auto node_toggle_if = std::make_shared<LogicNode>(logic_node_types->TOGGLE_IF);
+//  node_toggle_if->set_root_output(root);
+//  root->put_root(node_toggle_if);
+//
+//  auto node_worker_has = std::make_shared<LogicNode>(logic_node_types->WORKER_HAS);
+//  node_worker_has->set_output(node_toggle_if);
+//  node_toggle_if->set_input_1(node_worker_has);
+//
+//  auto node_coal = std::make_shared<LogicNode>(logic_node_types->INVENTORY_ITEM);
+//  node_coal->set_output(node_worker_has);
+//  node_worker_has->set_input_1(node_coal);
+//
+//  auto node_equals = std::make_shared<LogicNode>(logic_node_types->NUMERICAL_EQUALS);
+//  node_coal->set_output(node_worker_has);
+//  node_worker_has->set_input_2(node_equals);
+//
+//  auto node_one = std::make_shared<LogicNode>(logic_node_types->NUMBER);
+//  node_one->set_output(node_equals);
+//
+//  root_nodes.emplace_back(root);
   this->redraw_tree();
 }
 
 void LogicEditor::_process(float delta) {
+  if(dragged_node != nullptr) {
+    auto mouse_position = get_viewport()->get_mouse_position();
+    mouse_position.x -= 75;
+    mouse_position.y -= 50;
 
+    dragged_node->set_position(mouse_position);
+  }
+  // if the mouse button is down
+  // and it wasn't down previously
+  // and it is over one of the selection options
+  // assign the selection option as a drag item
+
+  // if the mouse button is up
+  // and is was down previously
+  // and a selection item is being dragged
+  // - if it is over the main area
+  // drop it on, and try to snap it to a tile
+  // - if it is over the toolbox area
+  // remove it
+
+  // if the mouse button is down
+  // and it was down previously
+  // and an item is being dragged
+  // draw the item at the current mouse position
+  // or snap it to a tree element if it is close enough and of the right type
+
+  // if the mouse button is up
+  // if it is over one of the selection options
+  // change the color of the selection options
+}
+
+void LogicEditor::_unhandled_input(const godot::InputEvent *event) {
+  if(event->get_class() == "InputEventMouseButton") {
+    auto mouse_event = reinterpret_cast<const godot::InputEventMouseButton *>(event);
+    if (mouse_event->get_button_index() == 1) {
+      if (mouse_event->is_pressed()) {
+        is_mouse_pressed = true;
+      } else {
+        if (is_mouse_pressed) {
+          dragged_node = nullptr;
+        }
+        is_mouse_pressed = false;
+      }
+    }
+  }
 }
 
 void LogicEditor::redraw_tree() {
@@ -88,7 +140,6 @@ void LogicEditor::redraw_tree() {
       continue;
     }
 
-    auto logic_node_types = LogicNodeTypes::getInstance();
     auto root_node_scene = create_node(logic_node_types->WORKER_TYPE);
     root_node_scene->set_position(godot::Vector2(200.0f, 100.0f));
     add_child(root_node_scene);
@@ -167,6 +218,7 @@ godot::Node2D *LogicEditor::create_node(const LogicNodeType *logic_node_type) {
   logic_background_node->set_modulate(godot::Color::html(godot::String(logic_node_type->color.c_str())));
 
   auto root_node = godot::Node2D::_new();
+  root_node->set_name(godot::String(logic_node_type->name.c_str()));
   root_node->add_child(logic_background_node);
 
   auto label = godot::Label::_new();
@@ -176,6 +228,18 @@ godot::Node2D *LogicEditor::create_node(const LogicNodeType *logic_node_type) {
   root_node->add_child(label);
   root_node->set_scale(godot::Vector2(0.2f, 0.2f));
 
+  auto area2d = godot::Area2D::_new();
+  area2d->set_name("area2d");
+
+  auto shape = godot::Ref<godot::RectangleShape2D>(godot::RectangleShape2D::_new());
+  shape->set_extents(godot::Vector2(150, 100));
+
+  int shape_owner = area2d->create_shape_owner(area2d);
+  area2d->shape_owner_add_shape(shape_owner, shape);
+  area2d->set_position(godot::Vector2(150, 100));
+  area2d->connect("input_event", this, "on_logic_piece_input_event", godot::Array::make(root_node, logic_node_type));
+
+  root_node->add_child(area2d);
   return root_node;
 }
 
@@ -207,5 +271,17 @@ void LogicEditor::create_atlas() {
 
   auto atlas = godot::AtlasTexture::_new();
   atlas->set_atlas(main_atlas_texture);
+}
 
+void LogicEditor::on_logic_piece_input_event(godot::Node *node, godot::InputEvent *input_event, int shape_idx, godot::Node* other) {
+  if(input_event->get_class() == "InputEventMouseButton") {
+    auto mouse_event = reinterpret_cast<const godot::InputEventMouseButton*>(input_event);
+    if (mouse_event->get_button_index() == 1) {
+      if (mouse_event->is_pressed()) {
+        dragged_node = cast_to<godot::Node2D>(other->duplicate());
+        dragged_node->set_position(mouse_event->get_position());
+        add_child(dragged_node);
+      }
+    }
+  }
 }

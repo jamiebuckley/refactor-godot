@@ -1,4 +1,4 @@
-extends Node2D
+extends Viewport
 
 # Declare member variables here. Examples:
 # var a = 2
@@ -6,13 +6,10 @@ extends Node2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	var native_grid = load("res://Native/logic_editor.gdns").new()
-	add_child(native_grid)
+	pass # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
-
-
-func on_logic_piece_input_event(viewport, event, shape_idx):
-	pass # Replace with function body.
+func _input(event):
+	unhandled_input(event)

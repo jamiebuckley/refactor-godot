@@ -17,6 +17,12 @@
 #include <ResourceLoader.hpp>
 #include <Spatial.hpp>
 #include <TextureRect.hpp>
+#include <Area2D.hpp>
+#include <CollisionShape2D.hpp>
+#include <CollisionObject2D.hpp>
+#include <InputEventMouseButton.hpp>
+#include <Shape2D.hpp>
+#include <InputEvent.hpp>
 
 #include <vector>
 #include <memory>
@@ -32,7 +38,9 @@ class LogicEditor: public godot::Node2D {
             static void _register_methods();
             void _init();
             void _ready();
+            void _unhandled_input(const godot::InputEvent* event);
             void _process(float delta);
+            void on_logic_piece_input_event(godot::Node* node, godot::InputEvent* input_event, int shape_idx, godot::Node* other);
 
         private:
           std::vector<std::shared_ptr<LogicRootNode>> root_nodes;
@@ -47,6 +55,8 @@ class LogicEditor: public godot::Node2D {
           std::map<LogicNodeConnection, godot::AtlasTexture*> logic_in_atlas_map;
           std::map<LogicNodeConnection, godot::AtlasTexture*> logic_out_atlas_map;
           godot::AtlasTexture* main_body_atlas;
+          godot::Node2D* dragged_node;
+          bool is_mouse_pressed;
 
     void create_atlas();
 };
