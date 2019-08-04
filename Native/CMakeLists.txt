@@ -19,7 +19,8 @@ set(SRC_FILES
         ${PROJECT_SOURCE_DIR}/grid/grid.cpp
         ${PROJECT_SOURCE_DIR}/godot_entities/godot_worker.cpp
         ${PROJECT_SOURCE_DIR}/logic/logic_editor.cpp
-        ${PROJECT_SOURCE_DIR}/logic/logic_node.cpp)
+        ${PROJECT_SOURCE_DIR}/logic/logic_node.cpp
+        ${PROJECT_SOURCE_DIR}/logic/logic_node_creator.cpp)
 
 include_directories(godot-cpp/godot_headers)
 include_directories(godot-cpp/include)

@@ -29,37 +29,40 @@
 #include <map>
 
 #include "logic_node.h"
+#include "logic_node_creator.h"
 
 namespace Refactor {
-class LogicEditor: public godot::Node2D {
-        GODOT_CLASS(LogicEditor, godot::Node2D)
 
-        public:
-            static void _register_methods();
-            void _init();
-            void _ready();
-            void _unhandled_input(const godot::InputEvent* event);
-            void _process(float delta);
-            void on_logic_piece_input_event(godot::Node* node, godot::InputEvent* input_event, int shape_idx, godot::Node* other);
+    class LogicEditor : public godot::Node2D {
+    GODOT_CLASS(LogicEditor, godot::Node2D)
 
-        private:
-          std::vector<std::shared_ptr<LogicRootNode>> root_nodes;
-          void redraw_tree();
+    public:
+        static void _register_methods();
 
-          godot::Node2D* create_root_node(EntityType entity_type);
-          godot::Node2D* create_node(const LogicNodeType* logic_node_type);
+        void _init();
 
-          std::map<Refactor::EntityType, godot::Ref<godot::PackedScene>> root_node_type_to_scene_map;
-          std::map<int, godot::PackedScene> node_type__to_scene_map;
+        void _ready();
 
-          std::map<LogicNodeConnection, godot::AtlasTexture*> logic_in_atlas_map;
-          std::map<LogicNodeConnection, godot::AtlasTexture*> logic_out_atlas_map;
-          godot::AtlasTexture* main_body_atlas;
-          godot::Node2D* dragged_node;
-          bool is_mouse_pressed;
+        void _unhandled_input(const godot::InputEvent *event);
 
-    void create_atlas();
-};
+        void _process(float delta);
+
+        void on_logic_piece_input_event(godot::Node *node, godot::InputEvent *input_event, int shape_idx,
+                                        godot::Node *other);
+
+    private:
+        std::vector<std::shared_ptr<LogicRootNode>> root_nodes;
+        void redraw_tree();
+        void draw_branch(godot::Vector2 offset, std::shared_ptr<LogicNode> tree_node);
+
+        ToolboxNode *dragged_node;
+        GhostNode *snapped_ghost_node;
+        std::vector<GhostNode *> ghost_nodes;
+
+        bool is_mouse_pressed;
+
+        std::unique_ptr<LogicNodeCreator> logic_node_creator;
+    };
 }
 
 

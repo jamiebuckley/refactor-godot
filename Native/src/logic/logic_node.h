@@ -9,35 +9,9 @@
 #include <vector>
 #include <memory>
 #include <common.h>
+#include <gen/Node2D.hpp>
 
 namespace Refactor {
-
-    class LogicNode;
-
-    class LogicRootNode {
-
-    private:
-        EntityType type;
-        std::shared_ptr<LogicNode> logic_tree;
-
-    public:
-        LogicRootNode(EntityType type) {
-          this->type = type;
-        }
-
-        std::shared_ptr<LogicNode> get_tree() {
-          return logic_tree;
-        }
-
-        void put_root(std::shared_ptr<LogicNode> node) {
-          this->logic_tree = node;
-        }
-
-        EntityType get_type() const {
-          return type;
-        }
-    };
-
 
     enum class LogicNodeConnection {
         NONE,
@@ -131,56 +105,107 @@ static int logic_node_type_id = 0;
 #undef NLNC
 #undef LNC
 
+    class LogicNode;
+
+    class LogicRootNode {
+
+    private:
+        EntityType type;
+        godot::Node2D* graphical_node;
+        godot::Node2D* ghost_node;
+        std::shared_ptr<LogicNode> logic_tree;
+
+    public:
+        LogicRootNode(EntityType type) {
+          this->type = type;
+        }
+
+        std::shared_ptr<LogicNode> get_tree() {
+          return logic_tree;
+        }
+
+        void put_root(std::shared_ptr<LogicNode> node) {
+          this->logic_tree = node;
+        }
+
+        EntityType get_type() const {
+          return type;
+        }
+
+        godot::Node2D *get_graphical_node() const {
+          return graphical_node;
+        }
+
+        void set_graphical_node(godot::Node2D *graphical_node) {
+          LogicRootNode::graphical_node = graphical_node;
+        }
+
+        godot::Node2D *get_ghost_node() const {
+          return ghost_node;
+        }
+
+        void set_ghost_node(godot::Node2D *ghost_node) {
+          LogicRootNode::ghost_node = ghost_node;
+        }
+    };
+
+    struct LogicNodeOutput {
+        bool is_root;
+    };
+
+    struct LogicNodeInput {
+        int index;
+        bool enabled;
+        godot::Node2D* ghost;
+        std::shared_ptr<LogicNode> node;
+    };
+
+
     class LogicNode {
     public:
-        explicit LogicNode(const LogicNodeType* logic_node_type) {
-          this->logic_node_type = logic_node_type;
+        explicit LogicNode(const LogicNodeType* type) {
+          this->logic_node_type = type;
+          this->output = {};
+          this->inputs = {
+                  std::make_shared<LogicNodeInput>(LogicNodeInput { .index = 0, .enabled = !type->connections_in.empty() }),
+                  std::make_shared<LogicNodeInput>(LogicNodeInput { .index = 1, .enabled = type->connections_in.size() > 1 })
+          };
         }
 
         const LogicNodeType* get_type() {
           return this->logic_node_type;
         }
 
-        void set_output(std::shared_ptr<LogicNode> _output) {
-          this->output = _output;
+        godot::Node2D *get_graphical_node() const {
+          return graphical_node;
         }
 
-        std::shared_ptr<LogicNode> get_output() {
-          return this->output;
+        void set_graphical_node(godot::Node2D *graphical_node) {
+          LogicNode::graphical_node = graphical_node;
         }
 
-        void set_root_output(std::shared_ptr<LogicRootNode> _output) {
-          this->root_output = _output;
+        const LogicNodeOutput &get_output() const {
+          return output;
         }
 
-        std::shared_ptr<LogicRootNode> get_root_output() {
-          return this->root_output;
+        void set_output(const LogicNodeOutput &output) {
+          LogicNode::output = output;
         }
 
-        void set_input_1(std::shared_ptr<LogicNode> _input) {
-          this->input_1 = _input;
+        std::vector<std::shared_ptr<LogicNodeInput>> get_inputs() {
+          return inputs;
         }
 
-        std::shared_ptr<LogicNode> get_input_1() {
-          return this->input_1;
-        }
-
-        void set_input_2(std::shared_ptr<LogicNode> _input) {
-          this->input_2 = _input;
-        }
-
-        std::shared_ptr<LogicNode> get_input_2() {
-          return this->input_2;
+        void set_inputs(const std::vector<std::shared_ptr<LogicNodeInput>> inputs) {
+          LogicNode::inputs = inputs;
         }
 
     private:
         const LogicNodeType *logic_node_type;
+        godot::Node2D* graphical_node = nullptr;
 
-        std::shared_ptr<LogicNode> output;
-        std::shared_ptr<LogicRootNode> root_output;
-
-        std::shared_ptr<LogicNode> input_1 = nullptr;
-        std::shared_ptr<LogicNode> input_2 = nullptr;
+        LogicNodeOutput output{};
+        std::vector<std::shared_ptr<LogicNodeInput>> inputs;
     };
 
 }

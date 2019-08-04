@@ -24,4 +24,6 @@ extern "C" void GDN_EXPORT godot_nativescript_init(void *handle) {
     godot::register_class<Game>();
     godot::register_class<GodotWorker>();
     godot::register_class<Refactor::LogicEditor>();
+    godot::register_class<Refactor::GhostNode>();
+    godot::register_class<Refactor::ToolboxNode>();
 }
