@@ -50,6 +50,8 @@ namespace Refactor {
         void on_logic_piece_input_event(godot::Node *node, godot::InputEvent *input_event, int shape_idx,
                                         godot::Node *other);
 
+        void handle_drag_release();
+
     private:
         std::vector<std::shared_ptr<LogicRootNode>> root_nodes;
         void redraw_tree();

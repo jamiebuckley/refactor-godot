@@ -151,6 +151,9 @@ static int logic_node_type_id = 0;
 
     struct LogicNodeOutput {
         bool is_root;
+        int root_index;
+        int parent_output_index;
+        std::shared_ptr<LogicNode> parent;
     };
 
     struct LogicNodeInput {
@@ -165,7 +168,7 @@ static int logic_node_type_id = 0;
     public:
         explicit LogicNode(const LogicNodeType* type) {
           this->logic_node_type = type;
-          this->output = {};
+          this->output = std::make_shared<LogicNodeOutput>();
           this->inputs = {
                   std::make_shared<LogicNodeInput>(LogicNodeInput { .index = 0, .enabled = !type->connections_in.empty() }),
                   std::make_shared<LogicNodeInput>(LogicNodeInput { .index = 1, .enabled = type->connections_in.size() > 1 })
@@ -184,11 +187,11 @@ static int logic_node_type_id = 0;
           LogicNode::graphical_node = graphical_node;
         }
 
-        const LogicNodeOutput &get_output() const {
+        std::shared_ptr<LogicNodeOutput> get_output() const {
           return output;
         }
 
-        void set_output(const LogicNodeOutput &output) {
+        void set_output(std::shared_ptr<LogicNodeOutput> output) {
           LogicNode::output = output;
         }
 
@@ -204,7 +207,7 @@ static int logic_node_type_id = 0;
         const LogicNodeType *logic_node_type;
         godot::Node2D* graphical_node = nullptr;
 
-        LogicNodeOutput output{};
+        std::shared_ptr<LogicNodeOutput> output;
         std::vector<std::shared_ptr<LogicNodeInput>> inputs;
     };
 

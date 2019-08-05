@@ -78,45 +78,57 @@ void LogicEditor::_unhandled_input(const godot::InputEvent *event) {
         is_mouse_pressed = true;
       } else {
         if (is_mouse_pressed) {
-          // mouse button has just been released
-          if (snapped_ghost_node != nullptr && dragged_node != nullptr) {
-            if (snapped_ghost_node->is_owned_by_root_node()) {
-              // dropping it on a root node
-              int root_index = snapped_ghost_node->get_root_index();
-              auto added_logic_node = std::make_shared<LogicNode>(LogicNode(dragged_node->get_logic_node_type()));
-              root_nodes[root_index]->put_root(added_logic_node);
-              root_nodes[root_index]->set_ghost_node(nullptr);
-            } else {
-              // dropping it on another node
-              auto owning_node = snapped_ghost_node->get_owning_node();
-              auto index = snapped_ghost_node->get_input_index();
-
-              // create a new node
-              auto added_logic_node = std::make_shared<LogicNode>(LogicNode(dragged_node->get_logic_node_type()));
-              owning_node->get_inputs()[index]->ghost = nullptr;
-              owning_node->get_inputs()[index]->node = added_logic_node;
-            }
-
-            ghost_nodes.erase(std::remove(ghost_nodes.begin(), ghost_nodes.end(), snapped_ghost_node),
-                              ghost_nodes.end());
-            remove_child(snapped_ghost_node);
-            remove_child(dragged_node);
-            dragged_node = nullptr;
-            redraw_tree();
-          }
-
-          // are we snapping to a ghost node?
-          // what is the parent node?
-          // add the dragged logic node type to the parent node
-          // remove the dragged node
-          // remove the ghost node
-          // redraw the tree
-          dragged_node = nullptr;
+          handle_drag_release();
         }
         is_mouse_pressed = false;
       }
     }
   }
+}
+
+void LogicEditor::handle_drag_release() {
+  if (dragged_node == nullptr) {
+    return;
+  }
+
+  if (snapped_ghost_node != nullptr) {
+    if (snapped_ghost_node->is_owned_by_root_node()) {
+      // dropping it on a root node
+      int root_index = snapped_ghost_node->get_root_index();
+      auto added_logic_node = std::make_shared<LogicNode>(LogicNode(dragged_node->get_logic_node_type()));
+      root_nodes[root_index]->put_root(added_logic_node);
+      root_nodes[root_index]->set_ghost_node(nullptr);
+    } else {
+      // dropping it on branch/leaf
+      auto owning_node = snapped_ghost_node->get_owning_node();
+      auto index = snapped_ghost_node->get_input_index();
+
+      // create a new node
+      auto added_logic_node = std::make_shared<LogicNode>(LogicNode(dragged_node->get_logic_node_type()));
+      added_logic_node->get_output()->parent = owning_node;
+      owning_node->get_inputs()[index]->ghost = nullptr;
+      owning_node->get_inputs()[index]->node = added_logic_node;
+    }
+
+    ghost_nodes.erase(std::remove(ghost_nodes.begin(),
+                                  ghost_nodes.end(),
+                                  snapped_ghost_node),
+                      ghost_nodes.end());
+
+    remove_child(snapped_ghost_node);
+    remove_child(dragged_node);
+
+    dragged_node = nullptr;
+    redraw_tree();
+  }
+
+  // are we snapping to a ghost node?
+  // what is the parent node?
+  // add the dragged logic node type to the parent node
+  // remove the dragged node
+  // remove the ghost node
+  // redraw the tree
+  dragged_node = nullptr;
 }
 
 void LogicEditor::on_logic_piece_input_event(godot::Node *node, godot::InputEvent *input_event, int shape_idx,
@@ -125,15 +137,27 @@ void LogicEditor::on_logic_piece_input_event(godot::Node *node, godot::InputEven
     auto mouse_event = reinterpret_cast<const godot::InputEventMouseButton *>(input_event);
     if (mouse_event->is_pressed() && mouse_event->get_button_index() == 1) {
       auto original_node = cast_to<ToolboxNode>(other);
+
       if (original_node->is_in_toolbox()) {
-        auto toolbox_node =  cast_to<ToolboxNode>(other);
+        // dragging from toolbox
+        auto toolbox_node = cast_to<ToolboxNode>(other);
         dragged_node = logic_node_creator->create_node(toolbox_node->get_logic_node_type());
         dragged_node->set_in_toolbox(false);
         dragged_node->set_logic_node_type(original_node->get_logic_node_type());
         dragged_node->set_position(mouse_event->get_position());
         add_child(dragged_node);
       } else {
+        // dragging from screen
         dragged_node = original_node;
+        auto logic_node = dragged_node->get_logic_node();
+        auto output = logic_node->get_output();
+        if (output != nullptr && !output->is_root) {
+          //iterate over tree and remove all ghost nodes
+          output->parent->get_inputs()[output->parent_output_index]->node = nullptr;
+          redraw_tree();
+        }
+        // find the parent
+        // set the corresponding input node to null
         // tell the parent that the node has been removed
       }
     }
@@ -185,22 +209,22 @@ void LogicEditor::draw_branch(godot::Vector2 offset, std::shared_ptr<LogicNode> 
   }
 
   auto handle_node_input = [&](std::shared_ptr<LogicNodeInput> input) {
-      if (input->enabled) {
-        if (input->node == nullptr) {
-          if (input->ghost == nullptr) {
-            auto ghost = logic_node_creator->create_ghost_node();
-            ghost->set_position(
-                    tree_node->get_graphical_node()->get_position() + godot::Vector2(110, input->index == 0 ? 0 : 90));
-            ghost->set_owning_node(tree_node);
-            ghost->set_input_index(input->index);
-            ghost_nodes.emplace_back(ghost);
-            add_child(ghost);
-          }
-        } else if (input->node != nullptr) {
-          draw_branch(tree_node->get_graphical_node()->get_position() + godot::Vector2(110, input->index == 0 ? 0 : 90),
-                      input->node);
+    if (input->enabled) {
+      if (input->node == nullptr) {
+        if (input->ghost == nullptr) {
+          auto ghost = logic_node_creator->create_ghost_node();
+          ghost->set_position(
+              tree_node->get_graphical_node()->get_position() + godot::Vector2(110, input->index == 0 ? 0 : 90));
+          ghost->set_owning_node(tree_node);
+          ghost->set_input_index(input->index);
+          ghost_nodes.emplace_back(ghost);
+          add_child(ghost);
         }
+      } else if (input->node != nullptr) {
+        draw_branch(tree_node->get_graphical_node()->get_position() + godot::Vector2(110, input->index == 0 ? 0 : 90),
+                    input->node);
       }
+    }
   };
   handle_node_input(tree_node->get_inputs()[0]);
   handle_node_input(tree_node->get_inputs()[1]);
