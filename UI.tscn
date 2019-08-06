@@ -19,6 +19,7 @@ logic_modal_path = NodePath("LogicDialog")
 option_label_path = NodePath("MarginContainer/VBoxContainer/HBoxContainer/BuildLabel")
 
 [node name="LogicDialog" type="WindowDialog" parent="."]
+editor/display_folded = true
 visible = true
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -26,6 +27,7 @@ margin_left = 48.6871
 margin_top = 71.5987
 margin_right = -156.313
 margin_bottom = -48.4014
+mouse_filter = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 resizable = true
@@ -61,6 +63,8 @@ script = ExtResource( 3 )
 [node name="Node2D" parent="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" instance=ExtResource( 4 )]
 
 [node name="WindowDialog" type="WindowDialog" parent="."]
+editor/display_folded = true
+visible = true
 margin_left = 206.852
 margin_top = 184.241
 margin_right = 868.852
@@ -149,6 +153,7 @@ rect_min_size = Vector2( 100, 100 )
 text = "Pick Up"
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
+editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
