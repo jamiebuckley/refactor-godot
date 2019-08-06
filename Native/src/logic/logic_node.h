@@ -15,6 +15,7 @@ namespace Refactor {
 
     enum class LogicNodeConnection {
         NONE,
+        ACTION,
         BOOLEAN,
         NUMERICAL_COMPARISON,
         NUMBER,
@@ -44,6 +45,7 @@ static int logic_node_type_id = 0;
 #define NODE_TYPE1_2(c, n, out, in1, in2) new LogicNodeType { .color = c, .id = logic_node_type_id++, .name = n, .connection_out = out, .connections_in = { in1, in2 } };
 
 #define BOOL(a) NamedLogicNodeConnection{a, LogicNodeConnection::BOOLEAN}
+#define ACTION(a) NamedLogicNodeConnection{a, LogicNodeConnection::ACTION}
 #define WORKER_TYPE(a) NamedLogicNodeConnection{a, LogicNodeConnection::WORKER_TYPE}
 #define INVENTORY_ITEM(a) NamedLogicNodeConnection{a, LogicNodeConnection::INVENTORY_ITEM}
 #define NUMBER(a) NamedLogicNodeConnection{a, LogicNodeConnection::NUMBER}
@@ -56,8 +58,10 @@ static int logic_node_type_id = 0;
 
     public:
         const LogicNodeType *NONE = new LogicNodeType{ "#333300", logic_node_type_id++, "None" };
-        const LogicNodeType *TOGGLE_IF = NODE_TYPE0_1( "#ff9900", "Toggle if", BOOL("Condition"));
-        const LogicNodeType *ON_IF = NODE_TYPE0_1( "#ff3300", "On if", BOOL("Condition"));
+
+        const LogicNodeType *ROOT = NODE_TYPE0_1( "#ff9900", "Root", ACTION("Action"))
+        const LogicNodeType *TOGGLE_IF = NODE_TYPE1_1( "#ff9900", "Toggle if", ACTION("Action"), BOOL("Condition"));
+        const LogicNodeType *ON_IF = NODE_TYPE1_1( "#ff3300", "On if", ACTION("Action"), BOOL("Condition"));
 
         const LogicNodeType *NOT = NODE_TYPE1_1( "#800000", "Not", BOOL("Out"), BOOL("In 1"));
         const LogicNodeType *AND = NODE_TYPE1_2 ("#0066ff", "And", BOOL("Out"), BOOL("In 1"), BOOL("In 2"));
@@ -107,51 +111,7 @@ static int logic_node_type_id = 0;
 
     class LogicNode;
 
-    class LogicRootNode {
-
-    private:
-        EntityType type;
-        godot::Node2D* graphical_node;
-        godot::Node2D* ghost_node;
-        std::shared_ptr<LogicNode> logic_tree;
-
-    public:
-        LogicRootNode(EntityType type) {
-          this->type = type;
-        }
-
-        std::shared_ptr<LogicNode> get_tree() {
-          return logic_tree;
-        }
-
-        void put_root(std::shared_ptr<LogicNode> node) {
-          this->logic_tree = node;
-        }
-
-        EntityType get_type() const {
-          return type;
-        }
-
-        godot::Node2D *get_graphical_node() const {
-          return graphical_node;
-        }
-
-        void set_graphical_node(godot::Node2D *graphical_node) {
-          LogicRootNode::graphical_node = graphical_node;
-        }
-
-        godot::Node2D *get_ghost_node() const {
-          return ghost_node;
-        }
-
-        void set_ghost_node(godot::Node2D *ghost_node) {
-          LogicRootNode::ghost_node = ghost_node;
-        }
-    };
-
     struct LogicNodeOutput {
-        bool is_root;
-        int root_index;
         int parent_output_index;
         std::shared_ptr<LogicNode> parent;
     };
@@ -191,16 +151,8 @@ static int logic_node_type_id = 0;
           return output;
         }
 
-        void set_output(std::shared_ptr<LogicNodeOutput> output) {
-          LogicNode::output = output;
-        }
-
         std::vector<std::shared_ptr<LogicNodeInput>> get_inputs() {
           return inputs;
-        }
-
-        void set_inputs(const std::vector<std::shared_ptr<LogicNodeInput>> inputs) {
-          LogicNode::inputs = inputs;
         }
 
     private:

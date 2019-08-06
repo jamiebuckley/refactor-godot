@@ -53,7 +53,7 @@ namespace Refactor {
         void handle_drag_release();
 
     private:
-        std::vector<std::shared_ptr<LogicRootNode>> root_nodes;
+        std::vector<std::shared_ptr<LogicNode>> root_nodes;
         void redraw_tree();
         void draw_branch(godot::Vector2 offset, std::shared_ptr<LogicNode> tree_node);
 

@@ -124,6 +124,7 @@ ToolboxNode *LogicNodeCreator::create_node(const LogicNodeType *logic_node_type)
   label->set("custom_fonts/font", resource_loader->load("res://Assets/Fonts/Montserrat.tres"));
   label->set_position(godot::Vector2(50, 50));
   root_node->add_child(label);
+
   root_node->set_scale(godot::Vector2(0.2f, 0.2f));
 
   auto area2d = godot::Area2D::_new();
@@ -155,7 +156,7 @@ void LogicNodeCreator::create_atlas() {
   auto main_atlas_texture = resource_loader->load("res://Assets/Textures/jigsaw_pieces.png");
 
 #define LNC LogicNodeConnection
-  std::vector<LNC> logic_order = {LNC::BOOLEAN, LNC::NUMERICAL_COMPARISON, LNC::INVENTORY_ITEM, LNC::NUMBER,
+  std::vector<LNC> logic_order = {LNC::ACTION, LNC::BOOLEAN, LNC::NUMERICAL_COMPARISON, LNC::INVENTORY_ITEM, LNC::NUMBER,
                                   LNC::WORKER_TYPE};
 
   for (int i = 0; i < 5; i++) {
