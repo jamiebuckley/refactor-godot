@@ -9,7 +9,7 @@ using Orientation = Godot.Orientation;
 
 namespace Refactor1
 {
-    public class Main : Spatial
+    public class Main : Spatial, GodotInterface
     {
         private const float TileSize = 1.0f;
 

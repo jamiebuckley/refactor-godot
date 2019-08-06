@@ -33,11 +33,11 @@ namespace Refactor1.Game
 
         private readonly int _size;
         
-        private readonly Main _main;
+        private readonly GodotInterface _main;
 
         private List<GridTile> _internalGrid;
         
-        public Grid(int size, Main main)
+        public Grid(int size, GodotInterface main)
         {
             this._size = size;
             _main = main;
@@ -216,16 +216,19 @@ namespace Refactor1.Game
             while (invalidStack.Count > 0)
             {
                 var tile = invalidStack.Pop();
-                var entityStack = new Stack<TempWorker>(tile.Entities);
-                while (entityStack.Count > 1)
+                var entityQueue = new Queue<TempWorker>(tile.Entities);
+                while (entityQueue.Count > 1)
                 {
-                    var topEntity = entityStack.Peek();
-                    if (topEntity.CurrentGridTile != topEntity.OldGridTile) entityStack.Pop();
+                    var topEntity = entityQueue.Dequeue();
+                    if (topEntity.CurrentGridTile == topEntity.OldGridTile)
+                    {
+                        entityQueue.Enqueue(topEntity);
+                    }
                     topEntity.CurrentGridTile = topEntity.OldGridTile;
                     topEntity.OldGridTile.Entities.Add(topEntity);
                     if (topEntity.OldGridTile.Entities.Count > 1) invalidStack.Push(topEntity.OldGridTile);
                 }
-                tile.Entities = entityStack.ToList();
+                tile.Entities = entityQueue.ToList();
             }
 
             foreach (var tempWorker in tempWorkers)

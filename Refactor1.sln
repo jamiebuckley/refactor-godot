@@ -1,6 +1,8 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Refactor1", "Refactor1.csproj", "{84BE68EE-59FE-425C-886C-14746157F632}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefactorTests", "RefactorTests\RefactorTests.csproj", "{DC1149EC-4B4C-4945-BF64-32CBAD59AED5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,5 +17,11 @@ Global
 		{84BE68EE-59FE-425C-886C-14746157F632}.Release|Any CPU.Build.0 = Release|Any CPU
 		{84BE68EE-59FE-425C-886C-14746157F632}.Tools|Any CPU.ActiveCfg = Tools|Any CPU
 		{84BE68EE-59FE-425C-886C-14746157F632}.Tools|Any CPU.Build.0 = Tools|Any CPU
+		{DC1149EC-4B4C-4945-BF64-32CBAD59AED5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC1149EC-4B4C-4945-BF64-32CBAD59AED5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC1149EC-4B4C-4945-BF64-32CBAD59AED5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC1149EC-4B4C-4945-BF64-32CBAD59AED5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC1149EC-4B4C-4945-BF64-32CBAD59AED5}.Tools|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC1149EC-4B4C-4945-BF64-32CBAD59AED5}.Tools|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

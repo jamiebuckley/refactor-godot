@@ -54,6 +54,7 @@
     <Compile Include="Game\Common\Point2D.cs" />
     <Compile Include="Game\Grid.cs" />
     <Compile Include="Game\Worker.cs" />
+    <Compile Include="GodotInterface.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
