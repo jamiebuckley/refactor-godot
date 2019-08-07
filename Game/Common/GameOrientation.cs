@@ -14,8 +14,8 @@ namespace Refactor1.Game.Common
             this.Name = name;
         }
 
-        public static readonly GameOrientation North = new GameOrientation(new Point2D(0, -1), "North");
-        public static readonly GameOrientation South = new GameOrientation(new Point2D(0, 1), "South");
+        public static readonly GameOrientation North = new GameOrientation(new Point2D(0, 1), "North");
+        public static readonly GameOrientation South = new GameOrientation(new Point2D(0, -1), "South");
         public static readonly GameOrientation East = new GameOrientation(new Point2D(1, 0), "East");
         public static readonly GameOrientation West = new GameOrientation(new Point2D(-1, 0), "West");
 

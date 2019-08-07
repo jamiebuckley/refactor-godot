@@ -209,7 +209,32 @@ namespace Refactor1.Game
             var invalidStack = new Stack<TempGridTile>();
             foreach (var gridTile in tempGridTiles)
             {
-                if (gridTile.Entities.Count > 1) invalidStack.Push(gridTile);
+                if (gridTile.Entities.Count > 1)
+                {
+                    invalidStack.Push(gridTile);
+                }
+
+                foreach (var entity in gridTile.Entities.ToList())
+                {
+                    if (entity.OldGridTile != entity.CurrentGridTile)
+                    {
+                        var workerFromThisTile =
+                            entity.OldGridTile.Entities.FirstOrDefault(x => x.OldGridTile == entity.CurrentGridTile);
+                        
+                        if (workerFromThisTile != null)
+                        {
+                            workerFromThisTile.OldGridTile.Entities.Remove(workerFromThisTile);
+                            workerFromThisTile.CurrentGridTile = gridTile;
+                            gridTile.Entities.Add(workerFromThisTile);
+
+                            gridTile.Entities.Remove(entity);
+                            entity.CurrentGridTile = entity.OldGridTile;
+                            entity.CurrentGridTile.Entities.Add(entity);
+                            if (entity.CurrentGridTile.Entities.Count() > 1 && !invalidStack.Contains(entity.CurrentGridTile)) 
+                                invalidStack.Push(entity.CurrentGridTile);
+                        }
+                    }
+                }
             }
 
 
@@ -219,10 +244,12 @@ namespace Refactor1.Game
                 var entityQueue = new Queue<TempWorker>(tile.Entities);
                 while (entityQueue.Count > 1)
                 {
+                    // remove entities down to 1, not moving the entity that came from this tile if it exists
+                    
                     var topEntity = entityQueue.Dequeue();
                     if (topEntity.CurrentGridTile == topEntity.OldGridTile)
                     {
-                        entityQueue.Enqueue(topEntity);
+                        continue;
                     }
                     topEntity.CurrentGridTile = topEntity.OldGridTile;
                     topEntity.OldGridTile.Entities.Add(topEntity);

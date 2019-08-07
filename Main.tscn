@@ -74,4 +74,3 @@ light_energy = 0.99
 light_indirect_energy = 1.85
 light_specular = 0.25
 omni_range = 24.9
-

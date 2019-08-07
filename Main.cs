@@ -98,10 +98,7 @@ namespace Refactor1
 
         private void HandleMouseClick(InputEventMouseButton @event)
         {
-            var result = GetWorldMousePosition();
-            if (!result.Any()) return;
-
-            var position = (Vector3) result["position"];
+            var position = _picker.Translation;
             var gridCoords = GetGridCoordinates(position);
 
             if (_selectedEntityType == EntityType.NONE)
@@ -123,18 +120,23 @@ namespace Refactor1
                 optionLabel.Text = "";
             }
 
+            GD.Print($"event {@event.Scancode} {@event.Pressed}");
             if (_selectedEntity == null) return;
-
-            if (@event.GetScancode() == (int) KeyList.P && @event.IsPressed())
+            
+            if (@event.GetScancode() == (int) KeyList.P && !@event.Pressed)
                 _selectedEntity.Orientation = GameOrientation.ClockwiseOf(_selectedEntity.Orientation);
             
-            if (@event.GetScancode() == (int) KeyList.O && @event.IsPressed())
+            if (@event.GetScancode() == (int) KeyList.O && !@event.Pressed)
                 _selectedEntity.Orientation = GameOrientation.AntiClockwiseOf(_selectedEntity.Orientation);
+            
+            (_selectedEntity.GodotEntity as Spatial).SetRotation(new Vector3(0,_selectedEntity.Orientation.ToRotation(), 0));
+            
+            
         }
 
         private void HandleGridSelection(Point2D gridCoords)
         {
-            GD.Print("Refactor1::Main::Selection");
+            GD.Print("Refactor1::Main::Selection " + gridCoords);
             if (!_grid.IsInGridBounds(gridCoords)) return;
 
             var gridTile = _grid.GetGridTile(gridCoords);
@@ -175,12 +177,16 @@ namespace Refactor1
             var packedScene = _entityTypeToPackedScenes[_selectedEntityType];
             var instance = packedScene.Instance() as Spatial;
 
+            GameOrientation orientation = GameOrientation.North;
             if (_selectedEntityType == EntityType.ENTRANCE || _selectedEntityType == EntityType.EXIT)
             {
-                var orientation = GetEdgeOrientation(gridCoords, 0, 19);
-                instance.Rotate(Vector3.Up, orientation.ToRotation());
-                _grid.AddEntity(instance, _selectedEntityType, gridCoords, orientation);
+                orientation = GetEdgeOrientation(gridCoords, 0, 19);
             }
+
+            instance.Rotate(Vector3.Up, orientation.ToRotation());
+            var gridEntity = _grid.AddEntity(instance, _selectedEntityType, gridCoords, orientation);
+            GD.Print($"Built {gridEntity.EntityType} at {gridEntity.CurrentGridTile.Position}");
+            
             instance.SetTranslation(_picker.GetTranslation());
             AddChild(instance);
 

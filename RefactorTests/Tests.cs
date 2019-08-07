@@ -16,28 +16,45 @@ namespace RefactorTests
         }
         
         [Fact]
-        public void Test1()
+        public void WorkerShouldMoveToEmptyTile()
         {
             var grid = new Refactor1.Game.Grid(2, new MockGodot());
-            var worker = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 0), GameOrientation.South);
+            var worker = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 0), GameOrientation.North);
             grid.Step();
-            Assert.Equal(worker.CurrentGridTile.Position.X, 0);
-            Assert.Equal(worker.CurrentGridTile.Position.Z, 1);
+            Assert.Equal(0,worker.CurrentGridTile.Position.X);
+            Assert.Equal(1,worker.CurrentGridTile.Position.Z);
         }
         
         [Fact]
-        public void Test2()
+        public void ImmobileWorkersShouldBlock()
         {
             var grid = new Refactor1.Game.Grid(2, new MockGodot());
-            var worker1 = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 0), GameOrientation.South);
+            var worker1 = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 0), GameOrientation.North);
+            var worker2 = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 1), GameOrientation.North);
+            
+            grid.Step();
+            Assert.Equal(0, worker1.CurrentGridTile.Position.X);
+            Assert.Equal(0, worker1.CurrentGridTile.Position.Z);
+            
+            Assert.Equal(0, worker2.CurrentGridTile.Position.X);
+            Assert.Equal(1, worker2.CurrentGridTile.Position.Z);
+        }
+
+        [Fact]
+        public void WorkersShouldNotCrossPaths()
+        {
+            var grid = new Refactor1.Game.Grid(2, new MockGodot());
+            
+            var worker1 = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 0), GameOrientation.North);
             var worker2 = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 1), GameOrientation.South);
             
             grid.Step();
-            Assert.Equal(worker1.CurrentGridTile.Position.X, 0);
-            Assert.Equal(worker1.CurrentGridTile.Position.Z, 0);
+            Assert.Equal(0, worker1.CurrentGridTile.Position.X);
+            Assert.Equal(0, worker1.CurrentGridTile.Position.Z);
             
-            Assert.Equal(worker2.CurrentGridTile.Position.X, 0);
-            Assert.Equal(worker2.CurrentGridTile.Position.Z, 1);
+            Assert.Equal(0, worker2.CurrentGridTile.Position.X);
+            Assert.Equal(1, worker2.CurrentGridTile.Position.Z);
+            
         }
     }
 }

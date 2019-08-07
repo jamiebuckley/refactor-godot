@@ -45,6 +45,10 @@ namespace Refactor1.Game.Common
             }
             return 0;
         }
-        
+
+        public override string ToString()
+        {
+            return $"Point2D({X}, {Z})";
+        }
     }
 }

@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GodotSharp, Version=1.0.7010.37193, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="GodotSharp, Version=1.0.7055.41579, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\.mono\assemblies\GodotSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
