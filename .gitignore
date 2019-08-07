@@ -17,3 +17,6 @@ Native/bin
 .vscode/
 **/cmake-build-debug/
 **/cmake-build-release/
+**/obj/
+**/bin/
+packages/
