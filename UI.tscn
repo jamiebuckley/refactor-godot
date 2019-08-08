@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Scripts/UI/UI.gd" type="Script" id=1]
 [ext_resource path="res://default_env.tres" type="Environment" id=2]
-[ext_resource path="res://LogicMinigame.gd" type="Script" id=3]
+[ext_resource path="res://Game/Logic/LogicEditorViewport.cs" type="Script" id=3]
 [ext_resource path="res://LogicMiniGame.tscn" type="PackedScene" id=4]
 
 [sub_resource type="World" id=1]
@@ -19,7 +19,6 @@ logic_modal_path = NodePath("LogicDialog")
 option_label_path = NodePath("MarginContainer/VBoxContainer/HBoxContainer/BuildLabel")
 
 [node name="LogicDialog" type="WindowDialog" parent="."]
-editor/display_folded = true
 visible = true
 anchor_right = 1.0
 anchor_bottom = 1.0

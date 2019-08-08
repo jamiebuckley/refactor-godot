@@ -49,14 +49,25 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Game\Common\Colours.cs" />
     <Compile Include="Game\Common\EntityType.cs" />
     <Compile Include="Game\Common\GameOrientation.cs" />
     <Compile Include="Game\Common\Point2D.cs" />
+    <Compile Include="Game\Enumeration.cs" />
     <Compile Include="Game\Grid.cs" />
+    <Compile Include="Game\Logic\LogicEditorViewport.cs" />
+    <Compile Include="Game\Logic\LogicEditor.cs" />
+    <Compile Include="Game\Logic\LogicNode.cs" />
+    <Compile Include="Game\Logic\LogicNodeConnection.cs" />
+    <Compile Include="Game\Logic\LogicNodeCreator.cs" />
+    <Compile Include="Game\Logic\LogicNodeType.cs" />
     <Compile Include="Game\Worker.cs" />
     <Compile Include="GodotInterface.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Game\Utility" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
