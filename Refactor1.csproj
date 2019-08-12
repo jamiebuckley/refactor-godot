@@ -55,6 +55,7 @@
     <Compile Include="Game\Common\Point2D.cs" />
     <Compile Include="Game\Enumeration.cs" />
     <Compile Include="Game\Grid.cs" />
+    <Compile Include="Game\Logic\GraphicalLogicNode.cs" />
     <Compile Include="Game\Logic\LogicEditorViewport.cs" />
     <Compile Include="Game\Logic\LogicEditor.cs" />
     <Compile Include="Game\Logic\LogicNode.cs" />

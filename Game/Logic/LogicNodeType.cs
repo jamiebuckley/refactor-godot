@@ -26,23 +26,23 @@ namespace Refactor1.Game.Logic
             return new List<LC> {lc1, lc2};
         }
 
-        public static readonly LNT None = new LNT(Colours.White, "None", LC.None, EmptyList());
-        public static readonly LNT Root = new LNT(Colours.White, "Root", LC.None, ListOne(LC.Action));
-        public static readonly LNT ToggleIf = new LNT(Colours.White, "Toggle If", LC.Action, ListOne(LC.Boolean));
-        public static readonly LNT OnIf = new LNT(Colours.White, "On If", LC.Action, ListOne(LC.Boolean));
-        public static readonly LNT And = new LNT(Colours.White, "And", LC.Boolean, ListTwo(LC.Boolean, LC.Boolean));
-        public static readonly LNT Not = new LNT(Colours.White, "Not", LC.Boolean, ListOne(LC.Boolean));
-        public static readonly LNT Or = new LNT(Colours.White, "Or", LC.Boolean, ListTwo(LC.Boolean, LC.Boolean));
-        public static readonly LNT Xor = new LNT(Colours.White, "Xor", LC.Boolean, ListTwo(LC.Boolean, LC.Boolean));
-        public static readonly LNT WorkerIs = new LNT(Colours.White, "Worker Is", LC.Boolean, ListOne(LC.WorkerType));
-        public static readonly LNT WorkerType = new LNT(Colours.White, "Worker Type", LC.WorkerType, EmptyList());
-        public static readonly LNT WorkerHas = new LNT(Colours.White, "Worker Has", LC.Boolean, ListTwo(LC.NumericalComparison, LC.InventoryItem));
-        public static readonly LNT InventoryItem = new LNT(Colours.White, "Inventory Item", LC.InventoryItem, EmptyList());
-        public static readonly LNT CounterIs = new LNT(Colours.White, "Counter Is", LC.Boolean, ListOne(LC.NumericalComparison));
-        public static readonly LNT NumericalEquals = new LNT(Colours.White, "Equals", LC.NumericalComparison, ListOne(LC.Number));
-        public static readonly LNT NumericalGreaterThan = new LNT(Colours.White, "Greater than", LC.NumericalComparison, ListOne(LC.Number));
-        public static readonly LNT NumericalLessThan = new LNT(Colours.White, "Less than", LC.NumericalComparison, ListOne(LC.Number));
-        public static readonly LNT Number = new LNT(Colours.White, "Number", LC.Number, EmptyList());
+        public static readonly LNT None = new LNT(Colours.Colour1, "None", LC.None, EmptyList());
+        public static readonly LNT Root = new LNT(Colours.Colour2, "Root", LC.None, ListOne(LC.Action));
+        public static readonly LNT ToggleIf = new LNT(Colours.Colour3, "Toggle If", LC.Action, ListOne(LC.Boolean));
+        public static readonly LNT OnIf = new LNT(Colours.Colour4, "On If", LC.Action, ListOne(LC.Boolean));
+        public static readonly LNT And = new LNT(Colours.Colour5, "And", LC.Boolean, ListTwo(LC.Boolean, LC.Boolean));
+        public static readonly LNT Not = new LNT(Colours.Colour6, "Not", LC.Boolean, ListOne(LC.Boolean));
+        public static readonly LNT Or = new LNT(Colours.Colour7, "Or", LC.Boolean, ListTwo(LC.Boolean, LC.Boolean));
+        public static readonly LNT Xor = new LNT(Colours.Colour8, "Xor", LC.Boolean, ListTwo(LC.Boolean, LC.Boolean));
+        public static readonly LNT WorkerIs = new LNT(Colours.Colour9, "Worker Is", LC.Boolean, ListOne(LC.WorkerType));
+        public static readonly LNT WorkerType = new LNT(Colours.Colour10, "Worker Type", LC.WorkerType, EmptyList());
+        public static readonly LNT WorkerHas = new LNT(Colours.Colour11, "Worker Has", LC.Boolean, ListTwo(LC.NumericalComparison, LC.InventoryItem));
+        public static readonly LNT InventoryItem = new LNT(Colours.Colour12, "Inventory Item", LC.InventoryItem, EmptyList());
+        public static readonly LNT CounterIs = new LNT(Colours.Colour13, "Counter Is", LC.Boolean, ListOne(LC.NumericalComparison));
+        public static readonly LNT NumericalEquals = new LNT(Colours.Colour14, "Equals", LC.NumericalComparison, ListOne(LC.Number));
+        public static readonly LNT NumericalGreaterThan = new LNT(Colours.Colour15, "Greater than", LC.NumericalComparison, ListOne(LC.Number));
+        public static readonly LNT NumericalLessThan = new LNT(Colours.Colour16, "Less than", LC.NumericalComparison, ListOne(LC.Number));
+        public static readonly LNT Number = new LNT(Colours.Colour16, "Number", LC.Number, EmptyList());
         
         public int Id { get; }
         

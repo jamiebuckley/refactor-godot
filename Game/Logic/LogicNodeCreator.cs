@@ -1,18 +1,25 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using Godot.Collections;
 using Refactor1.Game.Common;
+using Array = Godot.Collections.Array;
 
 namespace Refactor1.Game.Logic
 {
     public class LogicNodeCreator
     {
-        private Dictionary<LogicNodeConnection, AtlasTexture> _connectorOutAtlasMap = new Dictionary<LogicNodeConnection, AtlasTexture>();
-        private Dictionary<LogicNodeConnection, AtlasTexture> _connectorInAtlasMap = new Dictionary<LogicNodeConnection, AtlasTexture>();
+        private System.Collections.Generic.Dictionary<LogicNodeConnection, AtlasTexture> _connectorOutAtlasMap = new System.Collections.Generic.Dictionary<LogicNodeConnection, AtlasTexture>();
+        private System.Collections.Generic.Dictionary<LogicNodeConnection, AtlasTexture> _connectorInAtlasMap = new System.Collections.Generic.Dictionary<LogicNodeConnection, AtlasTexture>();
         private AtlasTexture _mainBodyAtlas;
         private AtlasTexture _ghostAtlas;
 
-        Node2D CreateNode(LogicNodeType logicNodeType)
+        public void Initialise()
+        {
+            CreateAtlas();
+        }
+
+        public GraphicalLogicNode CreateNode(LogicNodeType logicNodeType)
         {
             var backgroundNode = new Node2D();
 
@@ -48,50 +55,48 @@ namespace Refactor1.Game.Logic
                 backgroundNode.AddChild(outTextureRect);
             }
 
-//
-//  if (logic_node_num_inputs > 0 && logic_node_type->connections_in[0].connection_type != LogicNodeConnection::NONE) {
-//    auto in_logic_texture_rect = godot::TextureRect::_new();
-//    in_logic_texture_rect->set_texture(logic_in_atlas_map[logic_node_type->connections_in[0].connection_type]);
-//    in_logic_texture_rect->set_position(input_1_pos);
-//    logic_background_node->add_child(in_logic_texture_rect);
-//  }
-//
-//  if (logic_node_num_inputs == 2 && logic_node_type->connections_in[1].connection_type != LogicNodeConnection::NONE) {
-//    auto in_logic_texture_rect = godot::TextureRect::_new();
-//    in_logic_texture_rect->set_texture(logic_in_atlas_map[logic_node_type->connections_in[1].connection_type]);
-//    in_logic_texture_rect->set_position(input_2_pos);
-//    logic_background_node->add_child(in_logic_texture_rect);
-//  }
-//
-//  logic_background_node->set_modulate(godot::Color::html(godot::String(logic_node_type->color.c_str())));
-//
-//  auto root_node = ToolboxNode::_new();
-//  root_node->set_logic_node_type(logic_node_type);
-//  root_node->set_name(godot::String(logic_node_type->name.c_str()));
-//  root_node->add_child(logic_background_node);
-//
-//  auto label = godot::Label::_new();
-//  label->set_text(logic_node_type->name.c_str());
-//  label->set("custom_fonts/font", resource_loader->load("res://Assets/Fonts/Montserrat.tres"));
-//  label->set_position(godot::Vector2(50, 50));
-//  root_node->add_child(label);
-//
-//  root_node->set_scale(godot::Vector2(0.2f, 0.2f));
-//
-//  auto area2d = godot::Area2D::_new();
-//  area2d->set_name("area2d");
-//
-//  auto shape = godot::Ref<godot::RectangleShape2D>(godot::RectangleShape2D::_new());
-//  shape->set_extents(godot::Vector2(150, 100));
-//
-//  int shape_owner = area2d->create_shape_owner(area2d);
-//  area2d->shape_owner_add_shape(shape_owner, shape);
-//  area2d->set_position(godot::Vector2(150, 100));
-//  area2d->connect("input_event", event_listener, "on_logic_piece_input_event", godot::Array::make(root_node, logic_node_type));
-//
-//  root_node->add_child(area2d);
-//  return root_node;
-            throw new NotImplementedException();
+            if (numInputs > 0 && logicNodeType.ConnectionsIn[0] != LogicNodeConnection.None)
+            {
+                var logicInTextureRect = new TextureRect();
+                logicInTextureRect.SetTexture(_connectorInAtlasMap[logicNodeType.ConnectionsIn[0]]);
+                logicInTextureRect.SetPosition(input1Pos);
+                backgroundNode.AddChild(logicInTextureRect);
+            }
+            
+            if (numInputs == 2 && logicNodeType.ConnectionsIn[1] != LogicNodeConnection.None)
+            {
+                var logicInTextureRect = new TextureRect();
+                logicInTextureRect.SetTexture(_connectorInAtlasMap[logicNodeType.ConnectionsIn[1]]);
+                logicInTextureRect.SetPosition(input2Pos);
+                backgroundNode.AddChild(logicInTextureRect);
+            }
+            
+            backgroundNode.SetModulate(new Color(logicNodeType.Colour));
+            
+            var rootNode = new GraphicalLogicNode();
+            rootNode.AddChild(backgroundNode);
+            
+            var label = new Label();
+            label.SetText(logicNodeType.Name);
+            label.Set("custom_fonts/font", ResourceLoader.Load("res://Assets/Fonts/Montserrat.tres"));
+            label.SetPosition(new Vector2(50, 50));
+            rootNode.AddChild(label);
+            
+            var area2D = new Area2D();
+            area2D.SetName("area2d");
+            
+            var shape = new RectangleShape2D();
+            shape.SetExtents(new Vector2(512, 512));
+
+            int shapeOwner = area2D.CreateShapeOwner(area2D);
+            area2D.ShapeOwnerAddShape(shapeOwner, shape);
+            area2D.SetPosition(new Vector2(512, 512));
+            rootNode.AddChild(area2D);
+            
+            rootNode.Area2d = area2D;
+            rootNode.Type = logicNodeType;
+            
+            return rootNode;
         }
 
         void CreateAtlas()
@@ -116,7 +121,7 @@ namespace Refactor1.Game.Logic
             var mainBlockWidth = 512;
             var mainBlockHeight = 512 - connectorHeight;
             
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
                 var atlasOut = new AtlasTexture();
                 atlasOut.SetAtlas(logic_pieces_texture);
@@ -126,7 +131,7 @@ namespace Refactor1.Game.Logic
                 var atlasIn = new AtlasTexture();
                 atlasIn.SetAtlas(logic_pieces_texture);
                 atlasIn.SetRegion(new Rect2(i * connectorWidth + offset, 0, connectorWidth, connectorHeight));
-                _connectorOutAtlasMap.Add(logicOrder[i], atlasIn);
+                _connectorInAtlasMap.Add(logicOrder[i], atlasIn);
             }
             
             _mainBodyAtlas = new AtlasTexture();

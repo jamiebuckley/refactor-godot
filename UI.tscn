@@ -1,12 +1,13 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Scripts/UI/UI.gd" type="Script" id=1]
-[ext_resource path="res://default_env.tres" type="Environment" id=2]
-[ext_resource path="res://Game/Logic/LogicEditorViewport.cs" type="Script" id=3]
-[ext_resource path="res://LogicMiniGame.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Game/Logic/LogicEditorViewport.cs" type="Script" id=2]
+[ext_resource path="res://default_env.tres" type="Environment" id=3]
+[ext_resource path="res://LogicMinigame.gd" type="Script" id=4]
+[ext_resource path="res://LogicMiniGame.tscn" type="PackedScene" id=5]
 
 [sub_resource type="World" id=1]
-environment = ExtResource( 2 )
+environment = ExtResource( 3 )
 
 [node name="Control" type="Control"]
 anchor_right = 1.0
@@ -42,11 +43,12 @@ size_flags_vertical = 3
 [node name="ViewportContainer" type="ViewportContainer" parent="LogicDialog/MarginContainer"]
 margin_right = 818.0
 margin_bottom = 479.0
-mouse_filter = 2
+mouse_filter = 1
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.0
 stretch = true
+script = ExtResource( 2 )
 
 [node name="LogicMinigame" type="Viewport" parent="LogicDialog/MarginContainer/ViewportContainer"]
 size = Vector2( 818, 479 )
@@ -57,9 +59,9 @@ disable_3d = true
 usage = 0
 render_target_update_mode = 3
 physics_object_picking = true
-script = ExtResource( 3 )
+script = ExtResource( 4 )
 
-[node name="Node2D" parent="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" instance=ExtResource( 4 )]
+[node name="Node2D" parent="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" instance=ExtResource( 5 )]
 
 [node name="WindowDialog" type="WindowDialog" parent="."]
 editor/display_folded = true
@@ -73,7 +75,6 @@ size_flags_vertical = 0
 window_title = "Build Options"
 
 [node name="Panel" type="Panel" parent="WindowDialog"]
-editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 size_flags_horizontal = 3
@@ -152,7 +153,6 @@ rect_min_size = Vector2( 100, 100 )
 text = "Pick Up"
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
@@ -164,6 +164,7 @@ custom_constants/margin_left = 32
 custom_constants/margin_bottom = 32
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+editor/display_folded = true
 margin_left = 32.0
 margin_top = 32.0
 margin_right = 992.0

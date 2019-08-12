@@ -2,11 +2,11 @@ using Godot;
 
 namespace Refactor1.Game.Logic
 {
-    public class LogicEditorViewport : Viewport
+    public class LogicEditorViewport : ViewportContainer
     {
         public override void _Input(InputEvent @event)
         {
-            _UnhandledInput(@event);
+            GetNode("LogicMinigame")._UnhandledInput(@event);
         }
     }
 }
