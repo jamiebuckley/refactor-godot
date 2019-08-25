@@ -19,7 +19,17 @@ namespace Refactor1.Game.Logic
             CreateAtlas();
         }
 
-        public GraphicalLogicNode CreateNode(LogicNodeType logicNodeType)
+        public Node2D CreateGhostNode()
+        {
+            // todo: this needs to be a wrapper class that has the right type
+            var backgroundNode = new Node2D();
+            var mainTextureRect = new TextureRect();
+            mainTextureRect.SetTexture(_ghostAtlas);
+            backgroundNode.AddChild(mainTextureRect);
+            return backgroundNode;
+        }
+
+        public ToolboxNode CreateNode(LogicNodeType logicNodeType)
         {
             var backgroundNode = new Node2D();
 
@@ -73,7 +83,7 @@ namespace Refactor1.Game.Logic
             
             backgroundNode.SetModulate(new Color(logicNodeType.Colour));
             
-            var rootNode = new GraphicalLogicNode();
+            var rootNode = new ToolboxNode();
             rootNode.AddChild(backgroundNode);
             
             var label = new Label();
@@ -86,11 +96,11 @@ namespace Refactor1.Game.Logic
             area2D.SetName("area2d");
             
             var shape = new RectangleShape2D();
-            shape.SetExtents(new Vector2(512, 512));
+            shape.SetExtents(new Vector2(200, 200));
 
             int shapeOwner = area2D.CreateShapeOwner(area2D);
             area2D.ShapeOwnerAddShape(shapeOwner, shape);
-            area2D.SetPosition(new Vector2(512, 512));
+            area2D.SetPosition(new Vector2(100, 100));
             rootNode.AddChild(area2D);
             
             rootNode.Area2d = area2D;
