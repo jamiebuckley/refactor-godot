@@ -3,22 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Refactor1.Game.Common;
+using Refactor1.Game.Entity;
 using Orientation = Godot.Orientation;
 
 namespace Refactor1.Game
 {
     public class Grid
     {
-        public class GridEntity
-        {
-            public EntityType EntityType { get; set; }
-            
-            public Node GodotEntity { get; set; }
-            
-            public GridTile CurrentGridTile { get; set; }
-            
-            public GameOrientation Orientation { get; set; }
-        }
 
         public class GridTile
         {

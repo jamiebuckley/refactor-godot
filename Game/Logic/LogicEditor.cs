@@ -13,14 +13,19 @@ namespace Refactor1.Game.Logic
 
         private List<LogicNode> _roots = new List<LogicNode>();
 
-        private List<LogicNode.GhostConnection> _ghosts = new List<LogicNode.GhostConnection>();
+        private List<GraphicalLogicNode.GhostConnection> _ghosts = new List<GraphicalLogicNode.GhostConnection>();
 
-        private LogicNode.GhostConnection _currentSnappedGhost = null;
+        private GraphicalLogicNode.GhostConnection _currentSnappedGhost = null;
+
+        private Dictionary<LogicNode, GraphicalLogicNode> _logicNodeGraphics = new Dictionary<LogicNode, GraphicalLogicNode>();
 
         public override void _Ready()
         {
             _logicNodeCreator = new LogicNodeCreator();
             _logicNodeCreator.Initialise();
+
+            var saveButton = GetTree().GetRoot().FindNode("LogicSaveButton", true, false) as Button;
+            saveButton.Connect("pressed", this, "OnSaveButtonPressed");
             
             var logicToolbox = GetTree().GetRoot().FindNode("LogicToolbox", true, false);
             if (logicToolbox == null) throw new InvalidOperationException("Cannot initialise toolbox as cannot find logicToolbox node in scene");
@@ -30,8 +35,7 @@ namespace Refactor1.Game.Logic
                 var graphicalNode = _logicNodeCreator.CreateNode(type);
                 graphicalNode.SetScale(new Vector2(0.2f, 0.2f));
 
-                var binds = new Godot.Collections.Array();
-                binds.Add(graphicalNode);
+                var binds = new Godot.Collections.Array { graphicalNode };
                 graphicalNode.Area2d.Connect("input_event", this, "OnToolboxNodeSelected", binds);
                 var control = new Control();
                 control.AddChild(graphicalNode);
@@ -43,18 +47,24 @@ namespace Refactor1.Game.Logic
             var graphicalRootNode = _logicNodeCreator.CreateNode(LogicNodeType.Root);
             graphicalRootNode.SetScale(new Vector2(0.2f, 0.2f));
             AddChild(graphicalRootNode);
-            
-            _roots.Add(new LogicNode
+
+            var root = new LogicNode
             {
-                LogicNodeType = LogicNodeType.Root,
-                GraphicalNode = graphicalRootNode
+                LogicNodeType = LogicNodeType.Root
+            };
+            
+            _roots.Add(root);
+            
+            _logicNodeGraphics.Add(root, new GraphicalLogicNode()
+            {
+                GraphicalNode = graphicalRootNode   
             });
             UpdateGhosts();
         }
 
         private void UpdateGhosts()
         {
-            var validGhosts = new List<LogicNode.GhostConnection>();
+            var validGhosts = new List<GraphicalLogicNode.GhostConnection>();
             
             var stack = new Stack<LogicNode>(_roots);
             while (stack.Any())
@@ -66,14 +76,14 @@ namespace Refactor1.Game.Logic
                     
                     if (!node.HasChild(i))
                     {
-                        if (node.GetGhost(i) == null)
+                        if (GetGhost(node, i) == null)
                         {
                             var ghostNode = _logicNodeCreator.CreateGhostNode();
                             ghostNode.SetScale(new Vector2(0.2f, 0.2f));
-                            ghostNode.Position = node.GraphicalNode.Position + new Vector2(120, i * 100);
+                            ghostNode.Position = _logicNodeGraphics[node].GraphicalNode.Position + new Vector2(120, i * 100);
                             AddChild(ghostNode);
 
-                            var ghostConnection = new LogicNode.GhostConnection
+                            var ghostConnection = new GraphicalLogicNode.GhostConnection
                             {
                                 GhostNode = ghostNode,
                                 Owner = node,
@@ -81,11 +91,11 @@ namespace Refactor1.Game.Logic
                             };
                             _ghosts.Add(ghostConnection);
                             validGhosts.Add(ghostConnection);
-                            node.SetGhost(ghostConnection, i);
+                            SetGhost(node, ghostConnection, i);
                         }
                         else
                         {
-                            validGhosts.Add(node.GetGhost(i));
+                            validGhosts.Add(GetGhost(node, i));
                         }
                     }
                     else
@@ -100,14 +110,14 @@ namespace Refactor1.Game.Logic
             foreach (var ghostConnection in invalidGhosts)
             {
                 RemoveChild(ghostConnection.GhostNode);
-                ghostConnection.Owner.SetGhost(null, ghostConnection.ChildIndex);
+                SetGhost(ghostConnection.Owner, null, ghostConnection.ChildIndex);
                 GD.Print("removing ghost");
             }
 
             _ghosts = validGhosts;
         }
 
-        private bool IsValidConnection(LogicNode.GhostConnection ghostConnection, ToolboxNode toolboxNode)
+        private bool IsValidConnection(GraphicalLogicNode.GhostConnection ghostConnection, ToolboxNode toolboxNode)
         {
             var draggedNodeConnectionOut = toolboxNode.Type.ConnectionOut;
 
@@ -192,13 +202,39 @@ namespace Refactor1.Game.Logic
                 var node = new LogicNode
                 {
                     LogicNodeType = _draggedNode.Type,
-                    GraphicalNode = _draggedNode
                 };
+
+                _logicNodeGraphics.Add(node, new GraphicalLogicNode()
+                {
+                    GraphicalNode = _draggedNode
+                });
                 
                 _draggedNode.LogicNode = node;
                 
                 AddChild(_draggedNode);
             }
+        }
+        
+        private void SetGhost(LogicNode logicNode, GraphicalLogicNode.GhostConnection ghostConnection, int index)
+        {
+            var graphics = _logicNodeGraphics[logicNode];
+            if (index == 0)  graphics.GraphicalGhostNode1 = ghostConnection;
+            else if (index == 1) graphics.GraphicalGhostNode2 = ghostConnection;
+            else throw new ArgumentException($"Cannot set ghost connection {index}");
+        }
+
+        public GraphicalLogicNode.GhostConnection GetGhost(LogicNode logicNode, int index)
+        {
+            var graphics = _logicNodeGraphics[logicNode];
+            if (index == 0) return graphics.GraphicalGhostNode1;
+            if (index == 1) return graphics.GraphicalGhostNode2;
+            throw new ArgumentException($"Cannot get ghost connection {index}");
+        }
+
+        public void OnSaveButtonPressed()
+        {
+            // write tree to main state
+            GD.Print("save");
         }
     }
 }

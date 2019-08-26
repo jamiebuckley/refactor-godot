@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Godot.Collections;
 using Refactor1.Game;
 using Refactor1.Game.Common;
+using Refactor1.Game.Entity;
+using Refactor1.Game.Logic;
 using Array = Godot.Collections.Array;
 using Orientation = Godot.Orientation;
 
@@ -21,9 +24,9 @@ namespace Refactor1
 
         private EntityType _selectedEntityType = EntityType.NONE;
 
-        private Grid.GridEntity _selectedEntity;
+        private GridEntity _selectedEntity;
 
-        private Dictionary<EntityType, PackedScene> _entityTypeToPackedScenes;
+        private Godot.Collections.Dictionary<EntityType, PackedScene> _entityTypeToPackedScenes;
 
         // Called when the node enters the scene tree for the first time.
         public override void _Ready()
@@ -39,7 +42,7 @@ namespace Refactor1
             }
 
             // Load packed scenes
-            _entityTypeToPackedScenes = new Dictionary<EntityType, PackedScene>()
+            _entityTypeToPackedScenes = new Godot.Collections.Dictionary<EntityType, PackedScene>()
             {
                 {EntityType.ENTRANCE, ResourceLoader.Load<PackedScene>("res://Prototypes/Entrance.tscn") },
                 {EntityType.EXIT, ResourceLoader.Load<PackedScene>("res://Prototypes/Exit.tscn") },
@@ -55,7 +58,7 @@ namespace Refactor1
 
         public void OnBuildOptionButtonPress(Button button)
         {
-            var lookupMap = new Dictionary<String, EntityType>()
+            var lookupMap = new Godot.Collections.Dictionary<String, EntityType>()
             {
                 {"BOptDirectionalTileButton", EntityType.TILE},
                 {"BOptEntranceButton", EntityType.ENTRANCE},
@@ -269,6 +272,11 @@ namespace Refactor1
             worker.Game = this;
             worker.Destination = position;
             AddChild(worker);
+        }
+
+        public void SaveLogicTile(Point2D coordinates, List<LogicNode> roots)
+        {
+            
         }
     }
 }
