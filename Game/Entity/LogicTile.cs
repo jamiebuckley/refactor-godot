@@ -5,6 +5,6 @@ namespace Refactor1.Game.Entity
 {
     public class LogicTile : GridEntity
     {
-        public List<LogicNode> Roots { get; set; }
+        public List<LogicNode> Roots { get; set; } = new List<LogicNode>();
     }
 }

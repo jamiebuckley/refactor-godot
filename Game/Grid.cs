@@ -60,6 +60,10 @@ namespace Refactor1.Game
             {
                 gridEntity = new LogicTile();
             }
+            else if (entityType == EntityType.TILE)
+            {
+                gridEntity = new ArrowTile();
+            }
             else
             {
                 gridEntity = new GridEntity();
@@ -130,18 +134,54 @@ namespace Refactor1.Game
 
         public void Step()
         {
+            StepLogic();
             StepWorkerOrientations();
             StepWorkers();
             StepEntrances();
+        }
+
+        private void StepLogic()
+        {
+            foreach (var gridTile in _internalGrid)
+            {
+                var logicTile = gridTile.GridEntities.FirstOrDefault(ge => ge.EntityType == EntityType.LOGIC);
+                if (logicTile == null) continue;
+                
+                var logicTileCast = logicTile as LogicTile;
+                //if (!logicTileCast.Roots.Any()) continue;
+                //var executionResult = new LogicTileExecutor().Execute(logicTileCast.Roots[0], this);
+                //if (executionResult.Result == false) continue;
+
+                var surroundingEntities = GetSurroundingEntities(gridTile.Position);
+                var arrowTiles = surroundingEntities.Where(x => x.EntityType == EntityType.TILE).Select(e => e as ArrowTile);
+                foreach (var tile in arrowTiles)
+                {
+                    tile.Enabled = !tile.Enabled;
+                    if (tile.Enabled)
+                        tile.GodotEntity.Call("_set_enabled");
+                    else
+                        tile.GodotEntity.Call("_set_disabled");
+                }
+            }
+        }
+
+        private List<GridEntity> GetSurroundingEntities(Point2D gridCoords)
+        {
+            List<GridEntity> results = new List<GridEntity>();
+            if (gridCoords.X != _size) results.AddRange(GetGridTile(new Point2D(gridCoords.X + 1, gridCoords.Z)).GridEntities);
+            if (gridCoords.X != 0) results.AddRange(GetGridTile(new Point2D(gridCoords.X - 1, gridCoords.Z)).GridEntities);
+            if (gridCoords.Z != _size) results.AddRange(GetGridTile(new Point2D(gridCoords.Z + 1, gridCoords.Z)).GridEntities);
+            if (gridCoords.Z != _size) results.AddRange(GetGridTile(new Point2D(gridCoords.Z - 1, gridCoords.Z)).GridEntities);
+            return results;
         }
 
         private void StepWorkerOrientations()
         {
             foreach (var gridTile in _internalGrid)
             {
-                var tile = gridTile.GridEntities.FirstOrDefault(e => e.EntityType == EntityType.TILE);
+                var tile = gridTile.GridEntities.FirstOrDefault(e => e.EntityType == EntityType.TILE) as ArrowTile;
                 var worker = gridTile.GridEntities.FirstOrDefault(e => e.EntityType == EntityType.WORKER);
-                if (tile == null || worker == null) continue;
+                if (tile == null || worker == null || tile.Enabled == false) continue;
                 
                 worker.Orientation = tile.Orientation;
             }

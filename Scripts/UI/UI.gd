@@ -31,5 +31,4 @@ func on_build_modal_button_pressed():
 	build_modal.popup()
 
 func show_logic_modal():
-	print("logic popup")
 	get_node(logic_modal_path).popup()

@@ -196,6 +196,5 @@ margin_bottom = 204.0
 rect_min_size = Vector2( 100, 100 )
 text = "Pick Up"
 [connection signal="about_to_show" from="LogicDialog" to="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" method="_on_LogicDialog_about_to_show"]
-[connection signal="modal_closed" from="LogicDialog" to="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" method="_on_LogicDialog_modal_closed"]
+[connection signal="hide" from="LogicDialog" to="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" method="_on_LogicDialog_hide"]
 [connection signal="popup_hide" from="LogicDialog" to="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" method="_on_LogicDialog_popup_hide"]
-[connection signal="visibility_changed" from="LogicDialog" to="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" method="_on_LogicDialog_visibility_changed"]
