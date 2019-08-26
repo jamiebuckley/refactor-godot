@@ -33,6 +33,7 @@ mesh = SubResource( 1 )
 material/0 = SubResource( 2 )
 
 [node name="Area" type="Area" parent="MeshInstance"]
+editor/display_folded = true
 transform = Transform( 1, 0, 0, 0, 1, -5.55112e-17, 0, 0, 1, 0, 0, 0 )
 
 [node name="CollisionShape" type="CollisionShape" parent="MeshInstance/Area"]
@@ -45,6 +46,7 @@ current = true
 fov = 51.4
 
 [node name="UI" parent="." instance=ExtResource( 2 )]
+mouse_filter = 2
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource( 4 )

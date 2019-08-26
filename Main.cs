@@ -31,13 +31,13 @@ namespace Refactor1
             _grid = new Grid(20, this);
             GD.Print("Refactor::Main::Ready");
 
-            var buttons = GetNode("/root/RootSpatial/UI").GetTree().GetNodesInGroup("BuildOptionButton");
+            var UI = GetNode("/root/RootSpatial/UI");
+            var buttons = UI.GetTree().GetNodesInGroup("BuildOptionButton");
             foreach (Button button in buttons)
             {
                 button.Connect("pressed", this, "OnBuildOptionButtonPress", new Array {button});
             }
-            
-            
+
             // Load packed scenes
             _entityTypeToPackedScenes = new Dictionary<EntityType, PackedScene>()
             {
@@ -98,6 +98,7 @@ namespace Refactor1
 
         private void HandleMouseClick(InputEventMouseButton @event)
         {
+            GD.Print("Handle mouse click");
             var position = _picker.Translation;
             var gridCoords = GetGridCoordinates(position);
 

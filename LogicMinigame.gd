@@ -13,3 +13,16 @@ func _ready():
 #	pass
 func _input(event):
 	unhandled_input(event)
+
+func _on_LogicDialog_modal_closed():
+	print("disabling input")
+	set_disable_input(true)
+
+
+func _on_LogicDialog_about_to_show():
+	print("enabling input")
+	set_disable_input(false)
+
+
+func _on_LogicDialog_visibility_changed():
+	pass # Replace with function body.

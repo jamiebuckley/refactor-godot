@@ -1,18 +1,17 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Scripts/UI/UI.gd" type="Script" id=1]
-[ext_resource path="res://Game/Logic/LogicEditorViewport.cs" type="Script" id=2]
-[ext_resource path="res://default_env.tres" type="Environment" id=3]
-[ext_resource path="res://LogicMinigame.gd" type="Script" id=4]
-[ext_resource path="res://LogicMiniGame.tscn" type="PackedScene" id=5]
+[ext_resource path="res://default_env.tres" type="Environment" id=2]
+[ext_resource path="res://LogicMinigame.gd" type="Script" id=3]
+[ext_resource path="res://LogicMiniGame.tscn" type="PackedScene" id=4]
 
 [sub_resource type="World" id=1]
-environment = ExtResource( 3 )
+environment = ExtResource( 2 )
 
 [node name="Control" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-mouse_filter = 2
+mouse_filter = 1
 script = ExtResource( 1 )
 build_modal_button_path = NodePath("MarginContainer/VBoxContainer/HBoxContainer/BuildButton")
 build_modal_path = NodePath("WindowDialog")
@@ -27,7 +26,7 @@ margin_left = 48.6871
 margin_top = 71.5987
 margin_right = -156.313
 margin_bottom = -48.4014
-mouse_filter = 2
+mouse_filter = 1
 size_flags_horizontal = 0
 size_flags_vertical = 0
 resizable = true
@@ -35,8 +34,7 @@ resizable = true
 [node name="MarginContainer" type="MarginContainer" parent="LogicDialog"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-mouse_filter = 2
-mouse_default_cursor_shape = 5
+mouse_filter = 1
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -48,10 +46,10 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.0
 stretch = true
-script = ExtResource( 2 )
 
 [node name="LogicMinigame" type="Viewport" parent="LogicDialog/MarginContainer/ViewportContainer"]
 size = Vector2( 818, 479 )
+own_world = true
 world = SubResource( 1 )
 transparent_bg = true
 handle_input_locally = false
@@ -59,17 +57,61 @@ disable_3d = true
 usage = 0
 render_target_update_mode = 3
 physics_object_picking = true
-script = ExtResource( 4 )
+gui_disable_input = true
+script = ExtResource( 3 )
 
-[node name="Node2D" parent="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" instance=ExtResource( 5 )]
+[node name="Node2D" parent="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" instance=ExtResource( 4 )]
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/margin_right = 32
+custom_constants/margin_top = 32
+custom_constants/margin_left = 32
+custom_constants/margin_bottom = 32
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+margin_left = 32.0
+margin_top = 32.0
+margin_right = 992.0
+margin_bottom = 568.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+margin_right = 960.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 0, 50 )
+mouse_filter = 2
+alignment = 2
+
+[node name="BuildLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+margin_left = 856.0
+margin_top = 18.0
+margin_right = 856.0
+margin_bottom = 32.0
+mouse_filter = 1
+
+[node name="BuildButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+margin_left = 860.0
+margin_right = 960.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 100, 0 )
+size_flags_horizontal = 0
+text = "Build"
 
 [node name="WindowDialog" type="WindowDialog" parent="."]
 editor/display_folded = true
 visible = true
-margin_left = 206.852
-margin_top = 184.241
-margin_right = 868.852
-margin_bottom = 465.241
+margin_left = 9.21375
+margin_top = 114.286
+margin_right = 671.216
+margin_bottom = 395.286
+mouse_filter = 1
 size_flags_horizontal = 0
 size_flags_vertical = 0
 window_title = "Build Options"
@@ -77,6 +119,7 @@ window_title = "Build Options"
 [node name="Panel" type="Panel" parent="WindowDialog"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 1
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -87,6 +130,7 @@ margin_left = 8.0
 margin_top = 8.0
 margin_right = -8.0
 margin_bottom = -8.0
+mouse_filter = 1
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -151,44 +195,6 @@ margin_right = 204.0
 margin_bottom = 204.0
 rect_min_size = Vector2( 100, 100 )
 text = "Pick Up"
-
-[node name="MarginContainer" type="MarginContainer" parent="."]
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-custom_constants/margin_right = 32
-custom_constants/margin_top = 32
-custom_constants/margin_left = 32
-custom_constants/margin_bottom = 32
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
-editor/display_folded = true
-margin_left = 32.0
-margin_top = 32.0
-margin_right = 992.0
-margin_bottom = 568.0
-mouse_filter = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
-margin_right = 960.0
-margin_bottom = 50.0
-rect_min_size = Vector2( 0, 50 )
-alignment = 2
-
-[node name="BuildLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-margin_left = 856.0
-margin_top = 18.0
-margin_right = 856.0
-margin_bottom = 32.0
-
-[node name="BuildButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-margin_left = 860.0
-margin_right = 960.0
-margin_bottom = 50.0
-rect_min_size = Vector2( 100, 0 )
-size_flags_horizontal = 0
-text = "Build"
+[connection signal="about_to_show" from="LogicDialog" to="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" method="_on_LogicDialog_about_to_show"]
+[connection signal="modal_closed" from="LogicDialog" to="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" method="_on_LogicDialog_modal_closed"]
+[connection signal="visibility_changed" from="LogicDialog" to="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" method="_on_LogicDialog_visibility_changed"]

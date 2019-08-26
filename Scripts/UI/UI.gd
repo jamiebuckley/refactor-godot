@@ -20,15 +20,15 @@ func _ready():
 		button.connect("pressed", self, "_on_build_option_button_press", [button])
 	
 	get_node(build_modal_button_path).connect("pressed", self, "on_build_modal_button_pressed")
-	show_logic_modal()
+	#show_logic_modal()
 
 func _on_build_option_button_press(button):
 	var button_name = button.text
 	option_label.text = button_name
-	build_modal.visible = false
+	build_modal.hide()
 	
 func on_build_modal_button_pressed():
-	build_modal.show_modal(false)
+	build_modal.popup()
 
 func show_logic_modal():
-	get_node(logic_modal_path).show_modal(false)
+	get_node(logic_modal_path).popup()

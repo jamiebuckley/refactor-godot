@@ -56,7 +56,6 @@
     <Compile Include="Game\Enumeration.cs" />
     <Compile Include="Game\Grid.cs" />
     <Compile Include="Game\Logic\ToolboxNode.cs" />
-    <Compile Include="Game\Logic\LogicEditorViewport.cs" />
     <Compile Include="Game\Logic\LogicEditor.cs" />
     <Compile Include="Game\Logic\LogicNode.cs" />
     <Compile Include="Game\Logic\LogicNodeConnection.cs" />
@@ -66,9 +65,6 @@
     <Compile Include="GodotInterface.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Game\Utility" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
