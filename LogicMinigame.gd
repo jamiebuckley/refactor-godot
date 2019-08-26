@@ -25,4 +25,10 @@ func _on_LogicDialog_about_to_show():
 
 
 func _on_LogicDialog_visibility_changed():
+	print("visibility changed")
 	pass # Replace with function body.
+
+
+func _on_LogicDialog_popup_hide():
+	print("popup hide")
+	set_disable_input(true)

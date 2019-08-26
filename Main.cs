@@ -54,6 +54,31 @@ namespace Refactor1
             var pickerScene = ResourceLoader.Load<PackedScene>("res://Prototypes/Picker.tscn");
             _picker = (Spatial) pickerScene.Instance();
             AddChild(_picker);
+            
+            // LogicEditorDebug();
+        }
+
+        private void LogicEditorDebug()
+        {
+            var windowDialog = GetTree().GetRoot().FindNode("LogicDialog", true, false) as WindowDialog;
+            windowDialog.PopupCentered();
+            
+            var logicEditor = GetTree().GetRoot().FindNode("LogicEditor", true, false) as LogicEditor;
+
+
+            var root = new LogicNode(LogicNodeType.Root, null);
+            
+            var child1 = new LogicNode(LogicNodeType.ToggleIf, root);
+            root.Child1 = child1;
+            
+            var child2 = new LogicNode(LogicNodeType.NumericalEquals, child1);
+            child1.Child1 = child2;
+            
+            var child3 = new LogicNode(LogicNodeType.Number, child2);
+            child2.Child1 = child3;
+
+
+            logicEditor.LoadTree(new List<LogicNode>() { root });
         }
 
         public void OnBuildOptionButtonPress(Button button)
@@ -157,9 +182,18 @@ namespace Refactor1
             _selectedEntity?.GodotEntity.Call("_set_unselected");
             _selectedEntity = firstEntity;
             _selectedEntity.GodotEntity.Call("_set_selected");
-            
+
+            // Show LOGIC modal
             if (_selectedEntity.EntityType == EntityType.LOGIC)
+            {
                 GetNode("/root/RootSpatial/UI").Call("show_logic_modal");
+                var logicEditor = GetTree().GetRoot().FindNode("LogicEditor", true, false) as LogicEditor;
+                if (logicEditor == null)
+                {
+                    throw new ArgumentException("Failed to find logic editor to set coordinates");
+                }
+                logicEditor.SetCoordinates(gridCoords);
+            }
         }
 
         private void HandleGridBuild(Point2D gridCoords)
@@ -186,6 +220,8 @@ namespace Refactor1
 
             var packedScene = _entityTypeToPackedScenes[_selectedEntityType];
             var instance = packedScene.Instance() as Spatial;
+
+            Spatial wrappingScene;
 
             GameOrientation orientation = GameOrientation.North;
             if (_selectedEntityType == EntityType.ENTRANCE || _selectedEntityType == EntityType.EXIT)
@@ -276,7 +312,11 @@ namespace Refactor1
 
         public void SaveLogicTile(Point2D coordinates, List<LogicNode> roots)
         {
+            if (coordinates == null) throw new ArgumentException("Coordinates cannot be null");
             
+            var gridTile = _grid.GetGridTile(coordinates);
+            var logicTile = gridTile.GridEntities.First(x => x.EntityType == EntityType.LOGIC) as LogicTile;
+            logicTile.Roots = roots;
         }
     }
 }

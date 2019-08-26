@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Refactor1.Game.Common;
 
 namespace Refactor1.Game.Logic
 {
@@ -18,21 +19,38 @@ namespace Refactor1.Game.Logic
         private GraphicalLogicNode.GhostConnection _currentSnappedGhost = null;
 
         private Dictionary<LogicNode, GraphicalLogicNode> _logicNodeGraphics = new Dictionary<LogicNode, GraphicalLogicNode>();
+        
+        private Point2D _coordinates;
+
+        private VBoxContainer logicToolboxVBox;
 
         public override void _Ready()
         {
             _logicNodeCreator = new LogicNodeCreator();
             _logicNodeCreator.Initialise();
 
+            ConnectSaveButton();
+            SetupToolbox();
+            InitializeRoots();
+            UpdateGhosts();
+            
+            logicToolboxVBox = GetTree().GetRoot().FindNode("LogicToolboxVBox", true, false) as VBoxContainer;
+        }
+
+        private void ConnectSaveButton()
+        {
             var saveButton = GetTree().GetRoot().FindNode("LogicSaveButton", true, false) as Button;
             saveButton.Connect("pressed", this, "OnSaveButtonPressed");
-            
+        }
+
+        private void SetupToolbox()
+        {
             var logicToolbox = GetTree().GetRoot().FindNode("LogicToolbox", true, false);
             if (logicToolbox == null) throw new InvalidOperationException("Cannot initialise toolbox as cannot find logicToolbox node in scene");
 
             Enumeration.GetAll<LogicNodeType>().ToList().ForEach(type =>
             {
-                var graphicalNode = _logicNodeCreator.CreateNode(type);
+                var graphicalNode = _logicNodeCreator.CreateNode(type, false);
                 graphicalNode.SetScale(new Vector2(0.2f, 0.2f));
 
                 var binds = new Godot.Collections.Array { graphicalNode };
@@ -42,24 +60,17 @@ namespace Refactor1.Game.Logic
                 control.SetCustomMinimumSize(new Vector2(150, 150));
                 logicToolbox.AddChild(control);
             });
+        }
 
-
-            var graphicalRootNode = _logicNodeCreator.CreateNode(LogicNodeType.Root);
+        private void InitializeRoots()
+        {
+            var graphicalRootNode = _logicNodeCreator.CreateNode(LogicNodeType.Root, true);
             graphicalRootNode.SetScale(new Vector2(0.2f, 0.2f));
             AddChild(graphicalRootNode);
 
-            var root = new LogicNode
-            {
-                LogicNodeType = LogicNodeType.Root
-            };
-            
+            var root = new LogicNode { LogicNodeType = LogicNodeType.Root };
             _roots.Add(root);
-            
-            _logicNodeGraphics.Add(root, new GraphicalLogicNode()
-            {
-                GraphicalNode = graphicalRootNode   
-            });
-            UpdateGhosts();
+            _logicNodeGraphics.Add(root, new GraphicalLogicNode { GraphicalNode = graphicalRootNode });
         }
 
         private void UpdateGhosts()
@@ -167,7 +178,17 @@ namespace Refactor1.Game.Logic
             }
 
             var binds = new Godot.Collections.Array { _draggedNode };
-            _draggedNode.Area2d.Connect("input_event", this, "OnEditorNodeSelected", binds);
+            if (!_draggedNode.Area2d.IsConnected("input_event", this, "OnEditorNodeSelected"))
+            {
+                _draggedNode.Area2d.Connect("input_event", this, "OnEditorNodeSelected", binds);
+            }
+            
+            var rect = logicToolboxVBox.GetRect();
+            if (rect.HasPoint(GetGlobalMousePosition()))
+            {
+                RemoveChild(_draggedNode);
+            }
+
             _draggedNode = null;
         }
 
@@ -196,7 +217,7 @@ namespace Refactor1.Game.Logic
             
             if (@event is InputEventMouseButton inputEventMouseButton && inputEventMouseButton.Pressed)
             {
-                _draggedNode = _logicNodeCreator.CreateNode(graphicalNode.Type);
+                _draggedNode = _logicNodeCreator.CreateNode(graphicalNode.Type, true);
                 _draggedNode.SetScale(new Vector2(0.2f, 0.2f));
                 
                 var node = new LogicNode
@@ -233,8 +254,53 @@ namespace Refactor1.Game.Logic
 
         public void OnSaveButtonPressed()
         {
-            // write tree to main state
             GD.Print("save");
+            var main = GetTree().GetRoot().FindNode("RootSpatial", true, false) as Main;
+            main.SaveLogicTile(_coordinates, _roots);
+        }
+
+        public void SetCoordinates(Point2D gridCoords)
+        {
+            this._coordinates = gridCoords;
+        }
+
+        public void LoadTree(List<LogicNode> logicNodes)
+        {
+            this._roots = logicNodes;
+            LoadTreeNode(null, logicNodes.ElementAt(0), 0);
+            UpdateGhosts();
+        }
+
+        public void LoadTreeNode(ToolboxNode parent, LogicNode thisNode, int child1)
+        {
+            var graphics = _logicNodeCreator.CreateNode(thisNode.LogicNodeType, true);
+            graphics.LogicNode = thisNode;
+            graphics.SetScale(new Vector2(0.2f, 0.2f));
+            
+            var binds = new Godot.Collections.Array { graphics };
+            graphics.Area2d.Connect("input_event", this, "OnEditorNodeSelected", binds);
+            AddChild(graphics);
+
+            if (parent != null)
+            {
+                if (child1 == 1)
+                {
+                    graphics.SetPosition(parent.GetPosition() + new Vector2(120, 0));
+                }
+
+                if (child1 == 2)
+                {
+                    graphics.SetPosition(parent.GetPosition() + new Vector2(120, 100));
+                }
+            }
+            
+            _logicNodeGraphics.Add(thisNode, new GraphicalLogicNode()
+            {
+                GraphicalNode = graphics,
+            });
+            
+            if (thisNode.HasChild(0)) LoadTreeNode(graphics, thisNode.Child1, 1);
+            if (thisNode.HasChild(1)) LoadTreeNode(graphics, thisNode.Child1, 2);
         }
     }
 }

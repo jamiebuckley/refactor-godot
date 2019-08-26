@@ -60,7 +60,7 @@ physics_object_picking = true
 gui_disable_input = true
 script = ExtResource( 3 )
 
-[node name="Node2D" parent="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" instance=ExtResource( 4 )]
+[node name="LogicEditor" parent="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" instance=ExtResource( 4 )]
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 anchor_right = 1.0
@@ -197,4 +197,5 @@ rect_min_size = Vector2( 100, 100 )
 text = "Pick Up"
 [connection signal="about_to_show" from="LogicDialog" to="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" method="_on_LogicDialog_about_to_show"]
 [connection signal="modal_closed" from="LogicDialog" to="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" method="_on_LogicDialog_modal_closed"]
+[connection signal="popup_hide" from="LogicDialog" to="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" method="_on_LogicDialog_popup_hide"]
 [connection signal="visibility_changed" from="LogicDialog" to="LogicDialog/MarginContainer/ViewportContainer/LogicMinigame" method="_on_LogicDialog_visibility_changed"]

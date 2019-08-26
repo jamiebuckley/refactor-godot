@@ -1,10 +1,13 @@
 using System;
 using Godot;
+using Godot.Collections;
 
 namespace Refactor1.Game.Logic
 {
     public class LogicNode
     {
+        
+        public readonly string NumericalValueTag = "NumericalValue";
 
         public LogicNodeType LogicNodeType { get; set; }
 
@@ -15,6 +18,19 @@ namespace Refactor1.Game.Logic
         public LogicNode Child1 { get; set; }
 
         public LogicNode Child2 { get; set; }
+
+        public Dictionary<string, string> Tags { get; } = new Dictionary<string, string>();
+
+        public LogicNode()
+        {
+            
+        }
+
+        public LogicNode(LogicNodeType logicNodeType, LogicNode parent)
+        {
+            this.LogicNodeType = logicNodeType;
+            this.Parent = parent;
+        }
 
         public bool HasChild(int childIndex)
         {

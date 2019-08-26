@@ -22,7 +22,7 @@ config/icon="res://icon.png"
 
 [mono]
 
-debugger_agent/port=23686
+debugger_agent/port=23687
 
 [rendering]
 

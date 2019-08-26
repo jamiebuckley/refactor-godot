@@ -52,6 +52,7 @@
     <Compile Include="Game\Common\Colours.cs" />
     <Compile Include="Game\Common\EntityType.cs" />
     <Compile Include="Game\Common\GameOrientation.cs" />
+    <Compile Include="Game\Common\InventoryItem.cs" />
     <Compile Include="Game\Common\Point2D.cs" />
     <Compile Include="Game\Entity\GridEntity.cs" />
     <Compile Include="Game\Entity\LogicTile.cs" />

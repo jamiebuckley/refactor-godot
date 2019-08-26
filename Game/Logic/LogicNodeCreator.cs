@@ -9,6 +9,7 @@ namespace Refactor1.Game.Logic
 {
     public class LogicNodeCreator
     {
+
         private System.Collections.Generic.Dictionary<LogicNodeConnection, AtlasTexture> _connectorOutAtlasMap = new System.Collections.Generic.Dictionary<LogicNodeConnection, AtlasTexture>();
         private System.Collections.Generic.Dictionary<LogicNodeConnection, AtlasTexture> _connectorInAtlasMap = new System.Collections.Generic.Dictionary<LogicNodeConnection, AtlasTexture>();
         private AtlasTexture _mainBodyAtlas;
@@ -29,7 +30,7 @@ namespace Refactor1.Game.Logic
             return backgroundNode;
         }
 
-        public ToolboxNode CreateNode(LogicNodeType logicNodeType)
+        public ToolboxNode CreateNode(LogicNodeType logicNodeType, bool inEditor)
         {
             var backgroundNode = new Node2D();
 
@@ -105,8 +106,42 @@ namespace Refactor1.Game.Logic
             
             rootNode.Area2d = area2D;
             rootNode.Type = logicNodeType;
+
+            if (inEditor)
+            {
+                AddExtras(logicNodeType, rootNode);
+            }
             
             return rootNode;
+        }
+
+        private void AddExtras(LogicNodeType logicNodeType, ToolboxNode rootNode)
+        {
+            if (logicNodeType == LogicNodeType.Number)
+            {
+                var textEdit = new LineEdit();
+                textEdit.SetSize(new Vector2(350, 120));
+                textEdit.SetPosition(new Vector2(50, 250));
+                textEdit.SetEditable(true);
+                textEdit.Set("custom_fonts/font", ResourceLoader.Load("res://Assets/Fonts/Montserrat.tres"));
+                rootNode.AddChild(textEdit);
+                
+                textEdit.Connect("text_changed", rootNode, "OnTextChanged", new Array() { "NumericalValue" });
+            }
+            
+            else if (logicNodeType == LogicNodeType.InventoryItem)
+            {
+                var itemList = new OptionButton();
+                itemList.SetSize(new Vector2(350, 120));
+                itemList.SetPosition(new Vector2(50, 250));
+                foreach (var value in Enum.GetValues(typeof(InventoryItem)))
+                {
+                    itemList.AddItem(value.ToString());
+                }
+                
+                itemList.Set("custom_fonts/font", ResourceLoader.Load("res://Assets/Fonts/Montserrat.tres"));
+                rootNode.AddChild(itemList);
+            }
         }
 
         void CreateAtlas()

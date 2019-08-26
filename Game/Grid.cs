@@ -55,7 +55,16 @@ namespace Refactor1.Game
                 throw new ArgumentException($"Cannot place entityType {entityType} at position ({position.X}, {position.Z})");
             }
 
-            var gridEntity = new GridEntity();
+            GridEntity gridEntity;
+            if (entityType == EntityType.LOGIC)
+            {
+                gridEntity = new LogicTile();
+            }
+            else
+            {
+                gridEntity = new GridEntity();
+            }
+            
             gridEntity.EntityType = entityType;
             gridEntity.GodotEntity = godotNode;
             gridEntity.Orientation = orientation;
