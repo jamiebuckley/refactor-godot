@@ -60,39 +60,37 @@ namespace Refactor1.Game.Logic
             while (stack.Any())
             {
                 var node = stack.Pop();
-                for (int i = 0; i < 2; i++)
+                for (var i = 0; i < 2; i++)
                 {
-                    if (node.IsConnectionEnabled(i))
+                    if (!node.IsConnectionEnabled(i)) continue;
+                    
+                    if (!node.HasChild(i))
                     {
-                        if (!node.HasChild(i))
+                        if (node.GetGhost(i) == null)
                         {
-                            if (node.GetGhost(i) == null)
-                            {
-                                //node.LogicNodeType.ConnectionsIn[i]
-                                var ghostNode = _logicNodeCreator.CreateGhostNode();
-                                ghostNode.SetScale(new Vector2(0.2f, 0.2f));
-                                ghostNode.Position = node.GraphicalNode.Position + new Vector2(120, i * 100);
-                                AddChild(ghostNode);
+                            var ghostNode = _logicNodeCreator.CreateGhostNode();
+                            ghostNode.SetScale(new Vector2(0.2f, 0.2f));
+                            ghostNode.Position = node.GraphicalNode.Position + new Vector2(120, i * 100);
+                            AddChild(ghostNode);
 
-                                var ghostConnection = new LogicNode.GhostConnection
-                                {
-                                    GhostNode = ghostNode,
-                                    Owner = node,
-                                    ChildIndex = i
-                                };
-                                _ghosts.Add(ghostConnection);
-                                validGhosts.Add(ghostConnection);
-                                node.SetGhost(ghostConnection, i);
-                            }
-                            else
+                            var ghostConnection = new LogicNode.GhostConnection
                             {
-                                validGhosts.Add(node.GetGhost(i));
-                            }
+                                GhostNode = ghostNode,
+                                Owner = node,
+                                ChildIndex = i
+                            };
+                            _ghosts.Add(ghostConnection);
+                            validGhosts.Add(ghostConnection);
+                            node.SetGhost(ghostConnection, i);
                         }
                         else
                         {
-                            stack.Push(node.ChildAt(i));
+                            validGhosts.Add(node.GetGhost(i));
                         }
+                    }
+                    else
+                    {
+                        stack.Push(node.ChildAt(i));
                     }
                 }
             }
@@ -109,6 +107,19 @@ namespace Refactor1.Game.Logic
             _ghosts = validGhosts;
         }
 
+        private bool IsValidConnection(LogicNode.GhostConnection ghostConnection, ToolboxNode toolboxNode)
+        {
+            var draggedNodeConnectionOut = toolboxNode.Type.ConnectionOut;
+
+            if (!ghostConnection.Owner.IsConnectionEnabled(ghostConnection.ChildIndex))
+            {
+                return false;
+            }
+            
+            var parentInputConnection = ghostConnection.Owner.LogicNodeType.ConnectionsIn[ghostConnection.ChildIndex];
+            return draggedNodeConnectionOut == parentInputConnection;
+        }
+
         public override void _Process(float delta)
         {
             if (_draggedNode == null) return;
@@ -116,8 +127,11 @@ namespace Refactor1.Game.Logic
             
             // if the node is < 100 from any anchor points, snap
             // check if the anchor point and the snapping point is of matching type
-            var closeGhosts = _ghosts.Where(x => 
-                (x.GhostNode.Position - GetGlobalMousePosition()).Length() < 100);
+            var closeGhosts = _ghosts
+                .Where(x => (x.GhostNode.Position - GetGlobalMousePosition()).Length() < 100)
+                .Where(x => IsValidConnection(x, _draggedNode))
+                .ToList();
+            
             if (closeGhosts.Any())
             {
                 var closeGhost = closeGhosts.ElementAt(0);
@@ -130,25 +144,21 @@ namespace Refactor1.Game.Logic
                 _currentSnappedGhost = null;
             }
 
-            if (!Input.IsMouseButtonPressed(1))
+            if (Input.IsMouseButtonPressed(1)) return;
+            
+            
+            if (_currentSnappedGhost != null)
             {
-                if (_currentSnappedGhost != null)
-                {
-                    var newParent = _currentSnappedGhost.Owner;
-                    _draggedNode.LogicNode.Parent = newParent;
-                    _draggedNode.LogicNode.ChildIndex = _currentSnappedGhost.ChildIndex;
-                    newParent.SetChildAt(_draggedNode.LogicNode ,_currentSnappedGhost.ChildIndex);
-                    UpdateGhosts();
-                }
-                
-                var binds = new Godot.Collections.Array();
-                binds.Add(_draggedNode);
-                _draggedNode.Area2d.Connect("input_event", this, "OnEditorNodeSelected", binds);
-                _draggedNode = null;
-                // drop the node
-                // snap it to the anchor point
-                // return
+                var newParent = _currentSnappedGhost.Owner;
+                _draggedNode.LogicNode.Parent = newParent;
+                _draggedNode.LogicNode.ChildIndex = _currentSnappedGhost.ChildIndex;
+                newParent.SetChildAt(_draggedNode.LogicNode ,_currentSnappedGhost.ChildIndex);
+                UpdateGhosts();
             }
+
+            var binds = new Godot.Collections.Array { _draggedNode };
+            _draggedNode.Area2d.Connect("input_event", this, "OnEditorNodeSelected", binds);
+            _draggedNode = null;
         }
 
         public void OnEditorNodeSelected(object viewport, object @event, int shape_idx, ToolboxNode graphicalNode)

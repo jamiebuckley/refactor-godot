@@ -69,6 +69,12 @@ namespace Refactor1
             }
 
             _selectedEntityType = lookupMap[button.GetName()];
+            
+            var buildModal = GetNode("/root/RootSpatial/UI/WindowDialog") as WindowDialog;
+            buildModal.Hide();
+
+            var buildTextLabel = GetNode("/root/RootSpatial/UI/MarginContainer/VBoxContainer/HBoxContainer/BuildLabel") as Label;
+            buildTextLabel.SetText(_selectedEntityType.ToString());
         }
 
         // Called every frame. 'delta' is the elapsed time since the previous frame.
