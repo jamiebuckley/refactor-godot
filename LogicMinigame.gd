@@ -26,9 +26,9 @@ func _on_LogicDialog_about_to_show():
 
 func _on_LogicDialog_popup_hide():
 	print("popup hide")
-	set_disable_input(true)
 
 
 func _on_LogicDialog_hide():
 	print("regular hide")
+	set_disable_input(true)
 	pass # Replace with function body.

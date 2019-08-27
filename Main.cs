@@ -133,6 +133,7 @@ namespace Refactor1
         private void HandleMouseClick(InputEventMouseButton @event)
         {
             GD.Print("Handle mouse click");
+            if (@event.IsPressed()) return;
             var position = _picker.Translation;
             var gridCoords = GetGridCoordinates(position);
 

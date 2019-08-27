@@ -170,8 +170,8 @@ namespace Refactor1.Game
             List<GridEntity> results = new List<GridEntity>();
             if (gridCoords.X != _size) results.AddRange(GetGridTile(new Point2D(gridCoords.X + 1, gridCoords.Z)).GridEntities);
             if (gridCoords.X != 0) results.AddRange(GetGridTile(new Point2D(gridCoords.X - 1, gridCoords.Z)).GridEntities);
-            if (gridCoords.Z != _size) results.AddRange(GetGridTile(new Point2D(gridCoords.Z + 1, gridCoords.Z)).GridEntities);
-            if (gridCoords.Z != _size) results.AddRange(GetGridTile(new Point2D(gridCoords.Z - 1, gridCoords.Z)).GridEntities);
+            if (gridCoords.Z != _size) results.AddRange(GetGridTile(new Point2D(gridCoords.X, gridCoords.Z + 1)).GridEntities);
+            if (gridCoords.Z != 0) results.AddRange(GetGridTile(new Point2D(gridCoords.X, gridCoords.Z - 1)).GridEntities);
             return results;
         }
 
