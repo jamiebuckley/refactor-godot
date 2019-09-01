@@ -8,6 +8,7 @@ namespace Refactor1.Game.Common
         TILE,
         BLOCK,
         LOGIC,
+        COAL,
         NONE
     }
 }

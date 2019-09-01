@@ -48,6 +48,7 @@ namespace Refactor1
                 {EntityType.EXIT, ResourceLoader.Load<PackedScene>("res://Prototypes/Exit.tscn") },
                 {EntityType.TILE, ResourceLoader.Load<PackedScene>("res://Prototypes/DirectionalTile.tscn") },
                 {EntityType.WORKER, ResourceLoader.Load<PackedScene>("res://Prototypes/Worker.tscn") },
+                {EntityType.COAL, ResourceLoader.Load<PackedScene>("res://Prototypes/Coal.tscn")},
                 {EntityType.LOGIC, ResourceLoader.Load<PackedScene>("res://Prototypes/LogicTile.tscn") },
             };
             
@@ -56,6 +57,12 @@ namespace Refactor1
             AddChild(_picker);
             
             // LogicEditorDebug();
+
+            var coalEntity = _entityTypeToPackedScenes[EntityType.COAL].Instance() as Spatial;
+            coalEntity.Translation = GetWorldCoordinates(new Point2D(5, 5));
+            AddChild(coalEntity);
+            _grid.AddEntity(coalEntity, EntityType.COAL, new Point2D(5, 5),
+                GameOrientation.North);
         }
 
         private void LogicEditorDebug()

@@ -104,6 +104,12 @@ namespace Refactor1.Game
                     return !gridTile.GridEntities.Any(e => blocksWorker.Contains(e.EntityType));
                 }
 
+                case EntityType.COAL:
+                {
+                    // todo: This needs to have at least some checking
+                    return true;
+                }
+
                 default:
                     return false;
             }
@@ -148,9 +154,9 @@ namespace Refactor1.Game
                 if (logicTile == null) continue;
                 
                 var logicTileCast = logicTile as LogicTile;
-                //if (!logicTileCast.Roots.Any()) continue;
-                //var executionResult = new LogicTileExecutor().Execute(logicTileCast.Roots[0], this);
-                //if (executionResult.Result == false) continue;
+                if (!logicTileCast.Roots.Any()) continue;
+                var executionResult = new LogicTileExecutor().Execute(logicTileCast.Roots[0], gridTile);
+                if (executionResult.Result == false) continue;
 
                 var surroundingEntities = GetSurroundingEntities(gridTile.Position);
                 var arrowTiles = surroundingEntities.Where(x => x.EntityType == EntityType.TILE).Select(e => e as ArrowTile);
@@ -227,7 +233,7 @@ namespace Refactor1.Game
                 var currentPosition = tempWorker.OldGridTile.RealGridTile.Position;
                 var newPosition = currentPosition + tempWorker.RealWorker.Orientation.Direction;
 
-                var workerMovementBlockingEntities = new List<EntityType>() {EntityType.ENTRANCE, EntityType.EXIT};
+                var workerMovementBlockingEntities = new List<EntityType>() {EntityType.ENTRANCE, EntityType.EXIT, EntityType.COAL};
 
                 var isOutOfBounds = !IsInGridBounds(newPosition);
                 var workerBlockedByEntity = !isOutOfBounds && GetGridTile(newPosition).GridEntities

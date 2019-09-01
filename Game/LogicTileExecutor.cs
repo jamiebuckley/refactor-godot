@@ -17,7 +17,7 @@ namespace Refactor1.Game
             public bool Result { get; set; }
         }
         
-        public ExecutionResult Execute(LogicNode root, Grid grid)
+        public ExecutionResult Execute(LogicNode root, Grid.GridTile grid)
         {
             
             return new ExecutionResult()
