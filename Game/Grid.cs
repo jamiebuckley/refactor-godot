@@ -28,6 +28,8 @@ namespace Refactor1.Game
 
         private List<GridTile> _internalGrid;
         
+        public List<BlockedWorker> BlockedWorkers { get; } = new List<BlockedWorker>();
+        
         public Grid(int size, GodotInterface main)
         {
             this._size = size;
@@ -138,6 +140,16 @@ namespace Refactor1.Game
                 .ToList();
         }
 
+        /**
+         * Holds a record that a worker was blocked by an entity
+         */
+        public class BlockedWorker
+        {
+            public GridEntity Worker { get; set; }
+            
+            public GridEntity BlockedBy { get; set; }
+        }
+
         public void Step()
         {
             StepLogic();
@@ -210,6 +222,7 @@ namespace Refactor1.Game
 
         private void StepWorkers()
         {
+            BlockedWorkers.Clear();
             var tempGridTiles = new List<TempGridTile>(_internalGrid.Count);
             var tempWorkers = new List<TempWorker>(_internalGrid.Count);
             
@@ -236,9 +249,17 @@ namespace Refactor1.Game
                 var workerMovementBlockingEntities = new List<EntityType>() {EntityType.ENTRANCE, EntityType.EXIT, EntityType.COAL};
 
                 var isOutOfBounds = !IsInGridBounds(newPosition);
-                var workerBlockedByEntity = !isOutOfBounds && GetGridTile(newPosition).GridEntities
-                    .Any(e => workerMovementBlockingEntities.Contains(e.EntityType));
+                var blockingEntity = isOutOfBounds
+                    ? null
+                    : GetGridTile(newPosition).GridEntities
+                        .FirstOrDefault(e => workerMovementBlockingEntities.Contains(e.EntityType));
 
+                if (blockingEntity != null)
+                {
+                    BlockedWorkers.Add(new BlockedWorker { Worker = tempWorker.RealWorker, BlockedBy = blockingEntity });
+                }
+                
+                var workerBlockedByEntity = !isOutOfBounds && blockingEntity != null;
                 if (isOutOfBounds || workerBlockedByEntity)
                 {
                     tempWorker.CurrentGridTile = tempWorker.OldGridTile;
