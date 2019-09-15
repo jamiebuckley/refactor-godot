@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Refactor1;
+using Refactor1.Game;
 using Refactor1.Game.Common;
 using Xunit;
 
@@ -20,7 +22,7 @@ namespace RefactorTests
         {
             var grid = new Refactor1.Game.Grid(2, 1.0f, new MockGodot());
             var worker = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 0), GameOrientation.North);
-            grid.Step();
+            grid.Step(out _);
             Assert.Equal(0,worker.CurrentGridTile.Position.X);
             Assert.Equal(1,worker.CurrentGridTile.Position.Z);
         }
@@ -32,7 +34,7 @@ namespace RefactorTests
             var worker1 = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 0), GameOrientation.North);
             var worker2 = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 1), GameOrientation.North);
             
-            grid.Step();
+            grid.Step(out _);
             Assert.Equal(0, worker1.CurrentGridTile.Position.X);
             Assert.Equal(0, worker1.CurrentGridTile.Position.Z);
             
@@ -48,7 +50,7 @@ namespace RefactorTests
             var worker1 = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 0), GameOrientation.North);
             var worker2 = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 1), GameOrientation.South);
             
-            grid.Step();
+            grid.Step(out _);
             Assert.Equal(0, worker1.CurrentGridTile.Position.X);
             Assert.Equal(0, worker1.CurrentGridTile.Position.Z);
             

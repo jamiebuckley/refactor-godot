@@ -32,9 +32,9 @@ namespace Refactor1.Game
         {
             if (entityType == EntityType.WORKER)
             {
-                Worker worker = createdSpatial as Worker;
-                worker.Destination = coordinates;
-                worker.Grid = _grid;
+                WorkerScene workerScene = createdSpatial as WorkerScene;
+                workerScene.Destination = coordinates;
+                workerScene.Grid = _grid;
             }
             
             createdSpatial.Rotate(Vector3.Up, orientation.ToRotation());

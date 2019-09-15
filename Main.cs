@@ -182,7 +182,7 @@ namespace Refactor1
         public void CreateWorker(Point2D position, GameOrientation orientation)
         {
             if (!_gridBuilder.IsValid(EntityType.WORKER, position)) return;
-            var worker = _entityTypeToPackedScenes[EntityType.WORKER].Instance() as Worker;
+            var worker = _entityTypeToPackedScenes[EntityType.WORKER].Instance() as WorkerScene;
             _gridBuilder.HandleBuild(EntityType.WORKER, position, worker, orientation);
             AddChild(worker);
         }
@@ -199,16 +199,21 @@ namespace Refactor1
 
         private void OnTimer()
         {
-            _grid.Step();
-            HandleBlockedWorkers(_grid.BlockedWorkers);
-        }
-
-        private void HandleBlockedWorkers(List<Grid.BlockedWorker> blockedWorkers)
-        {
-            if (blockedWorkers.Any())
+            _grid.Step(out List<GridWorkerStepper.BlockedWorker> blockedWorkers);
+            
+            blockedWorkers.ForEach(blockedWorker =>
             {
-                GD.Print("Blocked workers!");
-            }
+                var workerEntity = blockedWorker.Worker as Worker;
+                var blockedBy = blockedWorker.BlockedBy;
+
+                if (blockedBy.EntityType == EntityType.COAL)
+                {
+                    GD.Print("Picking up coal");
+                    workerEntity.InventoryItems.Add(InventoryItem.COAL);
+                    var scene = (WorkerScene) workerEntity.GodotEntity;
+                    scene.SpeechBubbleFlash(50);
+                }
+            });
         }
 
         private void SetPickerPosition()

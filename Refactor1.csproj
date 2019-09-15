@@ -58,9 +58,13 @@
     <Compile Include="Game\Entity\ArrowTile.cs" />
     <Compile Include="Game\Entity\GridEntity.cs" />
     <Compile Include="Game\Entity\LogicTile.cs" />
+    <Compile Include="Game\Entity\Worker.cs" />
     <Compile Include="Game\Enumeration.cs" />
     <Compile Include="Game\Grid.cs" />
     <Compile Include="Game\GridBuilder.cs" />
+    <Compile Include="Game\GridEntranceStepper.cs" />
+    <Compile Include="Game\GridLogicStepper.cs" />
+    <Compile Include="Game\GridWorkerStepper.cs" />
     <Compile Include="Game\LogicTileExecutor.cs" />
     <Compile Include="Game\Logic\GraphicalLogicNode.cs" />
     <Compile Include="Game\Logic\ToolboxNode.cs" />
@@ -69,7 +73,7 @@
     <Compile Include="Game\Logic\LogicNodeConnection.cs" />
     <Compile Include="Game\Logic\LogicNodeCreator.cs" />
     <Compile Include="Game\Logic\LogicNodeType.cs" />
-    <Compile Include="Game\Worker.cs" />
+    <Compile Include="Game\WorkerScene.cs" />
     <Compile Include="GodotInterface.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

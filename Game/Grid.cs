@@ -28,22 +28,29 @@ namespace Refactor1.Game
         
         private readonly GodotInterface _main;
 
-        private List<GridTile> _internalGrid;
+        public List<GridTile> InternalGrid { get; }
         
-        public List<BlockedWorker> BlockedWorkers { get; } = new List<BlockedWorker>();
-        
+        private GridWorkerStepper _gridWorkerStepper;
+
+        private GridLogicStepper _gridLogicStepper;
+
+        private GridEntranceStepper _gridEntranceStepper;
+
         public Grid(int size, float tileSize, GodotInterface main)
         {
             _size = size;
             _tileSize = tileSize;
             _main = main;
-            _internalGrid = new List<GridTile>(size * size);
+            InternalGrid = new List<GridTile>(size * size);
+            _gridWorkerStepper = new GridWorkerStepper(this);
+            _gridLogicStepper = new GridLogicStepper(this);
+            _gridEntranceStepper = new GridEntranceStepper(main, this);
             
             for (var x = 0; x < size; x++)
             {
                 for (var z = 0; z < size; z++)
                 {
-                    _internalGrid.Add(new GridTile(new Point2D(x, z)));
+                    InternalGrid.Add(new GridTile(new Point2D(x, z)));
                 }
             }
         }
@@ -69,6 +76,10 @@ namespace Refactor1.Game
             else if (entityType == EntityType.TILE)
             {
                 gridEntity = new ArrowTile();
+            }
+            else if (entityType == EntityType.WORKER)
+            {
+                gridEntity = new Worker();
             }
             else
             {
@@ -135,61 +146,26 @@ namespace Refactor1.Game
 
         public GridTile GetGridTile(Point2D position)
         {
-            var gridTile = _internalGrid[position.X * _size + position.Z];
+            var gridTile = InternalGrid[position.X * _size + position.Z];
             return gridTile;
         }
 
-        List<GridEntity> FindEntitiesByType(EntityType entityType)
+        public List<GridEntity> FindEntitiesByType(EntityType entityType)
         {
-            return _internalGrid.SelectMany(x => x.GridEntities)
+            return InternalGrid.SelectMany(x => x.GridEntities)
                 .Where(e => e.EntityType == entityType)
                 .ToList();
         }
 
-        /**
-         * Holds a record that a worker was blocked by an entity
-         */
-        public class BlockedWorker
+        public void Step(out List<GridWorkerStepper.BlockedWorker> blockedWorkers)
         {
-            public GridEntity Worker { get; set; }
-            
-            public GridEntity BlockedBy { get; set; }
+            _gridLogicStepper.StepLogic();
+            _gridWorkerStepper.StepWorkerOrientations();
+             blockedWorkers = _gridWorkerStepper.StepWorkers();
+            _gridEntranceStepper.StepEntrances();
         }
 
-        public void Step()
-        {
-            StepLogic();
-            StepWorkerOrientations();
-            StepWorkers();
-            StepEntrances();
-        }
-
-        private void StepLogic()
-        {
-            foreach (var gridTile in _internalGrid)
-            {
-                var logicTile = gridTile.GridEntities.FirstOrDefault(ge => ge.EntityType == EntityType.LOGIC);
-                if (logicTile == null) continue;
-                
-                var logicTileCast = logicTile as LogicTile;
-                if (!logicTileCast.Roots.Any()) continue;
-                var executionResult = new LogicTileExecutor().Execute(logicTileCast.Roots[0], gridTile);
-                if (executionResult.Result == false) continue;
-
-                var surroundingEntities = GetSurroundingEntities(gridTile.Position);
-                var arrowTiles = surroundingEntities.Where(x => x.EntityType == EntityType.TILE).Select(e => e as ArrowTile);
-                foreach (var tile in arrowTiles)
-                {
-                    tile.Enabled = !tile.Enabled;
-                    if (tile.Enabled)
-                        tile.GodotEntity.Call("_set_enabled");
-                    else
-                        tile.GodotEntity.Call("_set_disabled");
-                }
-            }
-        }
-
-        private List<GridEntity> GetSurroundingEntities(Point2D gridCoords)
+        public List<GridEntity> GetSurroundingEntities(Point2D gridCoords)
         {
             List<GridEntity> results = new List<GridEntity>();
             if (gridCoords.X != _size) results.AddRange(GetGridTile(new Point2D(gridCoords.X + 1, gridCoords.Z)).GridEntities);
@@ -199,164 +175,6 @@ namespace Refactor1.Game
             return results;
         }
 
-        private void StepWorkerOrientations()
-        {
-            foreach (var gridTile in _internalGrid)
-            {
-                var tile = gridTile.GridEntities.FirstOrDefault(e => e.EntityType == EntityType.TILE) as ArrowTile;
-                var worker = gridTile.GridEntities.FirstOrDefault(e => e.EntityType == EntityType.WORKER);
-                if (tile == null || worker == null || tile.Enabled == false) continue;
-                
-                worker.Orientation = tile.Orientation;
-            }
-        }
-
-        private class TempGridTile
-        {
-            public GridTile RealGridTile { get; set; }
-            public List<TempWorker> Entities { get; set; } = new List<TempWorker>();
-        }
-
-        private class TempWorker
-        {
-            public TempGridTile CurrentGridTile { get; set; }
-            
-            public TempGridTile OldGridTile { get; set; }
-            
-            public GridEntity RealWorker { get; set; }
-        }
-
-        private void StepWorkers()
-        {
-            BlockedWorkers.Clear();
-            var tempGridTiles = new List<TempGridTile>(_internalGrid.Count);
-            var tempWorkers = new List<TempWorker>(_internalGrid.Count);
-            
-            // Put workers in temp workers list
-            // Clear workers from grid tile
-            foreach (var gridTile in _internalGrid)
-            {
-                var tempGridTile = new TempGridTile() {RealGridTile = gridTile};
-                tempGridTiles.Add(tempGridTile);
-                
-                var workers = gridTile.GridEntities.Where(e => e.EntityType == EntityType.WORKER)
-                    .Select(worker => new TempWorker() { RealWorker = worker, OldGridTile = tempGridTile})
-                    .ToList();
-                
-                gridTile.GridEntities.RemoveAll(e => e.EntityType == EntityType.WORKER);
-                tempWorkers.AddRange(workers);
-            }
-
-            foreach (var tempWorker in tempWorkers)
-            {
-                var currentPosition = tempWorker.OldGridTile.RealGridTile.Position;
-                var newPosition = currentPosition + tempWorker.RealWorker.Orientation.Direction;
-
-                var workerMovementBlockingEntities = new List<EntityType>() {EntityType.ENTRANCE, EntityType.EXIT, EntityType.COAL};
-
-                var isOutOfBounds = !IsInGridBounds(newPosition);
-                var blockingEntity = isOutOfBounds
-                    ? null
-                    : GetGridTile(newPosition).GridEntities
-                        .FirstOrDefault(e => workerMovementBlockingEntities.Contains(e.EntityType));
-
-                if (blockingEntity != null)
-                {
-                    BlockedWorkers.Add(new BlockedWorker { Worker = tempWorker.RealWorker, BlockedBy = blockingEntity });
-                }
-                
-                var workerBlockedByEntity = !isOutOfBounds && blockingEntity != null;
-                if (isOutOfBounds || workerBlockedByEntity)
-                {
-                    tempWorker.CurrentGridTile = tempWorker.OldGridTile;
-                    tempWorker.CurrentGridTile.Entities.Add(tempWorker);
-                }
-                else
-                {
-                    var newTile = tempGridTiles[newPosition.X * _size + newPosition.Z];
-                    tempWorker.CurrentGridTile = newTile;
-                    newTile.Entities.Add(tempWorker);
-                }
-            }
-
-            var invalidStack = new Stack<TempGridTile>();
-            foreach (var gridTile in tempGridTiles)
-            {
-                if (gridTile.Entities.Count > 1)
-                {
-                    invalidStack.Push(gridTile);
-                }
-
-                foreach (var entity in gridTile.Entities.ToList())
-                {
-                    if (entity.OldGridTile != entity.CurrentGridTile)
-                    {
-                        var workerFromThisTile =
-                            entity.OldGridTile.Entities.FirstOrDefault(x => x.OldGridTile == entity.CurrentGridTile);
-                        
-                        if (workerFromThisTile != null)
-                        {
-                            workerFromThisTile.OldGridTile.Entities.Remove(workerFromThisTile);
-                            workerFromThisTile.CurrentGridTile = gridTile;
-                            gridTile.Entities.Add(workerFromThisTile);
-
-                            gridTile.Entities.Remove(entity);
-                            entity.CurrentGridTile = entity.OldGridTile;
-                            entity.CurrentGridTile.Entities.Add(entity);
-                            if (entity.CurrentGridTile.Entities.Count() > 1 && !invalidStack.Contains(entity.CurrentGridTile)) 
-                                invalidStack.Push(entity.CurrentGridTile);
-                        }
-                    }
-                }
-            }
-
-
-            while (invalidStack.Count > 0)
-            {
-                var tile = invalidStack.Pop();
-                var entityQueue = new Queue<TempWorker>(tile.Entities);
-                while (entityQueue.Count > 1)
-                {
-                    // remove entities down to 1, not moving the entity that came from this tile if it exists
-                    
-                    var topEntity = entityQueue.Dequeue();
-                    if (topEntity.CurrentGridTile == topEntity.OldGridTile)
-                    {
-                        continue;
-                    }
-                    topEntity.CurrentGridTile = topEntity.OldGridTile;
-                    topEntity.OldGridTile.Entities.Add(topEntity);
-                    if (topEntity.OldGridTile.Entities.Count > 1) invalidStack.Push(topEntity.OldGridTile);
-                }
-                tile.Entities = entityQueue.ToList();
-            }
-
-            foreach (var tempWorker in tempWorkers)
-            {
-                var newGridTile = tempWorker.CurrentGridTile.RealGridTile;
-                newGridTile.GridEntities.Add(tempWorker.RealWorker);
-                tempWorker.RealWorker.CurrentGridTile = newGridTile;
-
-                if (tempWorker.RealWorker.GodotEntity == null) continue;
-                var worker = (Worker)tempWorker.RealWorker.GodotEntity;
-                worker.Destination = newGridTile.Position;
-            }
-        }
-        
-        private void StepEntrances()
-        {
-            var entrances = FindEntitiesByType(EntityType.ENTRANCE);
-            entrances.ForEach(entrance =>
-            {
-                var orientation = entrance.Orientation;
-                var gridTile = entrance.CurrentGridTile;
-                if (CanPlaceEntityType(EntityType.WORKER, gridTile.Position))
-                {
-                    _main.CreateWorker(gridTile.Position, entrance.Orientation);
-                }
-            });
-        }
-        
         public Point2D GetCoordinates(Vector3 position)
         {
             var offsetWorldX = position.x + (GetSize() * _tileSize) / 2;
