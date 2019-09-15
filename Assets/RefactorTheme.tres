@@ -10,7 +10,7 @@ bg_color = Color( 0.38356, 0.738281, 0.714368, 1 )
 bg_color = Color( 0.285645, 0.625, 0.602122, 1 )
 
 [sub_resource type="StyleBoxFlat" id=3]
-bg_color = Color( 0.188235, 0.341176, 0.376471, 1 )
+bg_color = Color( 0.54902, 0.439216, 0.439216, 1 )
 
 [sub_resource type="DynamicFont" id=4]
 extra_spacing_char = 1
@@ -29,6 +29,8 @@ Button/styles/focus = null
 Button/styles/hover = SubResource( 1 )
 Button/styles/normal = ExtResource( 1 )
 Button/styles/pressed = SubResource( 2 )
+Dialogs/constants/button_margin = 64
+Dialogs/constants/margin = 16
 Panel/styles/panel = SubResource( 3 )
 Panel/styles/panelf = null
 Panel/styles/panelnc = null

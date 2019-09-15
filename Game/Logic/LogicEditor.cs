@@ -152,7 +152,7 @@ namespace Refactor1.Game.Logic
                 .Where(x => (x.GhostNode.Position - GetGlobalMousePosition()).Length() < 100)
                 .Where(x => IsValidConnection(x, _draggedNode))
                 .ToList();
-            
+
             if (closeGhosts.Any())
             {
                 var closeGhost = closeGhosts.ElementAt(0);

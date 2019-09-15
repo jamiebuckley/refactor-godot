@@ -258,13 +258,18 @@ namespace Refactor1
         private void OnTimer()
         {
             _grid.Step();
-            if (_grid.BlockedWorkers.Any())
-            {
-                GD.Print("Blocked workers!");
-            }
+            HandleBlockedWorkers(_grid.BlockedWorkers);
             // Step Entrances
             // Step Grid
             // Step Worker Scenes
+        }
+
+        private void HandleBlockedWorkers(List<Grid.BlockedWorker> blockedWorkers)
+        {
+            if (blockedWorkers.Any())
+            {
+                GD.Print("Blocked workers!");
+            }
         }
 
         private void SetPickerPosition()

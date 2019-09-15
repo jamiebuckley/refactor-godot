@@ -20,6 +20,15 @@ run/main_scene="res://Main.tscn"
 boot_splash/bg_color=Color( 1, 1, 1, 1 )
 config/icon="res://icon.png"
 
+[display]
+
+window/size/width=1920
+window/size/height=1080
+
+[gui]
+
+theme/use_hidpi=true
+
 [mono]
 
 debugger_agent/port=23687
