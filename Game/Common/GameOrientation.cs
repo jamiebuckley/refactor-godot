@@ -36,6 +36,15 @@ namespace Refactor1.Game.Common
             if (orientation == East) return North;
             throw new ArgumentException("Could not recognise orientation " + orientation);
         }
+        
+        public static  GameOrientation GetEdgeOrientation(Point2D gridCoords, int minVal, int maxVal)
+        {
+            if (gridCoords.X == minVal) return GameOrientation.East;
+            else if (gridCoords.X == maxVal) return GameOrientation.West;
+            else if (gridCoords.Z == minVal) return GameOrientation.North;
+            else if (gridCoords.Z == maxVal) return GameOrientation.South;
+            return null;
+        }
 
         public float ToRotation()
         {

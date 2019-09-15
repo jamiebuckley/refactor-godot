@@ -49,6 +49,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
     <Compile Include="Game\Common\Colours.cs" />
     <Compile Include="Game\Common\EntityType.cs" />
     <Compile Include="Game\Common\GameOrientation.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Game\Entity\LogicTile.cs" />
     <Compile Include="Game\Enumeration.cs" />
     <Compile Include="Game\Grid.cs" />
+    <Compile Include="Game\GridBuilder.cs" />
     <Compile Include="Game\LogicTileExecutor.cs" />
     <Compile Include="Game\Logic\GraphicalLogicNode.cs" />
     <Compile Include="Game\Logic\ToolboxNode.cs" />

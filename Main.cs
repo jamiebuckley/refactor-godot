@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using Godot.Collections;
 using Refactor1.Game;
 using Refactor1.Game.Common;
 using Refactor1.Game.Entity;
 using Refactor1.Game.Logic;
 using Array = Godot.Collections.Array;
-using Orientation = Godot.Orientation;
 
 namespace Refactor1
 {
@@ -22,93 +20,74 @@ namespace Refactor1
 
         private Grid _grid;
 
+        private GridBuilder _gridBuilder;
+
         private EntityType _selectedEntityType = EntityType.NONE;
 
         private GridEntity _selectedEntity;
 
-        private Godot.Collections.Dictionary<EntityType, PackedScene> _entityTypeToPackedScenes;
+        private Dictionary<EntityType, PackedScene> _entityTypeToPackedScenes = new Dictionary<EntityType, PackedScene>();
 
         // Called when the node enters the scene tree for the first time.
         public override void _Ready()
         {
-            _grid = new Grid(20, this);
-            GD.Print("Refactor::Main::Ready");
+            _grid = new Grid(20, TileSize, this);
+            _gridBuilder = new GridBuilder(_grid);
+            
+            ConnectBuildOptionButtons();
+            PreparePackedScenes();
+            SetupPicker();
+            SetupLevel();
+        }
 
-            var UI = GetNode("/root/RootSpatial/UI");
-            var buttons = UI.GetTree().GetNodesInGroup("BuildOptionButton");
-            foreach (Button button in buttons)
+        private void ConnectBuildOptionButtons()
+        {
+            var ui = GetNode(Constants.UIPath);
+            foreach (Button button in ui.GetTree().GetNodesInGroup("BuildOptionButton"))
             {
                 button.Connect("pressed", this, "OnBuildOptionButtonPress", new Array {button});
             }
+        }
 
-            // Load packed scenes
-            _entityTypeToPackedScenes = new Godot.Collections.Dictionary<EntityType, PackedScene>()
+        private void PreparePackedScenes()
+        {
+            foreach (var entityTypeResourcePath in Constants.EntityTypeResourcePaths)
             {
-                {EntityType.ENTRANCE, ResourceLoader.Load<PackedScene>("res://Prototypes/Entrance.tscn") },
-                {EntityType.EXIT, ResourceLoader.Load<PackedScene>("res://Prototypes/Exit.tscn") },
-                {EntityType.TILE, ResourceLoader.Load<PackedScene>("res://Prototypes/DirectionalTile.tscn") },
-                {EntityType.WORKER, ResourceLoader.Load<PackedScene>("res://Prototypes/Worker.tscn") },
-                {EntityType.COAL, ResourceLoader.Load<PackedScene>("res://Prototypes/Coal.tscn")},
-                {EntityType.LOGIC, ResourceLoader.Load<PackedScene>("res://Prototypes/LogicTile.tscn") },
-            };
-            
-            var pickerScene = ResourceLoader.Load<PackedScene>("res://Prototypes/Picker.tscn");
+                _entityTypeToPackedScenes[entityTypeResourcePath.Key] =
+                    ResourceLoader.Load<PackedScene>(entityTypeResourcePath.Value);
+            }
+        }
+
+        private void SetupPicker()
+        {
+            var pickerScene = ResourceLoader.Load<PackedScene>(Constants.PickerSceneResourcePath);
             _picker = (Spatial) pickerScene.Instance();
             AddChild(_picker);
-            
-            // LogicEditorDebug();
+        }
 
+        private void SetupLevel()
+        {
             var coalEntity = _entityTypeToPackedScenes[EntityType.COAL].Instance() as Spatial;
-            coalEntity.Translation = GetWorldCoordinates(new Point2D(5, 5));
+            coalEntity.Translation = _grid.GetWorldCoordinates(new Point2D(5, 5));
             AddChild(coalEntity);
             _grid.AddEntity(coalEntity, EntityType.COAL, new Point2D(5, 5),
                 GameOrientation.North);
         }
 
-        private void LogicEditorDebug()
-        {
-            var windowDialog = GetTree().GetRoot().FindNode("LogicDialog", true, false) as WindowDialog;
-            windowDialog.PopupCentered();
-            
-            var logicEditor = GetTree().GetRoot().FindNode("LogicEditor", true, false) as LogicEditor;
-
-
-            var root = new LogicNode(LogicNodeType.Root, null);
-            
-            var child1 = new LogicNode(LogicNodeType.ToggleIf, root);
-            root.Child1 = child1;
-            
-            var child2 = new LogicNode(LogicNodeType.NumericalEquals, child1);
-            child1.Child1 = child2;
-            
-            var child3 = new LogicNode(LogicNodeType.Number, child2);
-            child2.Child1 = child3;
-
-
-            logicEditor.LoadTree(new List<LogicNode>() { root });
-        }
-
+        // ReSharper disable once UnusedMember.Global
         public void OnBuildOptionButtonPress(Button button)
         {
-            var lookupMap = new Godot.Collections.Dictionary<String, EntityType>()
+            if (!Constants.BuildOptionEntityTypes.ContainsKey(button.GetName()))
             {
-                {"BOptDirectionalTileButton", EntityType.TILE},
-                {"BOptEntranceButton", EntityType.ENTRANCE},
-                {"BOptExitButton", EntityType.EXIT},
-                {"BOptLogicButton", EntityType.LOGIC},
-            };
-            if (!lookupMap.ContainsKey(button.GetName()))
-            {
-                GD.Print("Could not find matching entity type for selected entity " + button.GetName());
-                return;
+                throw new ArgumentException(
+                    $"Could not find matching entity type for selected entity {button.GetName()}");
             }
-
-            _selectedEntityType = lookupMap[button.GetName()];
+            _selectedEntityType = Constants.BuildOptionEntityTypes[button.GetName()];
             
-            var buildModal = GetNode("/root/RootSpatial/UI/WindowDialog") as WindowDialog;
+            var buildModal = (WindowDialog)GetNode(Constants.BuildModalPath);
             buildModal.Hide();
 
-            var buildTextLabel = GetNode("/root/RootSpatial/UI/MarginContainer/VBoxContainer/HBoxContainer/BuildLabel") as Label;
+            var buildTextLabel = (Label)GetNode(Constants.CurrentBuildOptionLabel);
             buildTextLabel.SetText(_selectedEntityType.ToString());
         }
 
@@ -126,55 +105,41 @@ namespace Refactor1
 
         public override void _UnhandledInput(InputEvent @event)
         {
-            if (@event.GetType() == typeof(InputEventMouseButton))
-            {
-                HandleMouseClick(@event as InputEventMouseButton);
-            }
-
-            if (@event.GetType() == typeof(InputEventKey))
-            {
-                HandleKey(@event as InputEventKey);
-            }
+            if (@event is InputEventMouseButton mouseEvent) HandleMouseClick(mouseEvent);
+            if (@event is InputEventKey keyEvent) HandleKey(keyEvent);
         }
 
         private void HandleMouseClick(InputEventMouseButton @event)
         {
-            GD.Print("Handle mouse click");
             if (@event.IsPressed()) return;
-            var position = _picker.Translation;
-            var gridCoords = GetGridCoordinates(position);
+            var coordinates = _grid.GetCoordinates(_picker.Translation);
 
             if (_selectedEntityType == EntityType.NONE)
-            {
-                HandleGridSelection(gridCoords);
-            }
+                HandleGridSelection(coordinates);
             else
-            {
-                HandleGridBuild(gridCoords);
-            }
+                HandleGridBuild(coordinates);
         }
 
         private void HandleKey(InputEventKey @event)
         {
+            // unset build choice
             if (@event.GetScancode() == (int) KeyList.Escape)
             {
                 _selectedEntityType = EntityType.NONE;
-                var optionLabel = GetNode("UI").Get("option_label") as Label;
-                optionLabel.Text = "";
+                ((Label)(GetNode("UI").Get("option_label"))).Text = "";
             }
 
             GD.Print($"event {@event.Scancode} {@event.Pressed}");
             if (_selectedEntity == null) return;
             
+            // rotate selected entity
             if (@event.GetScancode() == (int) KeyList.P && !@event.Pressed)
                 _selectedEntity.Orientation = GameOrientation.ClockwiseOf(_selectedEntity.Orientation);
             
             if (@event.GetScancode() == (int) KeyList.O && !@event.Pressed)
                 _selectedEntity.Orientation = GameOrientation.AntiClockwiseOf(_selectedEntity.Orientation);
             
-            (_selectedEntity.GodotEntity as Spatial).SetRotation(new Vector3(0,_selectedEntity.Orientation.ToRotation(), 0));
-            
-            
+            ((Spatial)(_selectedEntity.GodotEntity)).SetRotation(new Vector3(0,_selectedEntity.Orientation.ToRotation(), 0));
         }
 
         private void HandleGridSelection(Point2D gridCoords)
@@ -204,64 +169,38 @@ namespace Refactor1
             }
         }
 
+        private Spatial CreateEntityType(EntityType entityType)
+        {
+            if (!_entityTypeToPackedScenes.ContainsKey(entityType))
+            {
+                throw new ArgumentException($"No matching packed scene to build for entity type {_selectedEntityType}");
+            }
+            return _entityTypeToPackedScenes[entityType].Instance() as Spatial;
+        }
+        
+        
+        public void CreateWorker(Point2D position, GameOrientation orientation)
+        {
+            if (!_gridBuilder.IsValid(EntityType.WORKER, position)) return;
+            var worker = _entityTypeToPackedScenes[EntityType.WORKER].Instance() as Worker;
+            _gridBuilder.HandleBuild(EntityType.WORKER, position, worker, orientation);
+            AddChild(worker);
+        }
+
         private void HandleGridBuild(Point2D gridCoords)
         {
             if (_selectedEntityType == EntityType.NONE) return;
-            if (!_grid.CanPlaceEntityType(_selectedEntityType, gridCoords)) return;
+            if (!_gridBuilder.IsValid(_selectedEntityType, gridCoords)) return;
             
-            int minAxis = 0, maxAxis = 19;
-            if (_selectedEntityType == EntityType.ENTRANCE || _selectedEntityType == EntityType.EXIT)
-            {
-                var validX = (gridCoords.X == minAxis || gridCoords.X == maxAxis) && (gridCoords.Z > minAxis && gridCoords.Z < maxAxis);
-                var validZ = (gridCoords.Z == minAxis || gridCoords.Z == maxAxis) && (gridCoords.X > minAxis && gridCoords.X < maxAxis);
-                if (!validX && !validZ) {
-                    // entrance/exit position is not on edge
-                    return;
-                }
-            }
-
-            if (!_entityTypeToPackedScenes.ContainsKey(_selectedEntityType))
-            {
-                GD.Print("No matching packed scene to build for entity type " + _selectedEntityType.ToString());
-                return;
-            }
-
-            var packedScene = _entityTypeToPackedScenes[_selectedEntityType];
-            var instance = packedScene.Instance() as Spatial;
-
-            Spatial wrappingScene;
-
-            GameOrientation orientation = GameOrientation.North;
-            if (_selectedEntityType == EntityType.ENTRANCE || _selectedEntityType == EntityType.EXIT)
-            {
-                orientation = GetEdgeOrientation(gridCoords, 0, 19);
-            }
-
-            instance.Rotate(Vector3.Up, orientation.ToRotation());
-            var gridEntity = _grid.AddEntity(instance, _selectedEntityType, gridCoords, orientation);
-            GD.Print($"Built {gridEntity.EntityType} at {gridEntity.CurrentGridTile.Position}");
-            
-            instance.SetTranslation(_picker.GetTranslation());
+            var instance = CreateEntityType(_selectedEntityType);
+            _gridBuilder.HandleBuild(_selectedEntityType, gridCoords, instance);
             AddChild(instance);
-
-        }
-
-        private GameOrientation GetEdgeOrientation(Point2D gridCoords, int minVal, int maxVal)
-        {
-            if (gridCoords.X == minVal) return GameOrientation.East;
-            else if (gridCoords.X == maxVal) return GameOrientation.West;
-            else if (gridCoords.Z == minVal) return GameOrientation.North;
-            else if (gridCoords.Z == maxVal) return GameOrientation.South;
-            return null;
         }
 
         private void OnTimer()
         {
             _grid.Step();
             HandleBlockedWorkers(_grid.BlockedWorkers);
-            // Step Entrances
-            // Step Grid
-            // Step Worker Scenes
         }
 
         private void HandleBlockedWorkers(List<Grid.BlockedWorker> blockedWorkers)
@@ -275,18 +214,19 @@ namespace Refactor1
         private void SetPickerPosition()
         {
             var result = GetWorldMousePosition();
-            if (result.Any() && result.ContainsKey("position"))
+            if (!result.Any() || !result.ContainsKey("position"))
             {
-                _picker.SetVisible(true);
-                Vector3 position = (Vector3) result["position"];
-
-                var xToTile = Mathf.Floor(position.x / TileSize) * TileSize + (TileSize / 2);
-                var zToTile = Mathf.Floor(position.z / TileSize) * TileSize + (TileSize / 2);
-                _picker.SetTranslation(new Vector3(xToTile, position.y + 0.05f, zToTile));
+                _picker.SetVisible(false);
+                return;
             }
+            
+            _picker.SetVisible(true);
+            var point2D = _grid.GetCoordinates((Vector3)result["position"]);
+            var worldCoordinates = _grid.GetWorldCoordinates(point2D);
+            _picker.SetTranslation(new Vector3(worldCoordinates.x, 0.05f, worldCoordinates.z));
         }
 
-        private Dictionary GetWorldMousePosition()
+        private Godot.Collections.Dictionary GetWorldMousePosition()
         {
             var camera = GetNode<Camera>("Camera");
             var rayFrom = camera.ProjectRayOrigin(GetViewport().GetMousePosition());
@@ -295,36 +235,6 @@ namespace Refactor1
             var spaceState = GetWorld().GetDirectSpaceState();
             var result = spaceState.IntersectRay(rayFrom, rayTo, null, 0x7FFFFFFF, true, true);
             return result;
-        }
-
-        private Point2D GetGridCoordinates(Vector3 position)
-        {
-            var offsetWorldX = position.x + (_grid.GetSize() * TileSize) / 2;
-            var offsetWorldZ = position.z + (_grid.GetSize() * TileSize) / 2;
-            return new Point2D(
-                Mathf.FloorToInt(offsetWorldX / TileSize),
-                Mathf.FloorToInt(offsetWorldZ / TileSize)
-            );
-        }
-
-        public Vector3 GetWorldCoordinates(Point2D position)
-        {
-            return new Vector3((position.X * TileSize) - (_grid.GetSize() * TileSize) / 2 + (TileSize / 2),
-                0.0f,
-                (position.Z * TileSize) - (_grid.GetSize() * TileSize) / 2 + (TileSize / 2));
-        }
-
-        public void CreateWorker(Point2D position, GameOrientation orientation)
-        {
-            if (!_grid.CanPlaceEntityType(EntityType.WORKER, position)) return;
-            var worker = _entityTypeToPackedScenes[EntityType.WORKER].Instance() as Worker;
-            var worldCoordinates = GetWorldCoordinates(position);
-            worker.SetTranslation(worldCoordinates);
-            
-            _grid.AddEntity(worker, EntityType.WORKER, position, orientation);
-            worker.Game = this;
-            worker.Destination = position;
-            AddChild(worker);
         }
 
         public void SaveLogicTile(Point2D coordinates, List<LogicNode> roots)

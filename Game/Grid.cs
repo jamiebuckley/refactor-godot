@@ -23,6 +23,8 @@ namespace Refactor1.Game
         }
 
         private readonly int _size;
+
+        private readonly float _tileSize;
         
         private readonly GodotInterface _main;
 
@@ -30,16 +32,18 @@ namespace Refactor1.Game
         
         public List<BlockedWorker> BlockedWorkers { get; } = new List<BlockedWorker>();
         
-        public Grid(int size, GodotInterface main)
+        public Grid(int size, float tileSize, GodotInterface main)
         {
-            this._size = size;
+            _size = size;
+            _tileSize = tileSize;
             _main = main;
-            this._internalGrid = new List<GridTile>(size * size);
+            _internalGrid = new List<GridTile>(size * size);
+            
             for (var x = 0; x < size; x++)
             {
                 for (var z = 0; z < size; z++)
                 {
-                    this._internalGrid.Add(new GridTile(new Point2D(x, z)));
+                    _internalGrid.Add(new GridTile(new Point2D(x, z)));
                 }
             }
         }
@@ -124,7 +128,9 @@ namespace Refactor1.Game
 
         public Vector3 GetWorldCoordinates(Point2D position)
         {
-            return Vector3.Zero;
+            return new Vector3((position.X * _tileSize) - (GetSize() * _tileSize) / 2 + (_tileSize / 2),
+                0.0f,
+                (position.Z * _tileSize) - (GetSize() * _tileSize) / 2 + (_tileSize / 2));
         }
 
         public GridTile GetGridTile(Point2D position)
@@ -349,6 +355,16 @@ namespace Refactor1.Game
                     _main.CreateWorker(gridTile.Position, entrance.Orientation);
                 }
             });
+        }
+        
+        public Point2D GetCoordinates(Vector3 position)
+        {
+            var offsetWorldX = position.x + (GetSize() * _tileSize) / 2;
+            var offsetWorldZ = position.z + (GetSize() * _tileSize) / 2;
+            return new Point2D(
+                Mathf.FloorToInt(offsetWorldX / _tileSize),
+                Mathf.FloorToInt(offsetWorldZ / _tileSize)
+            );
         }
     }
 }

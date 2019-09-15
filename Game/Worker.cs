@@ -8,7 +8,6 @@ namespace Refactor1.Game
         private Point2D _coordinates;
         
         private Point2D _destination;
-        public Main Game { get; set; }
 
         public Point2D Destination
         {
@@ -20,6 +19,8 @@ namespace Refactor1.Game
             }
         }
 
+        public Grid Grid { get; set; }
+
         public override void _Process(float delta)
         {
             if (_coordinates == null) _coordinates = _destination;
@@ -29,7 +30,7 @@ namespace Refactor1.Game
             var degrees = rotation * 57.2958f;
             SetRotationDegrees(new Vector3(0f, degrees, 0f));
             
-            var worldDestination = Game.GetWorldCoordinates(Destination);
+            var worldDestination = Grid.GetWorldCoordinates(Destination);
             var travelDifference = worldDestination - GetTranslation();
             SetTranslation(GetTranslation() + (travelDifference * 0.1f));
         }

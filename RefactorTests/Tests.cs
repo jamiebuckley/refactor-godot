@@ -18,7 +18,7 @@ namespace RefactorTests
         [Fact]
         public void WorkerShouldMoveToEmptyTile()
         {
-            var grid = new Refactor1.Game.Grid(2, new MockGodot());
+            var grid = new Refactor1.Game.Grid(2, 1.0f, new MockGodot());
             var worker = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 0), GameOrientation.North);
             grid.Step();
             Assert.Equal(0,worker.CurrentGridTile.Position.X);
@@ -28,7 +28,7 @@ namespace RefactorTests
         [Fact]
         public void ImmobileWorkersShouldBlock()
         {
-            var grid = new Refactor1.Game.Grid(2, new MockGodot());
+            var grid = new Refactor1.Game.Grid(2,1.0f, new MockGodot());
             var worker1 = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 0), GameOrientation.North);
             var worker2 = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 1), GameOrientation.North);
             
@@ -43,7 +43,7 @@ namespace RefactorTests
         [Fact]
         public void WorkersShouldNotCrossPaths()
         {
-            var grid = new Refactor1.Game.Grid(2, new MockGodot());
+            var grid = new Refactor1.Game.Grid(2,1.0f, new MockGodot());
             
             var worker1 = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 0), GameOrientation.North);
             var worker2 = grid.AddEntity(null, EntityType.WORKER, new Point2D(0, 1), GameOrientation.South);
