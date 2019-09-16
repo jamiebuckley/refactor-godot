@@ -300,7 +300,7 @@ namespace Refactor1.Game.Logic
             });
             
             if (thisNode.HasChild(0)) LoadTreeNode(graphics, thisNode.Child1, 1);
-            if (thisNode.HasChild(1)) LoadTreeNode(graphics, thisNode.Child1, 2);
+            if (thisNode.HasChild(1)) LoadTreeNode(graphics, thisNode.Child2, 2);
         }
     }
 }

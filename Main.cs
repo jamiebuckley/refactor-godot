@@ -38,6 +38,7 @@ namespace Refactor1
             PreparePackedScenes();
             SetupPicker();
             SetupLevel();
+            LogicEditorDebug();
         }
 
         private void ConnectBuildOptionButtons()
@@ -72,6 +73,35 @@ namespace Refactor1
             AddChild(coalEntity);
             _grid.AddEntity(coalEntity, EntityType.COAL, new Point2D(5, 5),
                 GameOrientation.North);
+        }
+        
+        private void LogicEditorDebug()
+        {
+            var windowDialog = GetTree().GetRoot().FindNode("LogicDialog", true, false) as WindowDialog;
+            windowDialog.PopupCentered();
+            
+            var logicEditor = GetTree().GetRoot().FindNode("LogicEditor", true, false) as LogicEditor;
+            
+            var root = new LogicNode(LogicNodeType.Root, null);
+            
+            var toggleIf = new LogicNode(LogicNodeType.ToggleIf, root);
+            root.Child1 = toggleIf;
+
+            var workerHas = new LogicNode(LogicNodeType.WorkerHas, toggleIf);
+            toggleIf.Child1 = workerHas;
+            
+            var numericalComparison = new LogicNode(LogicNodeType.NumericalGreaterThan, workerHas);
+            workerHas.Child1 = numericalComparison;
+
+            var number = new LogicNode(LogicNodeType.Number, numericalComparison);
+            number.Tags[LogicNode.NumericalValueTag] = "2";
+            numericalComparison.Child1 = number;
+
+            var inventoryItem = new LogicNode(LogicNodeType.InventoryItem, workerHas);
+            inventoryItem.Tags[LogicNode.InventoryItemTag] = InventoryItem.COAL.ToString();
+            workerHas.Child2 = inventoryItem;
+            
+            logicEditor.LoadTree(new List<LogicNode>() { root });
         }
 
         // ReSharper disable once UnusedMember.Global

@@ -110,6 +110,7 @@ namespace Refactor1.Game
 
             private int InventoryItemCount(LogicNode node)
             {
+                if (!node.Tags.ContainsKey(LogicNode.InventoryItemTag)) return 0;
                 Enum.TryParse(node.Tags[LogicNode.InventoryItemTag], out InventoryItem item);
                 var worker = _grid.GridEntities.FirstOrDefault(x => x.EntityType == EntityType.WORKER) as Worker;
                 return worker?.InventoryItems.Count(x => x == item) ?? 0;
