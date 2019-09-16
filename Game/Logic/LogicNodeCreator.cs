@@ -140,6 +140,7 @@ namespace Refactor1.Game.Logic
                 }
                 
                 itemList.Set("custom_fonts/font", ResourceLoader.Load("res://Assets/Fonts/Montserrat.tres"));
+                itemList.Connect("item_selected", rootNode, "OnItemChanged");
                 rootNode.AddChild(itemList);
             }
         }

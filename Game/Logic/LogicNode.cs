@@ -7,7 +7,9 @@ namespace Refactor1.Game.Logic
     public class LogicNode
     {
         
-        public readonly string NumericalValueTag = "NumericalValue";
+        public static readonly string NumericalValueTag = "NumericalValue";
+
+        public static readonly string InventoryItemTag = "InventoryItem";
 
         public LogicNodeType LogicNodeType { get; set; }
 
