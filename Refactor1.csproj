@@ -73,6 +73,8 @@
     <Compile Include="Game\Logic\LogicNodeConnection.cs" />
     <Compile Include="Game\Logic\LogicNodeCreator.cs" />
     <Compile Include="Game\Logic\LogicNodeType.cs" />
+    <Compile Include="Game\UserInterface\GoalItem.cs" />
+    <Compile Include="Game\UserInterface\UserInterface.cs" />
     <Compile Include="Game\WorkerScene.cs" />
     <Compile Include="GodotInterface.cs" />
     <Compile Include="Main.cs" />

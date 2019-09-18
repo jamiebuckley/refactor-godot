@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Assets/RefactorTheme.tres" type="Theme" id=1]
-[ext_resource path="res://Scripts/UI/UI.gd" type="Script" id=2]
+[ext_resource path="res://Game/UserInterface/UserInterface.cs" type="Script" id=2]
 [ext_resource path="res://default_env.tres" type="Environment" id=3]
 [ext_resource path="res://LogicMinigame.gd" type="Script" id=4]
 [ext_resource path="res://LogicMiniGame.tscn" type="PackedScene" id=5]
@@ -16,12 +16,14 @@ anchor_bottom = 1.0
 mouse_filter = 1
 theme = ExtResource( 1 )
 script = ExtResource( 2 )
-build_modal_button_path = NodePath("MarginContainer/VBoxContainer/HBoxContainer/BuildButton")
-build_modal_path = NodePath("WindowDialog")
-logic_modal_path = NodePath("LogicDialog")
-option_label_path = NodePath("MarginContainer/VBoxContainer/HBoxContainer/BuildLabel")
+OptionLabelPath = NodePath("MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/BuildLabel")
+BuildModalPath = NodePath("WindowDialog")
+BuildModalButtonPath = NodePath("MarginContainer/VBoxContainer/HBoxContainer/BuildButton")
+LogicModalPath = NodePath("LogicDialog")
+GoalBoxPath = NodePath("MarginContainer/VBoxContainer/HBoxContainer2/GoalBox")
 
 [node name="LogicDialog" type="WindowDialog" parent="."]
+editor/display_folded = true
 margin_left = 49.0
 margin_top = 72.0
 margin_right = 1583.0
@@ -97,9 +99,19 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 5.0
 
-[node name="BuildLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 margin_left = 1158.0
 margin_right = 1388.0
+margin_bottom = 67.0
+size_flags_horizontal = 3
+
+[node name="ColorRect" type="ColorRect" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer"]
+margin_right = 230.0
+margin_bottom = 67.0
+color = Color( 0.152941, 0.313726, 0.419608, 1 )
+
+[node name="BuildLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer"]
+margin_right = 230.0
 margin_bottom = 67.0
 mouse_filter = 1
 size_flags_horizontal = 3
@@ -128,8 +140,37 @@ mouse_filter = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 14.0
 
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+margin_right = 1108.0
+margin_bottom = 941.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 3.0
+
+[node name="GoalBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+margin_left = 1116.0
+margin_right = 1856.0
+margin_bottom = 941.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer2/GoalBox"]
+margin_right = 740.0
+mouse_filter = 2
+alignment = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer2/GoalBox"]
+margin_top = 8.0
+margin_right = 740.0
+margin_bottom = 8.0
+mouse_filter = 2
+alignment = 2
+
 [node name="WindowDialog" type="WindowDialog" parent="."]
-visible = true
+editor/display_folded = true
 margin_left = 1123.0
 margin_top = 132.0
 margin_right = 1887.0

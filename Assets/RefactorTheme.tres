@@ -4,13 +4,13 @@
 [ext_resource path="res://Assets/Fonts/Roboto-Regular.ttf" type="DynamicFontData" id=2]
 
 [sub_resource type="StyleBoxFlat" id=1]
-bg_color = Color( 0.38356, 0.738281, 0.714368, 1 )
+bg_color = Color( 0.0977516, 0.400391, 0.299511, 1 )
 
 [sub_resource type="StyleBoxFlat" id=2]
-bg_color = Color( 0.285645, 0.625, 0.602122, 1 )
+bg_color = Color( 0.073494, 0.330078, 0.24455, 1 )
 
 [sub_resource type="StyleBoxFlat" id=3]
-bg_color = Color( 0.54902, 0.439216, 0.439216, 1 )
+bg_color = Color( 0.792157, 0.792157, 0.792157, 1 )
 
 [sub_resource type="DynamicFont" id=4]
 extra_spacing_char = 1

@@ -27,12 +27,15 @@ namespace Refactor1
         private GridEntity _selectedEntity;
 
         private Dictionary<EntityType, PackedScene> _entityTypeToPackedScenes = new Dictionary<EntityType, PackedScene>();
+        
+        private UserInterface _userInterface;
 
         // Called when the node enters the scene tree for the first time.
         public override void _Ready()
         {
             _grid = new Grid(20, TileSize, this);
             _gridBuilder = new GridBuilder(_grid);
+            _userInterface = GetNode("UI") as UserInterface;
             
             ConnectBuildOptionButtons();
             PreparePackedScenes();
@@ -115,6 +118,8 @@ namespace Refactor1
             var tileGridEntity = _grid.AddEntity(tileEntity, EntityType.TILE, new Point2D(4, 5), GameOrientation.North) as LogicTile;
             
             logicEditor.LoadTree(new List<LogicNode>() { root });
+
+            _userInterface.AddGoal("A Tutorial", "Do some [color=#AAFF00]stuff[/color]");
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -169,7 +174,7 @@ namespace Refactor1
             if (@event.GetScancode() == (int) KeyList.Escape)
             {
                 _selectedEntityType = EntityType.NONE;
-                ((Label)(GetNode("UI").Get("option_label"))).Text = "";
+                _userInterface.SetOptionLabelText("");
             }
 
             GD.Print($"event {@event.Scancode} {@event.Pressed}");
@@ -202,7 +207,7 @@ namespace Refactor1
             // Show LOGIC modal
             if (_selectedEntity.EntityType == EntityType.LOGIC)
             {
-                GetNode("/root/RootSpatial/UI").Call("show_logic_modal");
+                _userInterface.ShowLogicModal();
                 var logicEditor = GetTree().GetRoot().FindNode("LogicEditor", true, false) as LogicEditor;
                 if (logicEditor == null)
                 {

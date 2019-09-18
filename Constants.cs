@@ -31,6 +31,6 @@ namespace Refactor1
         public static string BuildModalPath = "/root/RootSpatial/UI/WindowDialog";
 
         public static string CurrentBuildOptionLabel =
-            "/root/RootSpatial/UI/MarginContainer/VBoxContainer/HBoxContainer/BuildLabel";
+            "/root/RootSpatial/UI/MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/BuildLabel";
     }
 }
