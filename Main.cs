@@ -77,8 +77,8 @@ namespace Refactor1
         
         private void LogicEditorDebug()
         {
-            var windowDialog = GetTree().GetRoot().FindNode("LogicDialog", true, false) as WindowDialog;
-            windowDialog.PopupCentered();
+            //var windowDialog = GetTree().GetRoot().FindNode("LogicDialog", true, false) as WindowDialog;
+            //windowDialog.PopupCentered();
             
             var logicEditor = GetTree().GetRoot().FindNode("LogicEditor", true, false) as LogicEditor;
             
@@ -100,8 +100,19 @@ namespace Refactor1
             var inventoryItem = new LogicNode(LogicNodeType.InventoryItem, workerHas);
             inventoryItem.Tags[LogicNode.InventoryItemTag] = InventoryItem.COAL.ToString();
             workerHas.Child2 = inventoryItem;
+
+            var logicEntity = CreateEntityType(EntityType.LOGIC);
+            logicEntity.Translation = _grid.GetWorldCoordinates(new Point2D(4, 5));
+            AddChild(logicEntity);
             
-            logicEditor.LoadTree(new List<LogicNode>() { root });
+            var gridLogicEntity = _grid.AddEntity(logicEntity, EntityType.LOGIC, new Point2D(4, 5), GameOrientation.North) as LogicTile;
+            gridLogicEntity.Roots.Add(root);
+            
+            var tileEntity = CreateEntityType(EntityType.TILE);
+            tileEntity.Translation = _grid.GetWorldCoordinates(new Point2D(3, 5));
+            AddChild(tileEntity);
+            
+            var tileGridEntity = _grid.AddEntity(tileEntity, EntityType.TILE, new Point2D(3, 5), GameOrientation.North) as LogicTile;
         }
 
         // ReSharper disable once UnusedMember.Global

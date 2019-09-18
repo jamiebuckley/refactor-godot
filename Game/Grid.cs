@@ -140,7 +140,7 @@ namespace Refactor1.Game
         public Vector3 GetWorldCoordinates(Point2D position)
         {
             return new Vector3((position.X * _tileSize) - (GetSize() * _tileSize) / 2 + (_tileSize / 2),
-                0.0f,
+                0.05f,
                 (position.Z * _tileSize) - (GetSize() * _tileSize) / 2 + (_tileSize / 2));
         }
 
