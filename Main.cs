@@ -84,7 +84,7 @@ namespace Refactor1
             
             var root = new LogicNode(LogicNodeType.Root, null);
             
-            var toggleIf = new LogicNode(LogicNodeType.ToggleIf, root);
+            var toggleIf = new LogicNode(LogicNodeType.OnIf, root);
             root.Child1 = toggleIf;
 
             var workerHas = new LogicNode(LogicNodeType.WorkerHas, toggleIf);
@@ -102,17 +102,19 @@ namespace Refactor1
             workerHas.Child2 = inventoryItem;
 
             var logicEntity = CreateEntityType(EntityType.LOGIC);
-            logicEntity.Translation = _grid.GetWorldCoordinates(new Point2D(4, 5));
+            logicEntity.Translation = _grid.GetWorldCoordinates(new Point2D(3, 5));
             AddChild(logicEntity);
             
-            var gridLogicEntity = _grid.AddEntity(logicEntity, EntityType.LOGIC, new Point2D(4, 5), GameOrientation.North) as LogicTile;
+            var gridLogicEntity = _grid.AddEntity(logicEntity, EntityType.LOGIC, new Point2D(3, 5), GameOrientation.North) as LogicTile;
             gridLogicEntity.Roots.Add(root);
             
             var tileEntity = CreateEntityType(EntityType.TILE);
-            tileEntity.Translation = _grid.GetWorldCoordinates(new Point2D(3, 5));
+            tileEntity.Translation = _grid.GetWorldCoordinates(new Point2D(4, 5));
             AddChild(tileEntity);
             
-            var tileGridEntity = _grid.AddEntity(tileEntity, EntityType.TILE, new Point2D(3, 5), GameOrientation.North) as LogicTile;
+            var tileGridEntity = _grid.AddEntity(tileEntity, EntityType.TILE, new Point2D(4, 5), GameOrientation.North) as LogicTile;
+            
+            logicEditor.LoadTree(new List<LogicNode>() { root });
         }
 
         // ReSharper disable once UnusedMember.Global
