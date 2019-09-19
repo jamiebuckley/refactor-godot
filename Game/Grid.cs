@@ -36,6 +36,8 @@ namespace Refactor1.Game
 
         private GridEntranceStepper _gridEntranceStepper;
 
+        private GridExitStepper _gridExitStepper;
+
         public Grid(int size, float tileSize, GodotInterface main)
         {
             _size = size;
@@ -45,6 +47,7 @@ namespace Refactor1.Game
             _gridWorkerStepper = new GridWorkerStepper(this);
             _gridLogicStepper = new GridLogicStepper(this);
             _gridEntranceStepper = new GridEntranceStepper(main, this);
+            _gridExitStepper = new GridExitStepper(main, this);
             
             for (var x = 0; x < size; x++)
             {
@@ -169,6 +172,7 @@ namespace Refactor1.Game
             _gridWorkerStepper.StepWorkerOrientations();
              blockedWorkers = _gridWorkerStepper.StepWorkers();
             _gridEntranceStepper.StepEntrances();
+            _gridExitStepper.Step();
         }
 
         public List<GridEntity> GetSurroundingEntities(Point2D gridCoords)

@@ -7,18 +7,28 @@ namespace Refactor1.Game
 {
     public class GridExitStepper
     {
-        public void Step(Grid grid)
+        private readonly GodotInterface _main;
+        
+        private readonly Grid _grid;
+
+        public GridExitStepper(GodotInterface main, Grid grid)
         {
-            grid.InternalGrid.ForEach(gridTile =>
+            _main = main;
+            _grid = grid;
+        }
+
+        public void Step()
+        {
+            _grid.InternalGrid.ForEach(gridTile =>
             {
                 if (gridTile.GridEntities.Any(e => e.EntityType == EntityType.EXIT))
                 {
-                    var workers = gridTile.GridEntities.Where(e => e.EntityType == EntityType.WORKER);
+                    var workers = gridTile.GridEntities.Where(e => e.EntityType == EntityType.WORKER).ToList();
                     foreach (var gridEntity in workers)
                     {
                         var worker = (Worker) gridEntity;
-                        WorkerEvents.Instance.Value.WorkerExited(worker);
-                        grid.RemoveEntity(worker);
+                        GameEvents.Instance.Emit(new WorkerExitedEvent { Worker = worker });
+                        _grid.RemoveEntity(worker);
                     }
                 }
             });

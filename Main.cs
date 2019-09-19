@@ -5,7 +5,9 @@ using Godot;
 using Refactor1.Game;
 using Refactor1.Game.Common;
 using Refactor1.Game.Entity;
+using Refactor1.Game.Events;
 using Refactor1.Game.Logic;
+using Refactor1.Game.Mechanics;
 using Array = Godot.Collections.Array;
 
 namespace Refactor1
@@ -30,6 +32,7 @@ namespace Refactor1
         
         private UserInterface _userInterface;
 
+        private List<Goal> _goals = new List<Goal>();
         // Called when the node enters the scene tree for the first time.
         public override void _Ready()
         {
@@ -76,6 +79,35 @@ namespace Refactor1
             AddChild(coalEntity);
             _grid.AddEntity(coalEntity, EntityType.COAL, new Point2D(5, 5),
                 GameOrientation.North);
+
+            var goalItem = _userInterface.AddGoal("Collect 5 coal", "Collect 5 coal in 1 day");
+            CreateGoal(new Goal(goalItem)
+            {
+                MakeActive = (goal) =>
+                {
+                    int current = 0;
+                    var subscription = GameEvents.Instance.SubscribeTo(typeof(WorkerExitedEvent), evt =>
+                    {
+                        WorkerExitedEvent workerExitedEvent = (WorkerExitedEvent) evt;
+                        var carryingCoal = workerExitedEvent.Worker.InventoryItems.Where(x => x == InventoryItem.COAL)
+                            .Count();
+                        current += carryingCoal;
+                        
+                        goal.GoalItem.SetDescription($"Collect {5 - current} coal in 1 day");
+                        if (current >= 5)
+                        {
+                            goal.Complete();
+                        }
+                    });
+                    goal.Subscriptions.Add(subscription);
+                }
+            });
+        }
+
+        private void CreateGoal(Goal goal)
+        {
+            _goals.Add(goal);
+            goal.MakeActive(goal);
         }
         
         private void LogicEditorDebug()
@@ -118,8 +150,6 @@ namespace Refactor1
             var tileGridEntity = _grid.AddEntity(tileEntity, EntityType.TILE, new Point2D(4, 5), GameOrientation.North) as LogicTile;
             
             logicEditor.LoadTree(new List<LogicNode>() { root });
-
-            _userInterface.AddGoal("A Tutorial", "Do some [color=#AAFF00]stuff[/color]");
         }
 
         // ReSharper disable once UnusedMember.Global

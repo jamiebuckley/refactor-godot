@@ -1,5 +1,6 @@
 using Godot;
 using Godot.Collections;
+using Refactor1.Game.Events;
 
 namespace Refactor1.Game
 {
@@ -34,6 +35,12 @@ namespace Refactor1.Game
             _buildModal = GetNode(BuildModalPath) as WindowDialog;
             _logicModal = GetNode(LogicModalPath) as WindowDialog;
             _goalBox = GetNode(GoalBoxPath) as VBoxContainer;
+
+            GameEvents.Instance.SubscribeTo(typeof(GoalCompletedEvent), evt =>
+            {
+                GoalCompletedEvent goalCompletedEvent = (GoalCompletedEvent) evt;
+                _goalBox.RemoveChild(goalCompletedEvent.Goal.GoalItem.GetParent());
+            });
             
             foreach (Button button in GetTree().GetNodesInGroup("BuildOptionButton"))
             {
