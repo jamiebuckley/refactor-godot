@@ -74,7 +74,7 @@ namespace Refactor1.Game
                 var currentPosition = tempWorker.OldGridTile.RealGridTile.Position;
                 var newPosition = currentPosition + tempWorker.RealWorker.Orientation.Direction;
 
-                var workerMovementBlockingEntities = new List<EntityType>() {EntityType.ENTRANCE, EntityType.EXIT, EntityType.COAL};
+                var workerMovementBlockingEntities = new List<EntityType>() {EntityType.ENTRANCE, EntityType.COAL};
 
                 var isOutOfBounds = !_grid.IsInGridBounds(newPosition);
                 var blockingEntity = isOutOfBounds
@@ -136,6 +136,12 @@ namespace Refactor1.Game
             while (invalidStack.Count > 0)
             {
                 var tile = invalidStack.Pop();
+                tile.Entities.Sort((a, b) =>
+                {
+                    if (a.CurrentGridTile == a.OldGridTile && b.CurrentGridTile == b.OldGridTile) return 0;
+                    if (a.CurrentGridTile == a.OldGridTile) return 1;
+                    return -1;
+                });
                 var entityQueue = new Queue<TempWorker>(tile.Entities);
                 while (entityQueue.Count > 1)
                 {

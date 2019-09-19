@@ -60,9 +60,11 @@
     <Compile Include="Game\Entity\LogicTile.cs" />
     <Compile Include="Game\Entity\Worker.cs" />
     <Compile Include="Game\Enumeration.cs" />
+    <Compile Include="Game\Events\WorkerEvents.cs" />
     <Compile Include="Game\Grid.cs" />
     <Compile Include="Game\GridBuilder.cs" />
     <Compile Include="Game\GridEntranceStepper.cs" />
+    <Compile Include="Game\GridExitStepper.cs" />
     <Compile Include="Game\GridLogicStepper.cs" />
     <Compile Include="Game\GridWorkerStepper.cs" />
     <Compile Include="Game\LogicTileExecutor.cs" />

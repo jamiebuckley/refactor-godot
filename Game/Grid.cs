@@ -97,6 +97,12 @@ namespace Refactor1.Game
             return gridEntity;
         }
 
+        public void RemoveEntity(GridEntity entity)
+        {
+            entity.CurrentGridTile.GridEntities.Remove(entity);
+            entity.GodotEntity.GetParent().RemoveChild(entity.GodotEntity);
+        }
+
         public bool CanPlaceEntityType(EntityType entityType, Point2D position)
         {
             if (!IsInGridBounds(position)) return false;
