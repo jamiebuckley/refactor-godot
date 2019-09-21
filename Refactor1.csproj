@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Game\CameraController.cs" />
     <Compile Include="Game\Common\Colours.cs" />
     <Compile Include="Game\Common\EntityType.cs" />
     <Compile Include="Game\Common\GameOrientation.cs" />
