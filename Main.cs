@@ -137,10 +137,12 @@ namespace Refactor1
             var number = new LogicNode(LogicNodeType.Number, numericalComparison);
             number.Tags[LogicNode.NumericalValueTag] = "2";
             numericalComparison.Child1 = number;
+            number.ChildIndex = 0;
 
             var inventoryItem = new LogicNode(LogicNodeType.InventoryItem, workerHas);
             inventoryItem.Tags[LogicNode.InventoryItemTag] = InventoryItem.COAL.ToString();
             workerHas.Child2 = inventoryItem;
+            inventoryItem.ChildIndex = 1;
 
             var logicEntity = CreateEntityType(EntityType.LOGIC);
             logicEntity.Translation = _grid.GetWorldCoordinates(new Point2D(3, 5));
