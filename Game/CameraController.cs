@@ -74,6 +74,7 @@ namespace Refactor1.Game
 
         public bool HandleEvent(InputEvent inputEvent)
         {
+            GD.Print(inputEvent);
             if (inputEvent is InputEventMouseButton mouseEvent) return HandleMouse(mouseEvent);
             if (inputEvent is InputEventKey keyEvent) return HandleKey(keyEvent);
             return false;
@@ -99,6 +100,7 @@ namespace Refactor1.Game
 
         private bool HandleMouse(InputEventMouseButton mouseEvent)
         {
+            GD.Print(mouseEvent.ButtonIndex);
             if (mouseEvent.ButtonIndex == 3)
             {
                 _cameraOrbitActive = mouseEvent.Pressed;
