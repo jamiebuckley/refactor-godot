@@ -36,12 +36,18 @@ namespace Refactor1
         private UserInterface _userInterface;
 
         private List<Goal> _goals = new List<Goal>();
+
+        private Camera _camera;
+
+        private CameraController _cameraController;
         // Called when the node enters the scene tree for the first time.
         public override void _Ready()
         {
             _grid = new Grid(20, TileSize, this);
             _gridBuilder = new GridBuilder(_grid);
             _userInterface = GetNode("UI") as UserInterface;
+            _camera = GetNode<Camera>("Camera");
+            _cameraController = new CameraController(_camera);
             
             ConnectBuildOptionButtons();
             PreparePackedScenes();
@@ -134,10 +140,12 @@ namespace Refactor1
             var number = new LogicNode(LogicNodeType.Number, numericalComparison);
             number.Tags[LogicNode.NumericalValueTag] = "2";
             numericalComparison.Child1 = number;
+            number.ChildIndex = 0;
 
             var inventoryItem = new LogicNode(LogicNodeType.InventoryItem, workerHas);
             inventoryItem.Tags[LogicNode.InventoryItemTag] = InventoryItem.COAL.ToString();
             workerHas.Child2 = inventoryItem;
+            inventoryItem.ChildIndex = 1;
 
             var logicEntity = CreateEntityType(EntityType.LOGIC);
             logicEntity.Translation = _grid.GetWorldCoordinates(new Point2D(3, 5));
@@ -172,6 +180,7 @@ namespace Refactor1
         // Called every frame. 'delta' is the elapsed time since the previous frame.
         public override void _Process(float delta)
         {
+            _cameraController.Process(delta, GetViewport().GetMousePosition());
             SetPickerPosition();
             _pulseTimer += delta;
             if (_pulseTimer > 1.0f)
@@ -183,6 +192,10 @@ namespace Refactor1
 
         public override void _UnhandledInput(InputEvent @event)
         {
+            if (_cameraController.HandleEvent(@event))
+            {
+                return;
+            }
             if (@event is InputEventMouseButton mouseEvent) HandleMouseClick(mouseEvent);
             if (@event is InputEventKey keyEvent) HandleKey(keyEvent);
         }

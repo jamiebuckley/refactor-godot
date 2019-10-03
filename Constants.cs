@@ -10,7 +10,7 @@ namespace Refactor1
         {
             {EntityType.ENTRANCE, "res://Prototypes/Entrance.tscn" },
             {EntityType.EXIT, "res://Prototypes/Exit.tscn" },
-            {EntityType.TILE, "res://Prototypes/DirectionalTile.tscn" },
+            {EntityType.TILE, "res://Prototypes/AnimatedArrowTile.tscn" },
             {EntityType.WORKER, "res://Prototypes/Worker.tscn" },
             {EntityType.COAL, "res://Prototypes/Coal.tscn" },
             {EntityType.LOGIC, "res://Prototypes/LogicTile.tscn" },
