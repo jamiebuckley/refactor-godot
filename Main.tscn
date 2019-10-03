@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://Main.cs" type="Script" id=1]
 [ext_resource path="res://UI.tscn" type="PackedScene" id=2]
@@ -23,13 +23,18 @@ ambient_light_color = Color( 1, 1, 1, 1 )
 albedo_color = Color( 0.529412, 0.529412, 0.529412, 1 )
 albedo_texture = ExtResource( 3 )
 
+[sub_resource type="CubeMesh" id=7]
+
+[sub_resource type="SpatialMaterial" id=8]
+albedo_color = Color( 0.603922, 0.603922, 0.603922, 1 )
+
 [node name="RootSpatial" type="Spatial"]
 script = ExtResource( 1 )
 BuildModalNodePath = NodePath("")
 
 [node name="MeshInstance" type="MeshInstance" parent="."]
 editor/display_folded = true
-transform = Transform( 80, 0, 0, 0, -3.49691e-006, 0.01, 0, -80, -4.37114e-010, 0.148, 0, 0.063 )
+transform = Transform( 80, 0, 0, 0, -3.49691e-006, 0.01, 0, -80, -4.37114e-010, 0.148, -0.5, 0.063 )
 mesh = SubResource( 1 )
 material/0 = SubResource( 2 )
 
@@ -60,6 +65,7 @@ shadow_contact = 0.53
 
 [node name="MeshInstance2" type="MeshInstance" parent="."]
 transform = Transform( 10, 0, 0, 0, 1, 0, 0, 0, 10, 0, 0.01, 0 )
+visible = false
 mesh = SubResource( 5 )
 material/0 = SubResource( 6 )
 
@@ -78,3 +84,8 @@ light_energy = 0.99
 light_indirect_energy = 1.85
 light_specular = 0.25
 omni_range = 24.9
+
+[node name="MeshInstance3" type="MeshInstance" parent="."]
+transform = Transform( 10, 0, 0, 0, 0.5, 0, 0, 0, 10, 0, -0.5, 0 )
+mesh = SubResource( 7 )
+material/0 = SubResource( 8 )
