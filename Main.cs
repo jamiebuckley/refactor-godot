@@ -14,6 +14,9 @@ namespace Refactor1
 {
     public class Main : Spatial, GodotInterface
     {
+        [Export]
+        public NodePath BuildModalNodePath { get; set; }
+        
         private const float TileSize = 1.0f;
 
         private float _pulseTimer;
@@ -80,28 +83,28 @@ namespace Refactor1
             _grid.AddEntity(coalEntity, EntityType.COAL, new Point2D(5, 5),
                 GameOrientation.North);
 
-            var goalItem = _userInterface.AddGoal("Collect 5 coal", "Collect 5 coal in 1 day");
-            CreateGoal(new Goal(goalItem)
-            {
-                MakeActive = (goal) =>
-                {
-                    int current = 0;
-                    var subscription = GameEvents.Instance.SubscribeTo(typeof(WorkerExitedEvent), evt =>
-                    {
-                        WorkerExitedEvent workerExitedEvent = (WorkerExitedEvent) evt;
-                        var carryingCoal = workerExitedEvent.Worker.InventoryItems.Where(x => x == InventoryItem.COAL)
-                            .Count();
-                        current += carryingCoal;
-                        
-                        goal.GoalItem.SetDescription($"Collect {5 - current} coal in 1 day");
-                        if (current >= 5)
-                        {
-                            goal.Complete();
-                        }
-                    });
-                    goal.Subscriptions.Add(subscription);
-                }
-            });
+//            var goalItem = _userInterface.AddGoal("Collect 5 coal", "Collect 5 coal in 1 day");
+//            CreateGoal(new Goal(goalItem)
+//            {
+//                MakeActive = (goal) =>
+//                {
+//                    int current = 0;
+//                    var subscription = GameEvents.Instance.SubscribeTo(typeof(WorkerExitedEvent), evt =>
+//                    {
+//                        WorkerExitedEvent workerExitedEvent = (WorkerExitedEvent) evt;
+//                        var carryingCoal = workerExitedEvent.Worker.InventoryItems.Where(x => x == InventoryItem.COAL)
+//                            .Count();
+//                        current += carryingCoal;
+//                        
+//                        goal.GoalItem.SetDescription($"Collect {5 - current} coal in 1 day");
+//                        if (current >= 5)
+//                        {
+//                            goal.Complete();
+//                        }
+//                    });
+//                    goal.Subscriptions.Add(subscription);
+//                }
+//            });
         }
 
         private void CreateGoal(Goal goal)
@@ -162,11 +165,8 @@ namespace Refactor1
             }
             _selectedEntityType = Constants.BuildOptionEntityTypes[button.GetName()];
             
-            var buildModal = (WindowDialog)GetNode(Constants.BuildModalPath);
-            buildModal.Hide();
-
-            var buildTextLabel = (Label)GetNode(Constants.CurrentBuildOptionLabel);
-            buildTextLabel.SetText(_selectedEntityType.ToString());
+            _userInterface.BuildModal.Hide();
+            _userInterface.OptionLabel.SetText(_selectedEntityType.ToString());
         }
 
         // Called every frame. 'delta' is the elapsed time since the previous frame.

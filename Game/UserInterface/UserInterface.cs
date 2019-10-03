@@ -21,18 +21,18 @@ namespace Refactor1.Game
         [Export]
         public NodePath GoalBoxPath { get; set; }
 
-        private WindowDialog _buildModal;
+        public Panel BuildModal { get; private set; }
 
         private WindowDialog _logicModal;
 
-        private Label _optionLabel;
+        public Label OptionLabel { get; private set; }
 
         private VBoxContainer _goalBox;
         
         public override void _Ready()
         {
-            _optionLabel = GetNode(OptionLabelPath) as Label;
-            _buildModal = GetNode(BuildModalPath) as WindowDialog;
+            OptionLabel = GetNode(OptionLabelPath) as Label;
+            BuildModal = GetNode(BuildModalPath) as Panel;
             _logicModal = GetNode(LogicModalPath) as WindowDialog;
             _goalBox = GetNode(GoalBoxPath) as VBoxContainer;
 
@@ -53,13 +53,13 @@ namespace Refactor1.Game
 
         public void OnBuildOptionButtonPress(Button button)
         {
-            _optionLabel.Text = button.Text;
-            _buildModal.Hide();
+            OptionLabel.Text = button.Text;
+            BuildModal.Hide();
         }
 
         public void OnBuildModalButtonPressed()
         {
-            _buildModal.Popup_();
+            BuildModal.Visible = true;
         }
 
         public void ShowLogicModal()
@@ -92,7 +92,7 @@ namespace Refactor1.Game
 
         public void SetOptionLabelText(string text)
         {
-            _optionLabel.Text = text;
+            OptionLabel.Text = text;
         }
     }
 }

@@ -25,6 +25,7 @@ albedo_texture = ExtResource( 3 )
 
 [node name="RootSpatial" type="Spatial"]
 script = ExtResource( 1 )
+BuildModalNodePath = NodePath("")
 
 [node name="MeshInstance" type="MeshInstance" parent="."]
 editor/display_folded = true
