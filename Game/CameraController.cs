@@ -74,7 +74,6 @@ namespace Refactor1.Game
 
         public bool HandleEvent(InputEvent inputEvent)
         {
-            GD.Print(inputEvent);
             if (inputEvent is InputEventMouseButton mouseEvent) return HandleMouse(mouseEvent);
             if (inputEvent is InputEventKey keyEvent) return HandleKey(keyEvent);
             return false;

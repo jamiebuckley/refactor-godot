@@ -21,7 +21,7 @@ namespace Refactor1.Game
         [Export]
         public NodePath GoalBoxPath { get; set; }
 
-        public Panel BuildModal { get; private set; }
+        public Control BuildModal { get; private set; }
 
         private WindowDialog _logicModal;
 
@@ -32,7 +32,7 @@ namespace Refactor1.Game
         public override void _Ready()
         {
             OptionLabel = GetNode(OptionLabelPath) as Label;
-            BuildModal = GetNode(BuildModalPath) as Panel;
+            BuildModal = GetNode(BuildModalPath) as Control  ;
             _logicModal = GetNode(LogicModalPath) as WindowDialog;
             _goalBox = GetNode(GoalBoxPath) as VBoxContainer;
 
@@ -59,7 +59,7 @@ namespace Refactor1.Game
 
         public void OnBuildModalButtonPressed()
         {
-            BuildModal.Visible = true;
+            BuildModal.Show();
         }
 
         public void ShowLogicModal()

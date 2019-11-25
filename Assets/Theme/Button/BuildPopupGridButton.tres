@@ -4,7 +4,7 @@
 [ext_resource path="res://Assets/Textures/flat_ui/curved_box.svg" type="Texture" id=2]
 [ext_resource path="res://Assets/Theme/Button/ButtonStyleBox.tres" type="StyleBox" id=3]
 
-[sub_resource type="StyleBoxTexture" id=2]
+[sub_resource type="StyleBoxTexture" id=1]
 texture = ExtResource( 2 )
 region_rect = Rect2( 0, 0, 1000, 100 )
 margin_left = 20.0
@@ -13,7 +13,7 @@ margin_top = 20.0
 margin_bottom = 20.0
 modulate_color = Color( 0.623529, 0.623529, 0.623529, 1 )
 
-[sub_resource type="StyleBoxTexture" id=1]
+[sub_resource type="StyleBoxTexture" id=2]
 texture = ExtResource( 2 )
 region_rect = Rect2( 0, 0, 1000, 100 )
 margin_left = 20.0
@@ -31,6 +31,6 @@ Button/constants/hseparation = 4
 Button/fonts/font = ExtResource( 1 )
 Button/styles/disabled = null
 Button/styles/focus = null
-Button/styles/hover = SubResource( 2 )
+Button/styles/hover = SubResource( 1 )
 Button/styles/normal = ExtResource( 3 )
-Button/styles/pressed = SubResource( 1 )
+Button/styles/pressed = SubResource( 2 )
