@@ -23,7 +23,7 @@ namespace Refactor1.Game
 
         public Control BuildModal { get; private set; }
 
-        private WindowDialog _logicModal;
+        public Control LogicModal { get; private set; }
 
         public Label OptionLabel { get; private set; }
 
@@ -33,7 +33,7 @@ namespace Refactor1.Game
         {
             OptionLabel = GetNode(OptionLabelPath) as Label;
             BuildModal = GetNode(BuildModalPath) as Control  ;
-            _logicModal = GetNode(LogicModalPath) as WindowDialog;
+            LogicModal = GetNode(LogicModalPath) as Control;
             _goalBox = GetNode(GoalBoxPath) as VBoxContainer;
 
             GameEvents.Instance.SubscribeTo(typeof(GoalCompletedEvent), evt =>
@@ -64,7 +64,7 @@ namespace Refactor1.Game
 
         public void ShowLogicModal()
         {
-            _logicModal.Popup_();
+            LogicModal.Show();
         }
 
         public GoalItem AddGoal(string title, string description)

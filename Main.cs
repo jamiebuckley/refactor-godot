@@ -14,9 +14,6 @@ namespace Refactor1
 {
     public class Main : Spatial, GodotInterface
     {
-        [Export]
-        public NodePath BuildModalNodePath { get; set; }
-        
         private const float TileSize = 1.0f;
 
         private float _pulseTimer;
@@ -160,7 +157,7 @@ namespace Refactor1
             
             var tileGridEntity = _grid.AddEntity(tileEntity, EntityType.TILE, new Point2D(4, 5), GameOrientation.North) as LogicTile;
             
-            logicEditor.LoadTree(new List<LogicNode>() { root });
+            //logicEditor.LoadTree(new List<LogicNode>() { root });
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -251,12 +248,12 @@ namespace Refactor1
             if (_selectedEntity.EntityType == EntityType.LOGIC)
             {
                 _userInterface.ShowLogicModal();
-                var logicEditor = GetTree().GetRoot().FindNode("LogicEditor", true, false) as LogicEditor;
-                if (logicEditor == null)
-                {
-                    throw new ArgumentException("Failed to find logic editor to set coordinates");
-                }
-                logicEditor.SetCoordinates(gridCoords);
+//                var logicEditor = GetTree().GetRoot().FindNode("LogicEditor", true, false) as LogicEditor;
+//                if (logicEditor == null)
+//                {
+//                    throw new ArgumentException("Failed to find logic editor to set coordinates");
+//                }
+//                logicEditor.SetCoordinates(gridCoords);
             }
         }
 

@@ -10,9 +10,11 @@ func _ready():
 
 func _input(event):
 	if event is InputEventMouseButton:
-		if event.get_button_index() == 1:
-			dragging = !dragging
+		if event.get_button_index() == 1 && get_rect().has_point(get_local_mouse_position()) && event.is_pressed():
 			offset = get_local_mouse_position()
+			dragging = true
+		else:
+			dragging = false
 
 func _process(delta):
 	if dragging:

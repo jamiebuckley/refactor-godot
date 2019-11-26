@@ -30,7 +30,6 @@ albedo_color = Color( 0.603922, 0.603922, 0.603922, 1 )
 
 [node name="RootSpatial" type="Spatial"]
 script = ExtResource( 1 )
-BuildModalNodePath = NodePath("")
 
 [node name="MeshInstance" type="MeshInstance" parent="."]
 editor/display_folded = true
