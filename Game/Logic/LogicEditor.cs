@@ -322,5 +322,10 @@ namespace Refactor1.Game.Logic
             _logicNodeChoiceBox.QueueFree();
             _logicNodeChoiceBox = null;
         }
+
+        public void SetCoordinates(Point2D gridCoords)
+        {
+            
+        }
     }
 }

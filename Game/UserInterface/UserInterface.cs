@@ -1,6 +1,8 @@
 using Godot;
 using Godot.Collections;
+using Refactor1.Game.Common;
 using Refactor1.Game.Events;
+using Refactor1.Game.Logic;
 
 namespace Refactor1.Game
 {
@@ -64,7 +66,13 @@ namespace Refactor1.Game
 
         public void ShowLogicModal()
         {
-            LogicModal.Show();
+            LogicModal.Visible = true;
+        }
+        
+        public void SetLogicModalCoordinates(Point2D gridCoords)
+        {
+            var logicEditor = LogicModal.FindNode("LogicEditorArea", true) as LogicEditor;
+            logicEditor.SetCoordinates(gridCoords);
         }
 
         public GoalItem AddGoal(string title, string description)

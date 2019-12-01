@@ -248,12 +248,7 @@ namespace Refactor1
             if (_selectedEntity.EntityType == EntityType.LOGIC)
             {
                 _userInterface.ShowLogicModal();
-//                var logicEditor = GetTree().GetRoot().FindNode("LogicEditor", true, false) as LogicEditor;
-//                if (logicEditor == null)
-//                {
-//                    throw new ArgumentException("Failed to find logic editor to set coordinates");
-//                }
-//                logicEditor.SetCoordinates(gridCoords);
+                _userInterface.SetLogicModalCoordinates(gridCoords);
             }
         }
 
