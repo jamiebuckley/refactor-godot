@@ -28,7 +28,7 @@ namespace Refactor1.Game.Logic
             
         }
 
-        public LogicNode(LogicNodeType logicNodeType, LogicNode parent)
+        public LogicNode(LogicNodeType logicNodeType, LogicNode parent = null)
         {
             this.LogicNodeType = logicNodeType;
             this.Parent = parent;
@@ -57,9 +57,14 @@ namespace Refactor1.Game.Logic
 
         public void SetChildAt(LogicNode logicNode, int index)
         {
-            if (index == 0) Child1 = logicNode;
-            else if (index == 1) Child2 = logicNode;
+            if (index == 0)
+                Child1 = logicNode;
+            else if (index == 1)
+                Child2 = logicNode;
             else throw new ArgumentException($"Cannot set logic node at {index}");
+            
+            logicNode.ChildIndex = index;
+            logicNode.Parent = this;
         }
     }
 }

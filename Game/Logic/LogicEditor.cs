@@ -3,304 +3,324 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Refactor1.Game.Common;
+using Array = Godot.Collections.Array;
 
 namespace Refactor1.Game.Logic
 {
     public class LogicEditor : Control
     {
-        private LogicNodeCreator _logicNodeCreator;
+        private Dictionary<LogicNodeType, PackedScene> LogicNodeTypeToPackedScene =
+            new Dictionary<LogicNodeType, PackedScene>();
 
-        private ToolboxNode _draggedNode;
-
-        private List<LogicNode> _roots = new List<LogicNode>();
-
-        private List<GraphicalLogicNode.GhostConnection> _ghosts = new List<GraphicalLogicNode.GhostConnection>();
-
-        private GraphicalLogicNode.GhostConnection _currentSnappedGhost = null;
-
-        private Dictionary<LogicNode, GraphicalLogicNode> _logicNodeGraphics = new Dictionary<LogicNode, GraphicalLogicNode>();
+        private PackedScene Connector;
+        private PackedScene GhostNode;
+        private PackedScene LogicNodeChoiceBox;
+        private PackedScene LogicNodeChoiceBoxChoice;
         
-        private Point2D _coordinates;
+        private Node2D _logicNodeChoiceBox;
+        private LogicNode _logicNodeChoiceBoxGhostFor;
+        private int _logicNodeChoiceBoxGhostIndex;
 
-        private VBoxContainer logicToolboxVBox;
+        private float scale = 1.0f;
+        private Vector2 lastMousePosition;
+        private bool isDragging;
+
+        
+        private List<LogicNode> roots = new List<LogicNode>();
+        
+        private Dictionary<LogicNode, Node> GraphicalNodes = new Dictionary<LogicNode, Node>();
+        private Dictionary<LogicNode, Dictionary<int, Node>> GhostNodes = new Dictionary<LogicNode, Dictionary<int, Node>>();
+        private Dictionary<LogicNode, Dictionary<int, Node>> Lines = new Dictionary<LogicNode, Dictionary<int, Node>>();
+
+        private SwimLane swimLane;
 
         public override void _Ready()
         {
-            _logicNodeCreator = new LogicNodeCreator();
-            _logicNodeCreator.Initialise();
-
-            ConnectSaveButton();
-            SetupToolbox();
-            InitializeRoots();
-            UpdateGhosts();
-            
-            logicToolboxVBox = GetTree().GetRoot().FindNode("LogicToolboxVBox", true, false) as VBoxContainer;
-        }
-
-        private void ConnectSaveButton()
-        {
-            var saveButton = GetTree().GetRoot().FindNode("LogicSaveButton", true, false) as Button;
-            saveButton.Connect("pressed", this, "OnSaveButtonPressed");
-        }
-
-        private void SetupToolbox()
-        {
-            var logicToolbox = GetTree().GetRoot().FindNode("LogicToolbox", true, false);
-            if (logicToolbox == null) throw new InvalidOperationException("Cannot initialise toolbox as cannot find logicToolbox node in scene");
-
-            Enumeration.GetAll<LogicNodeType>().ToList().ForEach(type =>
+            var allLogicNodeTypes = Enumeration.GetAll<LogicNodeType>().ToList();
+            allLogicNodeTypes.ForEach(lnt =>
             {
-                var graphicalNode = _logicNodeCreator.CreateNode(type, false);
-                graphicalNode.SetScale(new Vector2(0.2f, 0.2f));
-
-                var binds = new Godot.Collections.Array { graphicalNode };
-                graphicalNode.Area2d.Connect("input_event", this, "OnToolboxNodeSelected", binds);
-                var control = new Control();
-                control.AddChild(graphicalNode);
-                control.SetCustomMinimumSize(new Vector2(150, 150));
-                logicToolbox.AddChild(control);
-            });
-        }
-
-        private void InitializeRoots()
-        {
-            var graphicalRootNode = _logicNodeCreator.CreateNode(LogicNodeType.Root, true);
-            graphicalRootNode.SetScale(new Vector2(0.2f, 0.2f));
-            AddChild(graphicalRootNode);
-
-            var root = new LogicNode { LogicNodeType = LogicNodeType.Root };
-            _roots.Add(root);
-            _logicNodeGraphics.Add(root, new GraphicalLogicNode { GraphicalNode = graphicalRootNode });
-        }
-
-        private void UpdateGhosts()
-        {
-            var validGhosts = new List<GraphicalLogicNode.GhostConnection>();
-            
-            var stack = new Stack<LogicNode>(_roots);
-            while (stack.Any())
-            {
-                var node = stack.Pop();
-                for (var i = 0; i < 2; i++)
+                if (lnt.ConnectionsIn.Count > 1)
                 {
-                    if (!node.IsConnectionEnabled(i)) continue;
-                    
-                    if (!node.HasChild(i))
+                    LogicNodeTypeToPackedScene[lnt] =
+                        ResourceLoader.Load("res://Scenes/LogicEditor/DoubleLogicNode.tscn") as PackedScene;
+                }
+                else if (lnt.ConnectionsIn.Count > 0)
+                {
+                    if (lnt.ConnectionOut == LogicNodeConnection.None)
                     {
-                        if (GetGhost(node, i) == null)
-                        {
-                            var ghostNode = _logicNodeCreator.CreateGhostNode();
-                            ghostNode.SetScale(new Vector2(0.2f, 0.2f));
-                            ghostNode.Position = _logicNodeGraphics[node].GraphicalNode.Position + new Vector2(120, i * 100);
-                            AddChild(ghostNode);
-
-                            var ghostConnection = new GraphicalLogicNode.GhostConnection
-                            {
-                                GhostNode = ghostNode,
-                                Owner = node,
-                                ChildIndex = i
-                            };
-                            _ghosts.Add(ghostConnection);
-                            validGhosts.Add(ghostConnection);
-                            SetGhost(node, ghostConnection, i);
-                        }
-                        else
-                        {
-                            validGhosts.Add(GetGhost(node, i));
-                        }
+                        LogicNodeTypeToPackedScene[lnt] =
+                            ResourceLoader.Load("res://Scenes/LogicEditor/StartingLogicNode.tscn") as PackedScene;
                     }
                     else
                     {
-                        stack.Push(node.ChildAt(i));
+                        LogicNodeTypeToPackedScene[lnt] =
+                            ResourceLoader.Load("res://Scenes/LogicEditor/SingleLogicNode.tscn") as PackedScene;
+                    }
+                }
+                else
+                {
+                    LogicNodeTypeToPackedScene[lnt] =
+                        ResourceLoader.Load("res://Scenes/LogicEditor/SingleLogicNode.tscn") as PackedScene;
+                }
+            });
+
+            Connector = ResourceLoader.Load("res://Scenes/LogicEditor/Connector.tscn") as PackedScene;
+            GhostNode = ResourceLoader.Load("res://Scenes/LogicEditor/GhostNode.tscn") as PackedScene;
+            LogicNodeChoiceBox = ResourceLoader.Load("res://Scenes/LogicEditor/LogicNodeChoiceBox.tscn") as PackedScene;
+            LogicNodeChoiceBoxChoice = ResourceLoader.Load("res://Scenes/LogicEditor/LogicNodeChoiceBoxChoice.tscn") as PackedScene;
+
+            SetRoots(new List<LogicNode> {DebugTree()});
+        }
+
+        private LogicNode DebugTree()
+        {
+            var root = new LogicNode(LogicNodeType.Root);
+            root.SetChildAt(new LogicNode(LogicNodeType.ToggleIf), 0);
+            root.Child1.SetChildAt(new LogicNode(LogicNodeType.And), 0);
+            return root;
+        }
+
+        public void SetRoots(List<LogicNode> logicNodes)
+        {
+            // clear current swimlanes
+            roots = logicNodes;
+            roots.ForEach(BuildTree);
+        }
+
+        public void BuildTree(LogicNode root)
+        {
+            if (swimLane == null)
+            {
+                swimLane = new SwimLane();
+                swimLane.Name = "SwimLane1";
+                AddChild(swimLane);
+            }
+
+            AddNode(swimLane, root, new Vector2());
+        }
+
+        public int AddNode(Node2D swimLane, LogicNode item, Vector2 position)
+        {
+            GraphicalLogicNode node;
+            if (!GraphicalNodes.ContainsKey(item))
+            {
+                node = GetNode(item.LogicNodeType) as GraphicalLogicNode;
+                node.OnPressed += OnGraphicalNodePressed;
+                
+                GraphicalNodes[item] = node;
+                swimLane.AddChild(node);
+            }
+            node = GraphicalNodes[item] as GraphicalLogicNode;
+            
+            node.SetColor(new Color(item.LogicNodeType.Colour));
+            node.SetText(item.LogicNodeType.Name);
+            node.Position = position;
+
+            var lineOffsets = new List<Vector2> {new Vector2(320, 55), new Vector2(320, 305)};
+            var childOffsets = new List<Vector2> {new Vector2(465, 0), new Vector2(465, 250)};
+
+            int previousColumnSpacing = 0;
+            for (int i = 0; i <= 1; i++)
+            {
+                if (item.IsConnectionEnabled(i))
+                {
+                    var multiColumnSpacing = previousColumnSpacing * new Vector2(0, 150);
+                    var nodePosition = position + childOffsets[i] + multiColumnSpacing;
+
+                    // draw line
+                    var line = GetLine(item, i);
+                    if (line == null)
+                    {
+                        line = Connector.Instance() as GraphicalLogicNodeConnector;
+                        if (!Lines.ContainsKey(item)) Lines[item] = new Dictionary<int, Node>();
+                        Lines[item][i] = line;
+                        swimLane.AddChild(line);
+                    }
+                    line.SetPosition(position + lineOffsets[i]);
+                    var target = new Vector2(nodePosition.x, nodePosition.y + lineOffsets[0].y);
+                    line.SetLineFromTo(position + lineOffsets[i], target);
+                    
+                    var ghostNode = GetGhostNode(item, i);
+                    if (item.HasChild(i))
+                    {
+                        if (ghostNode != null)
+                        {
+                            DeleteGhostNode(item, i);
+                        }
+                        previousColumnSpacing += AddNode(swimLane, item.ChildAt(i), nodePosition);
+                    }
+                    else
+                    {
+                        if (ghostNode == null)
+                        {
+                            ghostNode = GhostNode.Instance() as GraphicalLogicNode;
+                            ghostNode.GhostFor = item;
+                            ghostNode.GhostIndex = i;
+                            ghostNode.OnPressed += OnGraphicalNodePressed;
+                            swimLane.AddChild(ghostNode);
+                        }
+
+                        ghostNode.Position = nodePosition;
+
+                        if (!GhostNodes.ContainsKey(item)) GhostNodes[item] = new Dictionary<int, Node>();
+                        GhostNodes[item][i] = ghostNode;
                     }
                 }
             }
-            
-            // remove invalid ghosts
-            var invalidGhosts = _ghosts.Where(g => !validGhosts.Contains(g)).ToList();
-            foreach (var ghostConnection in invalidGhosts)
-            {
-                RemoveChild(ghostConnection.GhostNode);
-                SetGhost(ghostConnection.Owner, null, ghostConnection.ChildIndex);
-                GD.Print("removing ghost");
-            }
 
-            _ghosts = validGhosts;
+            if (item.IsConnectionEnabled(1)) return previousColumnSpacing + 1;
+            return previousColumnSpacing;
         }
 
-        private bool IsValidConnection(GraphicalLogicNode.GhostConnection ghostConnection, ToolboxNode toolboxNode)
+        private GraphicalLogicNode GetGhostNode(LogicNode item, int index)
         {
-            var draggedNodeConnectionOut = toolboxNode.Type.ConnectionOut;
+            if (!GhostNodes.ContainsKey(item)) return null;
+            if (!GhostNodes[item].ContainsKey(index)) return null;
+            return GhostNodes[item][index] as GraphicalLogicNode;
+        }
 
-            if (!ghostConnection.Owner.IsConnectionEnabled(ghostConnection.ChildIndex))
-            {
-                return false;
-            }
+        private GraphicalLogicNodeConnector GetLine(LogicNode item, int index)
+        {
+            if (!Lines.ContainsKey(item)) return null;
+            if (!Lines[item].ContainsKey(index)) return null;
+            return Lines[item][index] as GraphicalLogicNodeConnector;
+        }
+
+        private void DeleteGhostNode(LogicNode item, int index)
+        {
+            if (!GhostNodes.ContainsKey(item)) return;
+            if (!GhostNodes[item].ContainsKey(index)) return;
             
-            var parentInputConnection = ghostConnection.Owner.LogicNodeType.ConnectionsIn[ghostConnection.ChildIndex];
-            return draggedNodeConnectionOut == parentInputConnection;
+            var ghostNode = GhostNodes[item][index] as GraphicalLogicNode;
+            swimLane.RemoveChild(ghostNode);
+            ghostNode.QueueFree();
+
+            var ghostNodeForItem = GhostNodes[item];
+            ghostNodeForItem.Remove(index);
+            if (!ghostNodeForItem.Any())
+            {
+                GhostNodes.Remove(item);
+            }
+        }
+
+        private void OnGraphicalNodePressed(GraphicalLogicNode graphicalLogicNode)
+        {
+            if (_logicNodeChoiceBox != null)
+            {
+                swimLane.RemoveChild(_logicNodeChoiceBox);
+                _logicNodeChoiceBox.QueueFree();
+                _logicNodeChoiceBox = null;
+            }
+
+            if (graphicalLogicNode.LogicNode != null)
+            {
+                
+            }
+            else if (graphicalLogicNode.GhostFor != null)
+            {
+                var choiceBox = LogicNodeChoiceBox.Instance() as Node2D;
+                choiceBox.Position = graphicalLogicNode.Position + new Vector2(0, 150);
+                swimLane.AddChild(choiceBox);
+                _logicNodeChoiceBox = choiceBox;
+                _logicNodeChoiceBoxGhostFor = graphicalLogicNode.GhostFor;
+                _logicNodeChoiceBoxGhostIndex = graphicalLogicNode.GhostIndex;
+
+                var container = choiceBox.GetNode("choiceContainer") as Container;
+                var connection = graphicalLogicNode.GhostFor.LogicNodeType.ConnectionsIn[graphicalLogicNode.GhostIndex];
+                var matchingLogicNodeTypes = Enumeration.GetAll<LogicNodeType>().ToList().Where(x => x.ConnectionOut == connection).ToList();
+                matchingLogicNodeTypes.ForEach(type =>
+                {
+                    var choice = LogicNodeChoiceBoxChoice.Instance();
+                    ((Label) choice.GetNode("label")).Text = type.Name;
+                    ((TextureRect) choice.GetNode("texture")).Modulate = new Color(type.Colour);
+                    container.AddChild(choice);
+                    choice.Connect("gui_input", this, "_on_LogicChoiceBox_gui_input", new Array { type.Id });
+                });
+            }
+        }
+
+        public Node2D GetNode(LogicNodeType logicNodeType)
+        {
+            if (!LogicNodeTypeToPackedScene.ContainsKey(logicNodeType))
+                throw new ArgumentException($"Couldn't create node for {logicNodeType}");
+            var scene = LogicNodeTypeToPackedScene[logicNodeType].Instance();
+            return scene as Node2D;
         }
 
         public override void _Process(float delta)
         {
-            if (_draggedNode == null) return;
-            
-            
-            // if the node is < 100 from any anchor points, snap
-            // check if the anchor point and the snapping point is of matching type
-            var closeGhosts = _ghosts
-                .Where(x => (x.GhostNode.Position - GetGlobalMousePosition()).Length() < 100)
-                .Where(x => IsValidConnection(x, _draggedNode))
-                .ToList();
-
-            if (closeGhosts.Any())
+            if (Input.IsMouseButtonPressed((int) ButtonList.Middle))
             {
-                var closeGhost = closeGhosts.ElementAt(0);
-                _draggedNode.SetPosition(closeGhost.GhostNode.Position);
-                _currentSnappedGhost = closeGhost;
+                if (!isDragging)
+                {
+                    lastMousePosition = GetLocalMousePosition();
+                }
+
+                isDragging = true;
+                var difference = GetLocalMousePosition() - lastMousePosition;
+                var swimlane = GetNode("SwimLane1") as SwimLane;
+                swimlane.SetPosition(swimlane.GetPosition() + difference);
+                lastMousePosition = GetLocalMousePosition();
             }
             else
             {
-                _draggedNode.SetPosition(GetGlobalMousePosition());
-                _currentSnappedGhost = null;
+                isDragging = false;
             }
-
-            if (Input.IsMouseButtonPressed(1)) return;
-            
-            
-            if (_currentSnappedGhost != null)
-            {
-                var newParent = _currentSnappedGhost.Owner;
-                _draggedNode.LogicNode.Parent = newParent;
-                _draggedNode.LogicNode.ChildIndex = _currentSnappedGhost.ChildIndex;
-                newParent.SetChildAt(_draggedNode.LogicNode ,_currentSnappedGhost.ChildIndex);
-                UpdateGhosts();
-            }
-
-            var binds = new Godot.Collections.Array { _draggedNode };
-            if (!_draggedNode.Area2d.IsConnected("input_event", this, "OnEditorNodeSelected"))
-            {
-                _draggedNode.Area2d.Connect("input_event", this, "OnEditorNodeSelected", binds);
-            }
-            
-            var rect = logicToolboxVBox.GetRect();
-            if (rect.HasPoint(GetGlobalMousePosition()))
-            {
-                RemoveChild(_draggedNode);
-            }
-
-            _draggedNode = null;
         }
 
-        public void OnEditorNodeSelected(object viewport, object @event, int shape_idx, ToolboxNode graphicalNode)
+        public override void _Input(InputEvent @event)
         {
-            if (@event is InputEventMouseButton inputEventMouseButton && inputEventMouseButton.Pressed)
+            if (@event is InputEventMouse && GetRect().HasPoint(GetLocalMousePosition()))
             {
-                _draggedNode = graphicalNode;
-
-                if (_draggedNode.LogicNode.Parent != null)
+                if (@event is InputEventMouseButton iemb)
                 {
-                    // disconnect
-                    _draggedNode.LogicNode.Parent.SetChildAt(null, _draggedNode.LogicNode.ChildIndex);
-                    
-                    _draggedNode.LogicNode.Parent = null;
-                    _draggedNode.LogicNode.ChildIndex = 0;
+                    if (iemb.ButtonIndex == (int) ButtonList.WheelUp)
+                    {
+                        scale += 0.02f;
+                        (GetNode("SwimLane1") as SwimLane).SetScaleFloat(scale);
+                    }
+                    else if (iemb.ButtonIndex == (int) ButtonList.WheelDown)
+                    {
+                        scale -= 0.02f;
+                        (GetNode("SwimLane1") as SwimLane).SetScaleFloat(scale);
+                    }
                 }
-                
-                UpdateGhosts();
-            }
-        }
-
-        public void OnToolboxNodeSelected(object viewport, object @event, int shape_idx, ToolboxNode graphicalNode)
-        {
-            if (@event.GetType() != typeof(InputEventMouseButton)) return;
-            
-            if (@event is InputEventMouseButton inputEventMouseButton && inputEventMouseButton.Pressed)
-            {
-                _draggedNode = _logicNodeCreator.CreateNode(graphicalNode.Type, true);
-                _draggedNode.SetScale(new Vector2(0.2f, 0.2f));
-                
-                var node = new LogicNode
-                {
-                    LogicNodeType = _draggedNode.Type,
-                };
-
-                _logicNodeGraphics.Add(node, new GraphicalLogicNode()
-                {
-                    GraphicalNode = _draggedNode
-                });
-                
-                _draggedNode.LogicNode = node;
-                
-                AddChild(_draggedNode);
             }
         }
         
-        private void SetGhost(LogicNode logicNode, GraphicalLogicNode.GhostConnection ghostConnection, int index)
+        public void _on_NinePatchRect_gui_input(object @event)
         {
-            var graphics = _logicNodeGraphics[logicNode];
-            if (index == 0)  graphics.GraphicalGhostNode1 = ghostConnection;
-            else if (index == 1) graphics.GraphicalGhostNode2 = ghostConnection;
-            else throw new ArgumentException($"Cannot set ghost connection {index}");
-        }
-
-        public GraphicalLogicNode.GhostConnection GetGhost(LogicNode logicNode, int index)
-        {
-            var graphics = _logicNodeGraphics[logicNode];
-            if (index == 0) return graphics.GraphicalGhostNode1;
-            if (index == 1) return graphics.GraphicalGhostNode2;
-            throw new ArgumentException($"Cannot get ghost connection {index}");
-        }
-
-        public void OnSaveButtonPressed()
-        {
-            GD.Print("save");
-            var main = GetTree().GetRoot().FindNode("RootSpatial", true, false) as Main;
-            main.SaveLogicTile(_coordinates, _roots);
-        }
-
-        public void SetCoordinates(Point2D gridCoords)
-        {
-            this._coordinates = gridCoords;
-        }
-
-        public void LoadTree(List<LogicNode> logicNodes)
-        {
-            this._roots = logicNodes;
-            LoadTreeNode(null, logicNodes.ElementAt(0), 0);
-            UpdateGhosts();
-        }
-
-        public void LoadTreeNode(ToolboxNode parent, LogicNode thisNode, int child1)
-        {
-            var graphics = _logicNodeCreator.CreateNode(thisNode.LogicNodeType, true);
-            graphics.LogicNode = thisNode;
-            graphics.SetScale(new Vector2(0.2f, 0.2f));
-            
-            var binds = new Godot.Collections.Array { graphics };
-            graphics.Area2d.Connect("input_event", this, "OnEditorNodeSelected", binds);
-            AddChild(graphics);
-
-            if (parent != null)
+            if (@event is InputEventMouseButton imb && !imb.Pressed && imb.ButtonIndex == (int) ButtonList.Left)
             {
-                if (child1 == 1)
+                if (_logicNodeChoiceBox != null)
                 {
-                    graphics.SetPosition(parent.GetPosition() + new Vector2(120, 0));
-                }
-
-                if (child1 == 2)
-                {
-                    graphics.SetPosition(parent.GetPosition() + new Vector2(120, 100));
+                    swimLane.RemoveChild(_logicNodeChoiceBox);
+                    _logicNodeChoiceBox.QueueFree();
+                    _logicNodeChoiceBox = null;
                 }
             }
-            
-            _logicNodeGraphics.Add(thisNode, new GraphicalLogicNode()
+        }
+
+        public void _on_LogicChoiceBox_gui_input(object @event, int typeId)
+        {
+            if (@event is InputEventMouseButton imb && !imb.Pressed && imb.ButtonIndex == (int) ButtonList.Left)
             {
-                GraphicalNode = graphics,
-            });
-            
-            if (thisNode.HasChild(0)) LoadTreeNode(graphics, thisNode.Child1, 1);
-            if (thisNode.HasChild(1)) LoadTreeNode(graphics, thisNode.Child2, 2);
+                var type = Enumeration.GetAll<LogicNodeType>().First(x => x.Id == typeId);
+                if (_logicNodeChoiceBox != null)
+                {
+                    var logicNode = _logicNodeChoiceBoxGhostFor;
+                    logicNode.SetChildAt(new LogicNode(type), _logicNodeChoiceBoxGhostIndex);
+                    this.BuildTree(roots[0]);
+                }
+                DeleteChoiceBox();
+            }
+        }
+
+        private void DeleteChoiceBox()
+        {
+            swimLane.RemoveChild(_logicNodeChoiceBox);
+            _logicNodeChoiceBox.QueueFree();
+            _logicNodeChoiceBox = null;
         }
     }
 }

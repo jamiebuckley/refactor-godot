@@ -9,7 +9,7 @@ namespace Refactor1.Game.Logic
     public class LogicNodeType : Enumeration
     {
 
-        private static int _currentId = 0;
+        private static int _currentId;
 
         private static List<LC> EmptyList()
         {
@@ -50,8 +50,14 @@ namespace Refactor1.Game.Logic
         
         public string Name { get; }
 
+        /// <summary>
+        /// The 'output' types of the logic node type, e.g. Boolean for a Logical AND node
+        /// </summary>
         public LogicNodeConnection ConnectionOut { get; }
         
+        /// <summary>
+        /// The 'input' types of the logic node type, e.g. two Booleans for a Logical AND node
+        /// </summary>
         public List<LogicNodeConnection> ConnectionsIn { get; }
 
         public LogicNodeType(string colour, string name, LogicNodeConnection connectionOut, List<LogicNodeConnection> connectionsIn) : base(_currentId, name)

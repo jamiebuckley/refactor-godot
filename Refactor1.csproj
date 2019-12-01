@@ -71,6 +71,8 @@
     <Compile Include="Game\GridWorkerStepper.cs" />
     <Compile Include="Game\LogicTileExecutor.cs" />
     <Compile Include="Game\Logic\GraphicalLogicNode.cs" />
+    <Compile Include="Game\Logic\GraphicalLogicNodeConnector.cs" />
+    <Compile Include="Game\Logic\SwimLane.cs" />
     <Compile Include="Game\Logic\ToolboxNode.cs" />
     <Compile Include="Game\Logic\LogicEditor.cs" />
     <Compile Include="Game\Logic\LogicNode.cs" />

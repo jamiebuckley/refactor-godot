@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=26 format=2]
 
 [ext_resource path="res://Assets/RefactorTheme.tres" type="Theme" id=1]
 [ext_resource path="res://Game/UserInterface/UserInterface.cs" type="Script" id=2]
@@ -8,9 +8,14 @@
 [ext_resource path="res://Scripts/UI/HeaderDialogDrag.gd" type="Script" id=6]
 [ext_resource path="res://Assets/Theme/Button/BuildPopupGridButton.tres" type="Theme" id=7]
 [ext_resource path="res://Assets/Theme/Button/modal_cancel_button_normal.tres" type="StyleBox" id=8]
-[ext_resource path="res://Assets/Theme/Button/modal_cancel_button_hover.tres" type="StyleBox" id=9]
-[ext_resource path="res://Assets/Theme/Button/modal_cancel_button_pressed.tres" type="StyleBox" id=10]
-[ext_resource path="res://Scripts/UI/ModalToggleButton.gd" type="Script" id=11]
+[ext_resource path="res://Scripts/UI/NinePatchClearSelection.gd" type="Script" id=9]
+[ext_resource path="res://Game/Logic/LogicEditor.cs" type="Script" id=10]
+[ext_resource path="res://Assets/Theme/Button/modal_cancel_button_hover.tres" type="StyleBox" id=11]
+[ext_resource path="res://Assets/Theme/Button/modal_cancel_button_pressed.tres" type="StyleBox" id=12]
+[ext_resource path="res://Scripts/UI/ModalToggleButton.gd" type="Script" id=13]
+[ext_resource path="res://Assets/Theme/Button/modal_ok_button_hover.tres" type="StyleBox" id=14]
+[ext_resource path="res://Assets/Theme/Button/modal_ok_button_pressed.tres" type="StyleBox" id=15]
+[ext_resource path="res://Assets/Theme/Button/modal_ok_button_normal.tres" type="StyleBox" id=16]
 
 [sub_resource type="StyleBoxTexture" id=1]
 texture = ExtResource( 3 )
@@ -59,7 +64,6 @@ LogicModalPath = NodePath("LogicModal")
 GoalBoxPath = NodePath("UI/MainArea/GoalLayer/GoalBox")
 
 [node name="UI" type="VBoxContainer" parent="."]
-editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
@@ -211,7 +215,7 @@ text = "x"
 editor/display_folded = true
 margin_top = 48.0
 margin_right = 640.0
-margin_bottom = 372.0
+margin_bottom = 383.0
 mouse_filter = 1
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -224,7 +228,7 @@ custom_constants/margin_bottom = 8
 margin_left = 8.0
 margin_top = 8.0
 margin_right = 632.0
-margin_bottom = 316.0
+margin_bottom = 327.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.0
@@ -287,7 +291,7 @@ rect_min_size = Vector2( 150, 150 )
 text = "Pick Up"
 
 [node name="MarginContainer" type="MarginContainer" parent="BuildModal/VBoxContainer"]
-margin_top = 380.0
+margin_top = 391.0
 margin_right = 640.0
 margin_bottom = 467.0
 custom_constants/margin_right = 8
@@ -300,7 +304,7 @@ editor/display_folded = true
 margin_left = 8.0
 margin_top = 8.0
 margin_right = 632.0
-margin_bottom = 79.0
+margin_bottom = 68.0
 rect_min_size = Vector2( 0, 60 )
 size_flags_horizontal = 3
 alignment = 2
@@ -308,7 +312,7 @@ alignment = 2
 [node name="Button" type="Button" parent="BuildModal/VBoxContainer/MarginContainer/ButtonArea"]
 margin_left = 444.0
 margin_right = 624.0
-margin_bottom = 71.0
+margin_bottom = 60.0
 rect_min_size = Vector2( 180, 0 )
 custom_styles/normal = ExtResource( 8 )
 custom_fonts/font = ExtResource( 5 )
@@ -317,58 +321,68 @@ text = "Cancel"
 [node name="LogicModal" type="Control" parent="."]
 margin_left = 7.45683
 margin_top = 66.1989
-margin_right = 647.457
+margin_right = 807.457
 margin_bottom = 546.199
 mouse_filter = 1
 
-[node name="ColorRect" type="ColorRect" parent="LogicModal"]
-margin_top = 15.0
-margin_right = 640.0
-margin_bottom = 475.0
+[node name="CenterContainer" type="MarginContainer" parent="LogicModal"]
+margin_right = 800.0
+margin_bottom = 600.0
+
+[node name="NinePatchRect" type="NinePatchRect" parent="LogicModal/CenterContainer"]
+modulate = Color( 0.992157, 0.992157, 0.992157, 0.972549 )
+margin_right = 800.0
+margin_bottom = 600.0
+mouse_filter = 0
+texture = ExtResource( 3 )
+patch_margin_left = 5
+patch_margin_top = 5
+patch_margin_right = 5
+patch_margin_bottom = 5
+script = ExtResource( 9 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LogicModal/CenterContainer"]
+margin_right = 800.0
+margin_bottom = 600.0
+mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="LogicModal"]
-margin_right = 640.0
-margin_bottom = 467.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="LogicEditorTopBar" type="MarginContainer" parent="LogicModal/VBoxContainer"]
+[node name="LogicEditorTopBar" type="MarginContainer" parent="LogicModal/CenterContainer/VBoxContainer"]
 editor/display_folded = true
-margin_right = 640.0
+margin_right = 800.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 0, 40 )
 mouse_default_cursor_shape = 2
 size_flags_horizontal = 3
 script = ExtResource( 6 )
-nodePath = NodePath("../../../LogicModal")
+nodePath = NodePath("../../..")
 
-[node name="Panel" type="Panel" parent="LogicModal/VBoxContainer/LogicEditorTopBar"]
-margin_right = 640.0
+[node name="Panel" type="Panel" parent="LogicModal/CenterContainer/VBoxContainer/LogicEditorTopBar"]
+margin_right = 800.0
 margin_bottom = 40.0
 mouse_filter = 1
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_styles/panel = SubResource( 4 )
 
-[node name="HBoxContainer" type="HBoxContainer" parent="LogicModal/VBoxContainer/LogicEditorTopBar/Panel"]
+[node name="HBoxContainer" type="HBoxContainer" parent="LogicModal/CenterContainer/VBoxContainer/LogicEditorTopBar/Panel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 8.0
 alignment = 2
 
-[node name="Label" type="Label" parent="LogicModal/VBoxContainer/LogicEditorTopBar/Panel/HBoxContainer"]
+[node name="Label" type="Label" parent="LogicModal/CenterContainer/VBoxContainer/LogicEditorTopBar/Panel/HBoxContainer"]
 margin_top = 4.0
-margin_right = 574.0
+margin_right = 734.0
 margin_bottom = 35.0
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 5 )
 text = "Testing"
 
-[node name="Button" type="Button" parent="LogicModal/VBoxContainer/LogicEditorTopBar/Panel/HBoxContainer"]
-margin_left = 582.0
-margin_right = 632.0
+[node name="Button" type="Button" parent="LogicModal/CenterContainer/VBoxContainer/LogicEditorTopBar/Panel/HBoxContainer"]
+margin_left = 742.0
+margin_right = 792.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 50, 0 )
 custom_styles/hover = SubResource( 5 )
@@ -382,45 +396,63 @@ custom_colors/font_color_hover = Color( 0.952941, 0.952941, 0.952941, 1 )
 custom_colors/font_color_pressed = Color( 0.721569, 0.721569, 0.721569, 1 )
 text = "x"
 
-[node name="LogicEditorArea" type="MarginContainer" parent="LogicModal/VBoxContainer"]
+[node name="LogicEditorArea" type="MarginContainer" parent="LogicModal/CenterContainer/VBoxContainer"]
 margin_top = 48.0
-margin_right = 640.0
-margin_bottom = 392.0
-mouse_filter = 1
+margin_right = 800.0
+margin_bottom = 525.0
+rect_clip_content = true
+mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+script = ExtResource( 10 )
+
+[node name="MarginContainer" type="MarginContainer" parent="LogicModal/CenterContainer/VBoxContainer"]
+margin_top = 533.0
+margin_right = 800.0
+margin_bottom = 600.0
+rect_min_size = Vector2( 0, 30 )
+mouse_filter = 1
 custom_constants/margin_right = 8
 custom_constants/margin_top = 8
 custom_constants/margin_left = 8
 custom_constants/margin_bottom = 8
 
-[node name="MarginContainer" type="MarginContainer" parent="LogicModal/VBoxContainer"]
-margin_top = 400.0
-margin_right = 640.0
-margin_bottom = 467.0
-custom_constants/margin_right = 8
-custom_constants/margin_top = 8
-custom_constants/margin_left = 8
-custom_constants/margin_bottom = 8
-
-[node name="ButtonArea" type="HBoxContainer" parent="LogicModal/VBoxContainer/MarginContainer"]
+[node name="ButtonArea" type="HBoxContainer" parent="LogicModal/CenterContainer/VBoxContainer/MarginContainer"]
 margin_left = 8.0
 margin_top = 8.0
-margin_right = 632.0
+margin_right = 792.0
 margin_bottom = 59.0
-rect_min_size = Vector2( 0, 40 )
+rect_min_size = Vector2( 0, 30 )
 size_flags_horizontal = 3
 alignment = 2
 
-[node name="Button" type="Button" parent="LogicModal/VBoxContainer/MarginContainer/ButtonArea"]
-margin_left = 444.0
-margin_right = 624.0
+[node name="Button" type="Button" parent="LogicModal/CenterContainer/VBoxContainer/MarginContainer/ButtonArea"]
+margin_left = 416.0
+margin_right = 596.0
 margin_bottom = 51.0
-rect_min_size = Vector2( 180, 40 )
-custom_styles/hover = ExtResource( 9 )
-custom_styles/pressed = ExtResource( 10 )
+rect_min_size = Vector2( 180, 30 )
+size_flags_vertical = 3
+custom_styles/hover = ExtResource( 11 )
+custom_styles/pressed = ExtResource( 12 )
 custom_styles/normal = ExtResource( 8 )
 custom_fonts/font = ExtResource( 5 )
+custom_colors/font_color = Color( 1, 1, 1, 1 )
 text = "Cancel"
-script = ExtResource( 11 )
+script = ExtResource( 13 )
 modal_path = NodePath("../../../..")
+
+[node name="SaveButton" type="Button" parent="LogicModal/CenterContainer/VBoxContainer/MarginContainer/ButtonArea"]
+margin_left = 604.0
+margin_right = 784.0
+margin_bottom = 51.0
+rect_min_size = Vector2( 180, 30 )
+size_flags_vertical = 3
+custom_styles/hover = ExtResource( 14 )
+custom_styles/pressed = ExtResource( 15 )
+custom_styles/normal = ExtResource( 16 )
+custom_fonts/font = ExtResource( 5 )
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+text = "Save"
+script = ExtResource( 13 )
+modal_path = NodePath("../../../..")
+[connection signal="gui_input" from="LogicModal/CenterContainer/NinePatchRect" to="LogicModal/CenterContainer/VBoxContainer/LogicEditorArea" method="_on_NinePatchRect_gui_input"]
