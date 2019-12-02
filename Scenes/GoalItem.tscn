@@ -1,0 +1,49 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Game/UserInterface/GoalItem.cs" type="Script" id=1]
+[ext_resource path="res://Assets/Fonts/ui_nunito_light.tres" type="DynamicFont" id=2]
+
+[node name="VBoxContainer2" type="MarginContainer"]
+margin_left = 2.0
+margin_top = 2.0
+margin_right = 270.0
+margin_bottom = 70.0
+script = ExtResource( 1 )
+TitlePath = NodePath("")
+DescriptionPath = NodePath("MarginContainer/VBoxContainer/Description")
+
+[node name="Background" type="ColorRect" parent="."]
+margin_right = 268.0
+margin_bottom = 68.0
+size_flags_horizontal = 3
+color = Color( 0.894118, 0.913725, 0.890196, 0.941176 )
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+margin_right = 268.0
+margin_bottom = 68.0
+size_flags_horizontal = 3
+custom_constants/margin_right = 10
+custom_constants/margin_top = 10
+custom_constants/margin_left = 10
+custom_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 258.0
+margin_bottom = 58.0
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+margin_right = 248.0
+
+[node name="Description" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
+margin_top = 8.0
+margin_right = 248.0
+margin_bottom = 48.0
+rect_min_size = Vector2( 0, 40 )
+custom_fonts/normal_font = ExtResource( 2 )
+custom_colors/default_color = Color( 0, 0, 0, 1 )
+bbcode_enabled = true
+bbcode_text = "Collect [color=#13ad05]5[/color] coal in [color=#059cad]1[/color] day"
+text = "Collect 5 coal in 1 day"

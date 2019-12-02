@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<level>
+    <id>tutorial-level-1</id>
+    <name>Tutorial Level 1</name>
+    <goals>
+        <goal>
+            <id>goal-1</id>
+            <description>Mine 5 coal in a day, with 5 workers</description>
+            <fullInfo>
+                As part of a training exercise etc. etc.
+            </fullInfo>
+            <type>collect</type>
+            <collect>
+                <num>5</num>
+                <type>WorkerExitedEvent</type>
+                <equals>
+                    <field>CarryingItem</field>
+                    <value>COAL</value>
+                </equals>
+            </collect>
+            <restrictions>
+                <maxWorkerRestriction>5</maxWorkerRestriction>
+            </restrictions>
+        </goal>
+
+        <goal>
+            <id>goal-2</id>
+            <description>Mine 5 coal in a day, with 1 worker</description>
+            <fullInfo>
+                Unfortunately, four of yesterday's workers have come down with some form of coal-dust-induced coughing fit, and only Bob has showed up for duty today.
+                Way to go Bob!  Now seems a good time to demonstrate that one worker can easily do the work of five with nothing but a bit of elbow grease and emotional manipulation.
+                Get to it Bob!
+            </fullInfo>
+            <type>collect</type>
+            <collect>
+                <num>5</num>
+                <type>WorkerExitedEvent</type>
+                <equals>
+                    <field>CarryingItem</field>
+                    <value>COAL</value>
+                </equals>
+            </collect>
+            <restrictions>
+                <clearFloor/>
+                <maxWorkerRestriction>1</maxWorkerRestriction>
+            </restrictions>
+        </goal>
+    </goals>
+</level>

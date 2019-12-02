@@ -1,21 +1,22 @@
-[gd_scene load_steps=26 format=2]
+[gd_scene load_steps=27 format=2]
 
 [ext_resource path="res://Assets/RefactorTheme.tres" type="Theme" id=1]
 [ext_resource path="res://Game/UserInterface/UserInterface.cs" type="Script" id=2]
 [ext_resource path="res://Assets/Textures/flat_ui/curved_box.svg" type="Texture" id=3]
 [ext_resource path="res://Assets/Fonts/ui_nunito_light.tres" type="DynamicFont" id=4]
 [ext_resource path="res://Assets/Fonts/ui_nunito_bold.tres" type="DynamicFont" id=5]
-[ext_resource path="res://Scripts/UI/HeaderDialogDrag.gd" type="Script" id=6]
-[ext_resource path="res://Assets/Theme/Button/BuildPopupGridButton.tres" type="Theme" id=7]
-[ext_resource path="res://Assets/Theme/Button/modal_cancel_button_normal.tres" type="StyleBox" id=8]
-[ext_resource path="res://Scripts/UI/NinePatchClearSelection.gd" type="Script" id=9]
-[ext_resource path="res://Game/Logic/LogicEditor.cs" type="Script" id=10]
-[ext_resource path="res://Assets/Theme/Button/modal_cancel_button_hover.tres" type="StyleBox" id=11]
-[ext_resource path="res://Assets/Theme/Button/modal_cancel_button_pressed.tres" type="StyleBox" id=12]
-[ext_resource path="res://Scripts/UI/ModalToggleButton.gd" type="Script" id=13]
-[ext_resource path="res://Assets/Theme/Button/modal_ok_button_hover.tres" type="StyleBox" id=14]
-[ext_resource path="res://Assets/Theme/Button/modal_ok_button_pressed.tres" type="StyleBox" id=15]
-[ext_resource path="res://Assets/Theme/Button/modal_ok_button_normal.tres" type="StyleBox" id=16]
+[ext_resource path="res://Scenes/GoalItem.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Scripts/UI/HeaderDialogDrag.gd" type="Script" id=7]
+[ext_resource path="res://Assets/Theme/Button/BuildPopupGridButton.tres" type="Theme" id=8]
+[ext_resource path="res://Assets/Theme/Button/modal_cancel_button_normal.tres" type="StyleBox" id=9]
+[ext_resource path="res://Scripts/UI/NinePatchClearSelection.gd" type="Script" id=10]
+[ext_resource path="res://Game/Logic/LogicEditor.cs" type="Script" id=11]
+[ext_resource path="res://Assets/Theme/Button/modal_cancel_button_hover.tres" type="StyleBox" id=12]
+[ext_resource path="res://Assets/Theme/Button/modal_cancel_button_pressed.tres" type="StyleBox" id=13]
+[ext_resource path="res://Scripts/UI/ModalToggleButton.gd" type="Script" id=14]
+[ext_resource path="res://Assets/Theme/Button/modal_ok_button_hover.tres" type="StyleBox" id=15]
+[ext_resource path="res://Assets/Theme/Button/modal_ok_button_pressed.tres" type="StyleBox" id=16]
+[ext_resource path="res://Assets/Theme/Button/modal_ok_button_normal.tres" type="StyleBox" id=17]
 
 [sub_resource type="StyleBoxTexture" id=1]
 texture = ExtResource( 3 )
@@ -61,10 +62,9 @@ OptionLabelPath = NodePath("UI/TopBar/Content/BuildLabel")
 BuildModalPath = NodePath("BuildModal")
 BuildModalButtonPath = NodePath("UI/TopBar/Content/BuildButton")
 LogicModalPath = NodePath("LogicModal")
-GoalBoxPath = NodePath("UI/MainArea/GoalLayer/GoalBox")
+GoalBoxPath = NodePath("UI/MainArea/GoalLayer/MarginContainer/GoalBox")
 
 [node name="UI" type="VBoxContainer" parent="."]
-editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
@@ -72,7 +72,6 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="TopBar" type="MarginContainer" parent="UI"]
-editor/display_folded = true
 margin_right = 1024.0
 margin_bottom = 50.0
 size_flags_horizontal = 3
@@ -120,7 +119,6 @@ custom_fonts/font = ExtResource( 5 )
 text = "Build"
 
 [node name="MainArea" type="MarginContainer" parent="UI"]
-editor/display_folded = true
 margin_top = 58.0
 margin_right = 1024.0
 margin_bottom = 768.0
@@ -136,21 +134,41 @@ mouse_filter = 2
 size_flags_vertical = 3
 
 [node name="LeftArea" type="VBoxContainer" parent="UI/MainArea/GoalLayer"]
-margin_right = 609.0
+margin_right = 716.0
 margin_bottom = 710.0
 mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 3.0
 
-[node name="GoalBox" type="VBoxContainer" parent="UI/MainArea/GoalLayer"]
-margin_left = 617.0
+[node name="MarginContainer" type="MarginContainer" parent="UI/MainArea/GoalLayer"]
+margin_left = 724.0
 margin_right = 1024.0
 margin_bottom = 710.0
+rect_min_size = Vector2( 300, 0 )
+custom_constants/margin_right = 8
+custom_constants/margin_top = 8
+custom_constants/margin_left = 8
+custom_constants/margin_bottom = 8
+
+[node name="GoalBox" type="VBoxContainer" parent="UI/MainArea/GoalLayer/MarginContainer"]
+editor/display_folded = true
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 292.0
+margin_bottom = 702.0
 mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 2.0
+
+[node name="VBoxContainer2" parent="UI/MainArea/GoalLayer/MarginContainer/GoalBox" instance=ExtResource( 6 )]
+margin_left = 0.0
+margin_top = 0.0
+margin_right = 284.0
+margin_bottom = 113.0
+TitlePath = NodePath("../GoalBox/VBoxContainer2/MarginContainer/VBoxContainer/HBoxContainer/Title")
+DescriptionPath = NodePath("../GoalBox/VBoxContainer2/MarginContainer/VBoxContainer/Description")
 
 [node name="BuildModal" type="Control" parent="."]
 editor/display_folded = true
@@ -179,7 +197,7 @@ margin_right = 640.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 0, 40 )
 size_flags_horizontal = 3
-script = ExtResource( 6 )
+script = ExtResource( 7 )
 nodePath = NodePath("../..")
 
 [node name="Panel" type="Panel" parent="BuildModal/VBoxContainer/BuildPopupTopBar"]
@@ -233,7 +251,7 @@ margin_bottom = 327.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.0
-theme = ExtResource( 7 )
+theme = ExtResource( 8 )
 columns = 4
 
 [node name="BOptDirectionalTileButton" type="Button" parent="BuildModal/VBoxContainer/BuildPopupGridArea/GridContainer" groups=[
@@ -242,7 +260,7 @@ columns = 4
 margin_right = 150.0
 margin_bottom = 150.0
 rect_min_size = Vector2( 150, 150 )
-theme = ExtResource( 7 )
+theme = ExtResource( 8 )
 text = "Arrow"
 
 [node name="BOptEntranceButton" type="Button" parent="BuildModal/VBoxContainer/BuildPopupGridArea/GridContainer" groups=[
@@ -315,11 +333,13 @@ margin_left = 444.0
 margin_right = 624.0
 margin_bottom = 60.0
 rect_min_size = Vector2( 180, 0 )
-custom_styles/normal = ExtResource( 8 )
+custom_styles/normal = ExtResource( 9 )
 custom_fonts/font = ExtResource( 5 )
 text = "Cancel"
 
 [node name="LogicModal" type="Control" parent="."]
+editor/display_folded = true
+visible = false
 margin_left = 7.45683
 margin_top = 66.1989
 margin_right = 807.457
@@ -340,7 +360,7 @@ patch_margin_left = 5
 patch_margin_top = 5
 patch_margin_right = 5
 patch_margin_bottom = 5
-script = ExtResource( 9 )
+script = ExtResource( 10 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="LogicModal/CenterContainer"]
 margin_right = 800.0
@@ -356,7 +376,7 @@ margin_bottom = 40.0
 rect_min_size = Vector2( 0, 40 )
 mouse_default_cursor_shape = 2
 size_flags_horizontal = 3
-script = ExtResource( 6 )
+script = ExtResource( 7 )
 nodePath = NodePath("../../..")
 
 [node name="Panel" type="Panel" parent="LogicModal/CenterContainer/VBoxContainer/LogicEditorTopBar"]
@@ -405,7 +425,7 @@ rect_clip_content = true
 mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-script = ExtResource( 10 )
+script = ExtResource( 11 )
 
 [node name="MarginContainer" type="MarginContainer" parent="LogicModal/CenterContainer/VBoxContainer"]
 margin_top = 533.0
@@ -433,13 +453,13 @@ margin_right = 596.0
 margin_bottom = 51.0
 rect_min_size = Vector2( 180, 30 )
 size_flags_vertical = 3
-custom_styles/hover = ExtResource( 11 )
-custom_styles/pressed = ExtResource( 12 )
-custom_styles/normal = ExtResource( 8 )
+custom_styles/hover = ExtResource( 12 )
+custom_styles/pressed = ExtResource( 13 )
+custom_styles/normal = ExtResource( 9 )
 custom_fonts/font = ExtResource( 5 )
 custom_colors/font_color = Color( 1, 1, 1, 1 )
 text = "Cancel"
-script = ExtResource( 13 )
+script = ExtResource( 14 )
 modal_path = NodePath("../../../../..")
 
 [node name="SaveButton" type="Button" parent="LogicModal/CenterContainer/VBoxContainer/MarginContainer/ButtonArea"]
@@ -448,12 +468,12 @@ margin_right = 784.0
 margin_bottom = 51.0
 rect_min_size = Vector2( 180, 30 )
 size_flags_vertical = 3
-custom_styles/hover = ExtResource( 14 )
-custom_styles/pressed = ExtResource( 15 )
-custom_styles/normal = ExtResource( 16 )
+custom_styles/hover = ExtResource( 15 )
+custom_styles/pressed = ExtResource( 16 )
+custom_styles/normal = ExtResource( 17 )
 custom_fonts/font = ExtResource( 5 )
 custom_colors/font_color = Color( 1, 1, 1, 1 )
 text = "Save"
-script = ExtResource( 13 )
+script = ExtResource( 14 )
 modal_path = NodePath("../../../../..")
 [connection signal="gui_input" from="LogicModal/CenterContainer/NinePatchRect" to="LogicModal/CenterContainer/VBoxContainer/LogicEditorArea" method="_on_NinePatchRect_gui_input"]

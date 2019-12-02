@@ -21,7 +21,7 @@ namespace Refactor1.Game.Logic
         private LogicNode _logicNodeChoiceBoxGhostFor;
         private int _logicNodeChoiceBoxGhostIndex;
 
-        private float scale = 1.0f;
+        private float scale = 0.5f;
         private Vector2 lastMousePosition;
         private bool isDragging;
 
@@ -70,6 +70,7 @@ namespace Refactor1.Game.Logic
             LogicNodeChoiceBoxChoice = ResourceLoader.Load("res://Scenes/LogicEditor/LogicNodeChoiceBoxChoice.tscn") as PackedScene;
 
             SetRoots(new List<LogicNode> {DebugTree()});
+            (GetNode("SwimLane1") as SwimLane).SetScaleFloat(scale);
         }
 
         private LogicNode DebugTree()

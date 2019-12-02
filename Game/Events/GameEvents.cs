@@ -6,11 +6,11 @@ namespace Refactor1.Game.Events
 {
     public class GameEvents
     {
-        public static GameEvents Instance = new GameEvents();
+        public static readonly GameEvents Instance = new GameEvents();
         
         private int id = 0;
         
-        private Dictionary<Type, List<Action<GameEvent>>> _listeners = new Dictionary<Type, List<Action<GameEvent>>>();
+        private readonly Dictionary<Type, List<Action<GameEvent>>> _listeners = new Dictionary<Type, List<Action<GameEvent>>>();
         
         public Action SubscribeTo(Type eventName, Action<GameEvent> listener)
         {
@@ -21,6 +21,7 @@ namespace Refactor1.Game.Events
 
         public void Emit<T>(T gameEvent) where T : GameEvent
         {
+            if (!_listeners.ContainsKey(typeof(T))) return;
             var listeners = _listeners[typeof(T)];
             listeners?.ForEach(l => l.Invoke(gameEvent));
         }
