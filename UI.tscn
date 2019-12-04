@@ -166,7 +166,7 @@ size_flags_stretch_ratio = 2.0
 margin_left = 0.0
 margin_top = 0.0
 margin_right = 284.0
-margin_bottom = 113.0
+margin_bottom = 68.0
 TitlePath = NodePath("../GoalBox/VBoxContainer2/MarginContainer/VBoxContainer/HBoxContainer/Title")
 DescriptionPath = NodePath("../GoalBox/VBoxContainer2/MarginContainer/VBoxContainer/Description")
 
@@ -338,8 +338,6 @@ custom_fonts/font = ExtResource( 5 )
 text = "Cancel"
 
 [node name="LogicModal" type="Control" parent="."]
-editor/display_folded = true
-visible = false
 margin_left = 7.45683
 margin_top = 66.1989
 margin_right = 807.457
