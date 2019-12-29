@@ -65,6 +65,7 @@ LogicModalPath = NodePath("LogicModal")
 GoalBoxPath = NodePath("UI/MainArea/GoalLayer/MarginContainer/GoalBox")
 
 [node name="UI" type="VBoxContainer" parent="."]
+editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
@@ -437,6 +438,7 @@ custom_constants/margin_left = 8
 custom_constants/margin_bottom = 8
 
 [node name="ButtonArea" type="HBoxContainer" parent="LogicModal/CenterContainer/VBoxContainer/MarginContainer"]
+editor/display_folded = true
 margin_left = 8.0
 margin_top = 8.0
 margin_right = 792.0
@@ -474,4 +476,4 @@ custom_colors/font_color = Color( 1, 1, 1, 1 )
 text = "Save"
 script = ExtResource( 14 )
 modal_path = NodePath("../../../../..")
-[connection signal="gui_input" from="LogicModal/CenterContainer/NinePatchRect" to="LogicModal/CenterContainer/VBoxContainer/LogicEditorArea" method="_on_NinePatchRect_gui_input"]
+[connection signal="gui_input" from="LogicModal/CenterContainer/NinePatchRect" to="LogicModal/CenterContainer/VBoxContainer/LogicEditorArea" method="CloseLogicChoiceBox"]

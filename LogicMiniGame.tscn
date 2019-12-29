@@ -35,39 +35,39 @@ custom_constants/margin_bottom = 8
 [node name="ParentVBox" type="VBoxContainer" parent="MarginContainer"]
 margin_left = 8.0
 margin_top = 8.0
-margin_right = 1912.0
-margin_bottom = 1072.0
+margin_right = 1016.0
+margin_bottom = 760.0
 
 [node name="MainAreaVBox" type="VBoxContainer" parent="MarginContainer/ParentVBox"]
-margin_right = 1904.0
-margin_bottom = 956.0
+margin_right = 1008.0
+margin_bottom = 644.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/ParentVBox/MainAreaVBox"]
-margin_right = 1904.0
+margin_right = 1008.0
 margin_bottom = 37.0
 rect_min_size = Vector2( 0, 30 )
 size_flags_horizontal = 3
 alignment = 2
 
 [node name="LogicSaveButton" type="Button" parent="MarginContainer/ParentVBox/MainAreaVBox/HBoxContainer"]
-margin_left = 1829.0
-margin_right = 1904.0
+margin_left = 933.0
+margin_right = 1008.0
 margin_bottom = 37.0
 text = "Save"
 
 [node name="LogicToolboxVBox" type="VBoxContainer" parent="MarginContainer/ParentVBox"]
 editor/display_folded = true
-margin_top = 964.0
-margin_right = 1904.0
-margin_bottom = 1064.0
+margin_top = 652.0
+margin_right = 1008.0
+margin_bottom = 752.0
 rect_min_size = Vector2( 0, 100 )
 size_flags_horizontal = 3
 size_flags_vertical = 0
 
 [node name="LogicToolboxScrollArea" type="ScrollContainer" parent="MarginContainer/ParentVBox/LogicToolboxVBox"]
-margin_right = 1904.0
+margin_right = 1008.0
 margin_bottom = 100.0
 mouse_filter = 1
 size_flags_horizontal = 3
@@ -75,7 +75,7 @@ size_flags_vertical = 3
 custom_styles/bg = SubResource( 1 )
 
 [node name="LogicToolbox" type="HBoxContainer" parent="MarginContainer/ParentVBox/LogicToolboxVBox/LogicToolboxScrollArea"]
-margin_right = 1904.0
+margin_right = 1008.0
 margin_bottom = 100.0
 size_flags_horizontal = 3
 size_flags_vertical = 3

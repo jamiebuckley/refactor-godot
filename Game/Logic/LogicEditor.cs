@@ -9,6 +9,22 @@ namespace Refactor1.Game.Logic
 {
     public class LogicEditor : Control
     {
+        public static class LogicEditorDimensions
+        {
+            public static int BASE_UNIT = 8;
+            public static List<Vector2> LINE_OFFSETS = new List<Vector2>()
+            {
+                new Vector2(21 * BASE_UNIT, 3 * BASE_UNIT),
+                new Vector2(21 * BASE_UNIT, 19 * BASE_UNIT)
+            };
+
+            public static List<Vector2> CHILD_OFFSETS = new List<Vector2>()
+            {
+                new Vector2(21 * BASE_UNIT + 16 * BASE_UNIT, 0),
+                new Vector2(21 * BASE_UNIT + 16 * BASE_UNIT, 16 * BASE_UNIT)
+            };
+        }
+        
         private Dictionary<LogicNodeType, PackedScene> LogicNodeTypeToPackedScene =
             new Dictionary<LogicNodeType, PackedScene>();
 
@@ -117,16 +133,13 @@ namespace Refactor1.Game.Logic
             node.SetText(item.LogicNodeType.Name);
             node.Position = position;
 
-            var lineOffsets = new List<Vector2> {new Vector2(320, 55), new Vector2(320, 305)};
-            var childOffsets = new List<Vector2> {new Vector2(465, 0), new Vector2(465, 250)};
-
             int previousColumnSpacing = 0;
             for (int i = 0; i <= 1; i++)
             {
                 if (item.IsConnectionEnabled(i))
                 {
                     var multiColumnSpacing = previousColumnSpacing * new Vector2(0, 150);
-                    var nodePosition = position + childOffsets[i] + multiColumnSpacing;
+                    var nodePosition = position + LogicEditorDimensions.CHILD_OFFSETS[i] + multiColumnSpacing;
 
                     // draw line
                     var line = GetLine(item, i);
@@ -137,9 +150,9 @@ namespace Refactor1.Game.Logic
                         Lines[item][i] = line;
                         swimLane.AddChild(line);
                     }
-                    line.SetPosition(position + lineOffsets[i]);
-                    var target = new Vector2(nodePosition.x, nodePosition.y + lineOffsets[0].y);
-                    line.SetLineFromTo(position + lineOffsets[i], target);
+                    line.SetPosition(position + LogicEditorDimensions.LINE_OFFSETS[i]);
+                    var target = new Vector2(nodePosition.x, nodePosition.y + LogicEditorDimensions.LINE_OFFSETS[0].y);
+                    line.SetLineFromTo(position + LogicEditorDimensions.LINE_OFFSETS[i], target);
                     
                     var ghostNode = GetGhostNode(item, i);
                     if (item.HasChild(i))
@@ -220,13 +233,14 @@ namespace Refactor1.Game.Logic
             else if (graphicalLogicNode.GhostFor != null)
             {
                 var choiceBox = LogicNodeChoiceBox.Instance() as Node2D;
-                choiceBox.Position = graphicalLogicNode.Position + new Vector2(0, 150);
+                choiceBox.Position = graphicalLogicNode.Position + new Vector2(0, 100);
                 swimLane.AddChild(choiceBox);
                 _logicNodeChoiceBox = choiceBox;
                 _logicNodeChoiceBoxGhostFor = graphicalLogicNode.GhostFor;
                 _logicNodeChoiceBoxGhostIndex = graphicalLogicNode.GhostIndex;
 
                 var container = choiceBox.GetNode("choiceContainer") as Container;
+                container.GetChild(0).Connect("gui_input", this, "CloseLogicChoiceBox");
                 var connection = graphicalLogicNode.GhostFor.LogicNodeType.ConnectionsIn[graphicalLogicNode.GhostIndex];
                 var matchingLogicNodeTypes = Enumeration.GetAll<LogicNodeType>().ToList().Where(x => x.ConnectionOut == connection).ToList();
                 matchingLogicNodeTypes.ForEach(type =>
@@ -235,7 +249,7 @@ namespace Refactor1.Game.Logic
                     ((Label) choice.GetNode("label")).Text = type.Name;
                     ((TextureRect) choice.GetNode("texture")).Modulate = new Color(type.Colour);
                     container.AddChild(choice);
-                    choice.Connect("gui_input", this, "_on_LogicChoiceBox_gui_input", new Array { type.Id });
+                    choice.Connect("gui_input", this, "OnLogicChoiceBoxChoiceInput", new Array { type.Id });
                 });
             }
         }
@@ -289,7 +303,8 @@ namespace Refactor1.Game.Logic
             }
         }
         
-        public void _on_NinePatchRect_gui_input(object @event)
+        // ReSharper disable once UnusedMember.Global
+        public void CloseLogicChoiceBox(object @event)
         {
             if (@event is InputEventMouseButton imb && !imb.Pressed && imb.ButtonIndex == (int) ButtonList.Left)
             {
@@ -302,7 +317,8 @@ namespace Refactor1.Game.Logic
             }
         }
 
-        public void _on_LogicChoiceBox_gui_input(object @event, int typeId)
+        // ReSharper disable once UnusedMember.Global
+        public void OnLogicChoiceBoxChoiceInput(object @event, int typeId)
         {
             if (@event is InputEventMouseButton imb && !imb.Pressed && imb.ButtonIndex == (int) ButtonList.Left)
             {

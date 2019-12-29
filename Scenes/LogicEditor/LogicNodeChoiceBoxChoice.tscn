@@ -1,26 +1,30 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://Assets/Textures/logic_textures/choice_node.png" type="Texture" id=1]
+[ext_resource path="res://Assets/Textures/logic_textures_6/choice_node_background.png" type="Texture" id=1]
 [ext_resource path="res://Assets/Fonts/ui_nunito_extra_large.tres" type="DynamicFont" id=2]
 
 [node name="MarginContainer2" type="MarginContainer"]
-margin_right = 312.0
-margin_bottom = 125.0
+margin_right = 160.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 160, 64 )
 mouse_filter = 1
 
 [node name="texture" type="TextureRect" parent="."]
-modulate = Color( 0.945098, 0.227451, 0.337255, 1 )
-margin_right = 312.0
-margin_bottom = 125.0
+modulate = Color( 0.968627, 0.0470588, 0.0470588, 1 )
+margin_right = 160.0
+margin_bottom = 64.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 texture = ExtResource( 1 )
+expand = true
 
 [node name="label" type="Label" parent="."]
-margin_right = 312.0
-margin_bottom = 125.0
+margin_right = 160.0
+margin_bottom = 64.0
 mouse_filter = 1
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_fonts/font = ExtResource( 2 )
-text = "X"
+text = "Close"
 align = 1
 valign = 1

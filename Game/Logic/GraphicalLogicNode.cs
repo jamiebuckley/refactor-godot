@@ -36,7 +36,7 @@ namespace Refactor1.Game.Logic
 
         public TextureRect GetTextureRect()
         {
-            return (GetNode("background") as Node2D).GetNode("texture") as TextureRect;
+            return GetNode("texture") as TextureRect;
         }
 
         public void SetText(String text)
