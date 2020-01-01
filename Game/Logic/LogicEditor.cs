@@ -34,7 +34,8 @@ namespace Refactor1.Game.Logic
         private PackedScene LogicNodeChoiceBoxChoice;
         
         private Node2D _logicNodeChoiceBox;
-        private LogicNode _logicNodeChoiceBoxGhostFor;
+        
+        private LogicNode _editingLogicNode;
         private int _logicNodeChoiceBoxGhostIndex;
 
         private float scale = 0.5f;
@@ -116,77 +117,80 @@ namespace Refactor1.Game.Logic
             AddNode(swimLane, root, new Vector2());
         }
 
-        public int AddNode(Node2D swimLane, LogicNode item, Vector2 position)
+        public int AddNode(Node2D swimLane, LogicNode logicNode, Vector2 position)
         {
             GraphicalLogicNode node;
-            if (!GraphicalNodes.ContainsKey(item))
+            if (!GraphicalNodes.ContainsKey(logicNode))
             {
-                node = GetNode(item.LogicNodeType) as GraphicalLogicNode;
+                // add the graphical node if one doesn't exist
+                node = GetNode(logicNode.LogicNodeType) as GraphicalLogicNode;
                 node.OnPressed += OnGraphicalNodePressed;
                 
-                GraphicalNodes[item] = node;
+                GraphicalNodes[logicNode] = node;
                 swimLane.AddChild(node);
             }
-            node = GraphicalNodes[item] as GraphicalLogicNode;
             
-            node.SetColor(new Color(item.LogicNodeType.Colour));
-            node.SetText(item.LogicNodeType.Name);
+            // update the information, e.g. color, text, position
+            node = GraphicalNodes[logicNode] as GraphicalLogicNode;
+            node.SetColor(new Color(logicNode.LogicNodeType.Colour));
+            node.SetText(logicNode.LogicNodeType.Name);
             node.Position = position;
 
-            int previousColumnSpacing = 0;
-            for (int i = 0; i <= 1; i++)
+            var previousColumnSpacing = 0;
+            // for each potential child
+            for (var i = 0; i <= 1; i++)
             {
-                if (item.IsConnectionEnabled(i))
+                if (!logicNode.IsConnectionEnabled(i)) continue;
+                
+                // calculate the position of this node
+                var multiColumnSpacing = previousColumnSpacing * new Vector2(0, 150);
+                var nodePosition = position + LogicEditorDimensions.CHILD_OFFSETS[i] + multiColumnSpacing;
+
+                // draw line to the child/ghost
+                var line = GetLine(logicNode, i);
+                if (line == null)
                 {
-                    var multiColumnSpacing = previousColumnSpacing * new Vector2(0, 150);
-                    var nodePosition = position + LogicEditorDimensions.CHILD_OFFSETS[i] + multiColumnSpacing;
-
-                    // draw line
-                    var line = GetLine(item, i);
-                    if (line == null)
-                    {
-                        line = Connector.Instance() as GraphicalLogicNodeConnector;
-                        if (!Lines.ContainsKey(item)) Lines[item] = new Dictionary<int, Node>();
-                        Lines[item][i] = line;
-                        swimLane.AddChild(line);
-                    }
-                    line.SetPosition(position + LogicEditorDimensions.LINE_OFFSETS[i]);
-                    var target = new Vector2(nodePosition.x, nodePosition.y + LogicEditorDimensions.LINE_OFFSETS[0].y);
-                    line.SetLineFromTo(position + LogicEditorDimensions.LINE_OFFSETS[i], target);
+                    line = Connector.Instance() as GraphicalLogicNodeConnector;
+                    if (!Lines.ContainsKey(logicNode)) Lines[logicNode] = new Dictionary<int, Node>();
+                    Lines[logicNode][i] = line;
+                    swimLane.AddChild(line);
+                }
+                
+                // set the line's position and target
+                line.SetPosition(position + LogicEditorDimensions.LINE_OFFSETS[i]);
+                var target = new Vector2(nodePosition.x, nodePosition.y + LogicEditorDimensions.LINE_OFFSETS[0].y);
+                line.SetLineFromTo(position + LogicEditorDimensions.LINE_OFFSETS[i], target);
                     
-                    var ghostNode = GetGhostNode(item, i);
-                    if (item.HasChild(i))
+                var ghostNode = GetGhostNodeIfExists(logicNode, i);
+                if (logicNode.HasChild(i))
+                {
+                    if (ghostNode != null)
                     {
-                        if (ghostNode != null)
-                        {
-                            DeleteGhostNode(item, i);
-                        }
-                        previousColumnSpacing += AddNode(swimLane, item.ChildAt(i), nodePosition);
+                        DeleteGhostNode(logicNode, i);
                     }
-                    else
+                    previousColumnSpacing += AddNode(swimLane, logicNode.ChildAt(i), nodePosition);
+                }
+                else
+                {
+                    if (ghostNode == null)
                     {
-                        if (ghostNode == null)
-                        {
-                            ghostNode = GhostNode.Instance() as GraphicalLogicNode;
-                            ghostNode.GhostFor = item;
-                            ghostNode.GhostIndex = i;
-                            ghostNode.OnPressed += OnGraphicalNodePressed;
-                            swimLane.AddChild(ghostNode);
-                        }
-
-                        ghostNode.Position = nodePosition;
-
-                        if (!GhostNodes.ContainsKey(item)) GhostNodes[item] = new Dictionary<int, Node>();
-                        GhostNodes[item][i] = ghostNode;
+                        ghostNode = GhostNode.Instance() as GraphicalLogicNode;
+                        ghostNode.GhostInformation = new GhostInformation() {ChildIndex = i, LogicNode = logicNode};
+                        ghostNode.OnPressed += OnGraphicalNodePressed;
+                        swimLane.AddChild(ghostNode);
                     }
+
+                    ghostNode.Position = nodePosition;
+
+                    if (!GhostNodes.ContainsKey(logicNode)) GhostNodes[logicNode] = new Dictionary<int, Node>();
+                    GhostNodes[logicNode][i] = ghostNode;
                 }
             }
 
-            if (item.IsConnectionEnabled(1)) return previousColumnSpacing + 1;
-            return previousColumnSpacing;
+            return logicNode.IsConnectionEnabled(1) ? previousColumnSpacing + 1 : previousColumnSpacing;
         }
 
-        private GraphicalLogicNode GetGhostNode(LogicNode item, int index)
+        private GraphicalLogicNode GetGhostNodeIfExists(LogicNode item, int index)
         {
             if (!GhostNodes.ContainsKey(item)) return null;
             if (!GhostNodes[item].ContainsKey(index)) return null;
@@ -230,19 +234,29 @@ namespace Refactor1.Game.Logic
             {
                 
             }
-            else if (graphicalLogicNode.GhostFor != null)
+            else if (graphicalLogicNode.GhostInformation != null)
             {
+                // create a choice box
                 var choiceBox = LogicNodeChoiceBox.Instance() as Node2D;
                 choiceBox.Position = graphicalLogicNode.Position + new Vector2(0, 100);
                 swimLane.AddChild(choiceBox);
+                
+                // store the choice box and the information about what we are editing
                 _logicNodeChoiceBox = choiceBox;
-                _logicNodeChoiceBoxGhostFor = graphicalLogicNode.GhostFor;
-                _logicNodeChoiceBoxGhostIndex = graphicalLogicNode.GhostIndex;
+                _editingLogicNode = graphicalLogicNode.GhostInformation.LogicNode;
+                _logicNodeChoiceBoxGhostIndex = graphicalLogicNode.GhostInformation.ChildIndex;
 
+                // populate the choice box
                 var container = choiceBox.GetNode("choiceContainer") as Container;
+                
+                // connect the first choice to closing the box
                 container.GetChild(0).Connect("gui_input", this, "CloseLogicChoiceBox");
-                var connection = graphicalLogicNode.GhostFor.LogicNodeType.ConnectionsIn[graphicalLogicNode.GhostIndex];
+                
+                // find all logic node types that are valid for this ghost 
+                var connection = graphicalLogicNode.GhostInformation.LogicNode.LogicNodeType.ConnectionsIn[graphicalLogicNode.GhostInformation.ChildIndex];
                 var matchingLogicNodeTypes = Enumeration.GetAll<LogicNodeType>().ToList().Where(x => x.ConnectionOut == connection).ToList();
+                
+                // add them to the container
                 matchingLogicNodeTypes.ForEach(type =>
                 {
                     var choice = LogicNodeChoiceBoxChoice.Instance();
@@ -325,7 +339,7 @@ namespace Refactor1.Game.Logic
                 var type = Enumeration.GetAll<LogicNodeType>().First(x => x.Id == typeId);
                 if (_logicNodeChoiceBox != null)
                 {
-                    var logicNode = _logicNodeChoiceBoxGhostFor;
+                    var logicNode = _editingLogicNode;
                     logicNode.SetChildAt(new LogicNode(type), _logicNodeChoiceBoxGhostIndex);
                     this.BuildTree(roots[0]);
                 }

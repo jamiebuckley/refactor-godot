@@ -3,6 +3,12 @@ using Godot;
 
 namespace Refactor1.Game.Logic
 {
+    public class GhostInformation
+    {
+        public int ChildIndex { get; set; }
+        public LogicNode LogicNode { get; set; }
+    }
+    
     public class GraphicalLogicNode : Node2D
     {
         public delegate void PressedHandler(GraphicalLogicNode graphicalLogicNode);
@@ -16,8 +22,8 @@ namespace Refactor1.Game.Logic
 
         public LogicNode LogicNode;
 
-        public LogicNode GhostFor;
-        public int GhostIndex;
+        
+        public GhostInformation GhostInformation { get; set; }
 
         public override void _Ready()
         {

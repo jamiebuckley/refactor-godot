@@ -346,6 +346,7 @@ margin_bottom = 546.199
 mouse_filter = 2
 
 [node name="CenterContainer" type="MarginContainer" parent="LogicModal"]
+editor/display_folded = true
 margin_right = 800.0
 margin_bottom = 600.0
 
