@@ -70,6 +70,7 @@
     <Compile Include="Game\GridLogicStepper.cs" />
     <Compile Include="Game\GridWorkerStepper.cs" />
     <Compile Include="Game\LogicTileExecutor.cs" />
+    <Compile Include="Game\Logic\GhostIndexInformation.cs" />
     <Compile Include="Game\Logic\GraphicalLogicNode.cs" />
     <Compile Include="Game\Logic\GraphicalLogicNodeConnector.cs" />
     <Compile Include="Game\Logic\SwimLane.cs" />
@@ -77,7 +78,6 @@
     <Compile Include="Game\Logic\LogicEditor.cs" />
     <Compile Include="Game\Logic\LogicNode.cs" />
     <Compile Include="Game\Logic\LogicNodeConnection.cs" />
-    <Compile Include="Game\Logic\LogicNodeCreator.cs" />
     <Compile Include="Game\Logic\LogicNodeType.cs" />
     <Compile Include="Game\Mechanics\Goal.cs" />
     <Compile Include="Game\UserInterface\GoalItem.cs" />

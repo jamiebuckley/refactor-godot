@@ -11,83 +11,70 @@ namespace Refactor1.Game.Logic
     {
         public static class LogicEditorDimensions
         {
-            public static int BASE_UNIT = 8;
-            public static List<Vector2> LINE_OFFSETS = new List<Vector2>()
+            public static readonly int BaseUnit = 8;
+            public static readonly List<Vector2> LineOffsets = new List<Vector2>()
             {
-                new Vector2(21 * BASE_UNIT, 3 * BASE_UNIT),
-                new Vector2(21 * BASE_UNIT, 19 * BASE_UNIT)
+                new Vector2(21 * BaseUnit, 3 * BaseUnit),
+                new Vector2(21 * BaseUnit, 19 * BaseUnit)
             };
 
-            public static List<Vector2> CHILD_OFFSETS = new List<Vector2>()
+            public static readonly List<Vector2> ChildOffsets = new List<Vector2>()
             {
-                new Vector2(21 * BASE_UNIT + 16 * BASE_UNIT, 0),
-                new Vector2(21 * BASE_UNIT + 16 * BASE_UNIT, 16 * BASE_UNIT)
+                new Vector2(21 * BaseUnit + 16 * BaseUnit, 0),
+                new Vector2(21 * BaseUnit + 16 * BaseUnit, 16 * BaseUnit)
             };
         }
         
-        private Dictionary<LogicNodeType, PackedScene> LogicNodeTypeToPackedScene =
+        private Dictionary<LogicNodeType, PackedScene> _logicNodeTypeToPackedScene =
             new Dictionary<LogicNodeType, PackedScene>();
 
-        private PackedScene Connector;
-        private PackedScene GhostNode;
-        private PackedScene LogicNodeChoiceBox;
-        private PackedScene LogicNodeChoiceBoxChoice;
+        private PackedScene _connectorPackedScene;
+        private PackedScene _ghostNodePackedScene;
+        private PackedScene _logicNodeChoiceBoxPackedScene;
+        public PackedScene LogicNodeChoiceBoxChoicePackedScene;
         
         private Node2D _logicNodeChoiceBox;
         
         private LogicNode _editingLogicNode;
         private int _logicNodeChoiceBoxGhostIndex;
 
-        private float scale = 0.5f;
-        private Vector2 lastMousePosition;
-        private bool isDragging;
+        private float _scale = 0.5f;
+        private Vector2 _lastMousePosition;
+        private bool _isDragging;
 
         
-        private List<LogicNode> roots = new List<LogicNode>();
+        private List<LogicNode> _roots = new List<LogicNode>();
         
-        private Dictionary<LogicNode, Node> GraphicalNodes = new Dictionary<LogicNode, Node>();
-        private Dictionary<LogicNode, Dictionary<int, Node>> GhostNodes = new Dictionary<LogicNode, Dictionary<int, Node>>();
-        private Dictionary<LogicNode, Dictionary<int, Node>> Lines = new Dictionary<LogicNode, Dictionary<int, Node>>();
+        private readonly Dictionary<LogicNode, Node> _graphicalNodes = new Dictionary<LogicNode, Node>();
+        private readonly Dictionary<LogicNode, Dictionary<int, Node>> _ghostNodes = new Dictionary<LogicNode, Dictionary<int, Node>>();
+        private readonly Dictionary<LogicNode, Dictionary<int, Node>> _lines = new Dictionary<LogicNode, Dictionary<int, Node>>();
 
-        private SwimLane swimLane;
+        private SwimLane _swimLane;
+
+        private String GetSceneNameForLogicNodeType(LogicNodeType logicNodeType)
+        {
+            if (logicNodeType.ConnectionsIn.Count > 1) return "res://Scenes/LogicEditor/DoubleLogicNode.tscn";
+            if (logicNodeType.ConnectionOut == LogicNodeConnection.None)
+                return "res://Scenes/LogicEditor/StartingLogicNode.tscn";
+            return "res://Scenes/LogicEditor/SingleLogicNode.tscn";
+        }
 
         public override void _Ready()
         {
-            var allLogicNodeTypes = Enumeration.GetAll<LogicNodeType>().ToList();
-            allLogicNodeTypes.ForEach(lnt =>
-            {
-                if (lnt.ConnectionsIn.Count > 1)
-                {
-                    LogicNodeTypeToPackedScene[lnt] =
-                        ResourceLoader.Load("res://Scenes/LogicEditor/DoubleLogicNode.tscn") as PackedScene;
-                }
-                else if (lnt.ConnectionsIn.Count > 0)
-                {
-                    if (lnt.ConnectionOut == LogicNodeConnection.None)
-                    {
-                        LogicNodeTypeToPackedScene[lnt] =
-                            ResourceLoader.Load("res://Scenes/LogicEditor/StartingLogicNode.tscn") as PackedScene;
-                    }
-                    else
-                    {
-                        LogicNodeTypeToPackedScene[lnt] =
-                            ResourceLoader.Load("res://Scenes/LogicEditor/SingleLogicNode.tscn") as PackedScene;
-                    }
-                }
-                else
-                {
-                    LogicNodeTypeToPackedScene[lnt] =
-                        ResourceLoader.Load("res://Scenes/LogicEditor/SingleLogicNode.tscn") as PackedScene;
-                }
-            });
-
-            Connector = ResourceLoader.Load("res://Scenes/LogicEditor/Connector.tscn") as PackedScene;
-            GhostNode = ResourceLoader.Load("res://Scenes/LogicEditor/GhostNode.tscn") as PackedScene;
-            LogicNodeChoiceBox = ResourceLoader.Load("res://Scenes/LogicEditor/LogicNodeChoiceBox.tscn") as PackedScene;
-            LogicNodeChoiceBoxChoice = ResourceLoader.Load("res://Scenes/LogicEditor/LogicNodeChoiceBoxChoice.tscn") as PackedScene;
+            // for each type of logic node
+            // create a map to the appropriate graphical node scene
+            var getSceneForType = new Func<LogicNodeType, PackedScene>(type =>
+                ResourceLoader.Load(GetSceneNameForLogicNodeType(type)) as PackedScene);
+            _logicNodeTypeToPackedScene = Enumeration.GetAll<LogicNodeType>().ToList().ToDictionary(x => x, getSceneForType);
+            
+            _connectorPackedScene = ResourceLoader.Load("res://Scenes/LogicEditor/Connector.tscn") as PackedScene;
+            _ghostNodePackedScene = ResourceLoader.Load("res://Scenes/LogicEditor/GhostNode.tscn") as PackedScene;
+            _logicNodeChoiceBoxPackedScene = ResourceLoader.Load("res://Scenes/LogicEditor/LogicNodeChoiceBox.tscn") as PackedScene;
+            LogicNodeChoiceBoxChoicePackedScene = ResourceLoader.Load("res://Scenes/LogicEditor/LogicNodeChoiceBoxChoice.tscn") as PackedScene;
 
             SetRoots(new List<LogicNode> {DebugTree()});
-            (GetNode("SwimLane1") as SwimLane).SetScaleFloat(scale);
+            var swimLane = GetNode("SwimLane1") as SwimLane;
+            swimLane?.SetScaleFloat(_scale);
         }
 
         private LogicNode DebugTree()
@@ -101,37 +88,37 @@ namespace Refactor1.Game.Logic
         public void SetRoots(List<LogicNode> logicNodes)
         {
             // clear current swimlanes
-            roots = logicNodes;
-            roots.ForEach(BuildTree);
+            _roots = logicNodes;
+            _roots.ForEach(BuildTree);
         }
 
         public void BuildTree(LogicNode root)
         {
-            if (swimLane == null)
+            if (_swimLane == null)
             {
-                swimLane = new SwimLane();
-                swimLane.Name = "SwimLane1";
-                AddChild(swimLane);
+                _swimLane = new SwimLane();
+                _swimLane.Name = "SwimLane1";
+                AddChild(_swimLane);
             }
 
-            AddNode(swimLane, root, new Vector2());
+            AddNode(_swimLane, root, new Vector2());
         }
 
         public int AddNode(Node2D swimLane, LogicNode logicNode, Vector2 position)
         {
             GraphicalLogicNode node;
-            if (!GraphicalNodes.ContainsKey(logicNode))
+            if (!_graphicalNodes.ContainsKey(logicNode))
             {
                 // add the graphical node if one doesn't exist
                 node = GetNode(logicNode.LogicNodeType) as GraphicalLogicNode;
                 node.OnPressed += OnGraphicalNodePressed;
                 
-                GraphicalNodes[logicNode] = node;
+                _graphicalNodes[logicNode] = node;
                 swimLane.AddChild(node);
             }
             
             // update the information, e.g. color, text, position
-            node = GraphicalNodes[logicNode] as GraphicalLogicNode;
+            node = (GraphicalLogicNode) _graphicalNodes[logicNode];
             node.SetColor(new Color(logicNode.LogicNodeType.Colour));
             node.SetText(logicNode.LogicNodeType.Name);
             node.Position = position;
@@ -144,22 +131,22 @@ namespace Refactor1.Game.Logic
                 
                 // calculate the position of this node
                 var multiColumnSpacing = previousColumnSpacing * new Vector2(0, 150);
-                var nodePosition = position + LogicEditorDimensions.CHILD_OFFSETS[i] + multiColumnSpacing;
+                var nodePosition = position + LogicEditorDimensions.ChildOffsets[i] + multiColumnSpacing;
 
                 // draw line to the child/ghost
                 var line = GetLine(logicNode, i);
                 if (line == null)
                 {
-                    line = Connector.Instance() as GraphicalLogicNodeConnector;
-                    if (!Lines.ContainsKey(logicNode)) Lines[logicNode] = new Dictionary<int, Node>();
-                    Lines[logicNode][i] = line;
+                    line = _connectorPackedScene.Instance() as GraphicalLogicNodeConnector;
+                    if (!_lines.ContainsKey(logicNode)) _lines[logicNode] = new Dictionary<int, Node>();
+                    _lines[logicNode][i] = line;
                     swimLane.AddChild(line);
                 }
                 
                 // set the line's position and target
-                line.SetPosition(position + LogicEditorDimensions.LINE_OFFSETS[i]);
-                var target = new Vector2(nodePosition.x, nodePosition.y + LogicEditorDimensions.LINE_OFFSETS[0].y);
-                line.SetLineFromTo(position + LogicEditorDimensions.LINE_OFFSETS[i], target);
+                line.SetPosition(position + LogicEditorDimensions.LineOffsets[i]);
+                var target = new Vector2(nodePosition.x, nodePosition.y + LogicEditorDimensions.LineOffsets[0].y);
+                line.SetLineFromTo(position + LogicEditorDimensions.LineOffsets[i], target);
                     
                 var ghostNode = GetGhostNodeIfExists(logicNode, i);
                 if (logicNode.HasChild(i))
@@ -174,16 +161,16 @@ namespace Refactor1.Game.Logic
                 {
                     if (ghostNode == null)
                     {
-                        ghostNode = GhostNode.Instance() as GraphicalLogicNode;
-                        ghostNode.GhostInformation = new GhostInformation() {ChildIndex = i, LogicNode = logicNode};
+                        ghostNode = _ghostNodePackedScene.Instance() as GraphicalLogicNode;
+                        ghostNode.GhostInformation = new GhostIndexInformation() {ChildIndex = i, LogicNode = logicNode};
                         ghostNode.OnPressed += OnGraphicalNodePressed;
                         swimLane.AddChild(ghostNode);
                     }
 
                     ghostNode.Position = nodePosition;
 
-                    if (!GhostNodes.ContainsKey(logicNode)) GhostNodes[logicNode] = new Dictionary<int, Node>();
-                    GhostNodes[logicNode][i] = ghostNode;
+                    if (!_ghostNodes.ContainsKey(logicNode)) _ghostNodes[logicNode] = new Dictionary<int, Node>();
+                    _ghostNodes[logicNode][i] = ghostNode;
                 }
             }
 
@@ -192,32 +179,32 @@ namespace Refactor1.Game.Logic
 
         private GraphicalLogicNode GetGhostNodeIfExists(LogicNode item, int index)
         {
-            if (!GhostNodes.ContainsKey(item)) return null;
-            if (!GhostNodes[item].ContainsKey(index)) return null;
-            return GhostNodes[item][index] as GraphicalLogicNode;
+            if (!_ghostNodes.ContainsKey(item)) return null;
+            if (!_ghostNodes[item].ContainsKey(index)) return null;
+            return _ghostNodes[item][index] as GraphicalLogicNode;
         }
 
         private GraphicalLogicNodeConnector GetLine(LogicNode item, int index)
         {
-            if (!Lines.ContainsKey(item)) return null;
-            if (!Lines[item].ContainsKey(index)) return null;
-            return Lines[item][index] as GraphicalLogicNodeConnector;
+            if (!_lines.ContainsKey(item)) return null;
+            if (!_lines[item].ContainsKey(index)) return null;
+            return _lines[item][index] as GraphicalLogicNodeConnector;
         }
 
         private void DeleteGhostNode(LogicNode item, int index)
         {
-            if (!GhostNodes.ContainsKey(item)) return;
-            if (!GhostNodes[item].ContainsKey(index)) return;
+            if (!_ghostNodes.ContainsKey(item)) return;
+            if (!_ghostNodes[item].ContainsKey(index)) return;
             
-            var ghostNode = GhostNodes[item][index] as GraphicalLogicNode;
-            swimLane.RemoveChild(ghostNode);
+            var ghostNode = _ghostNodes[item][index] as GraphicalLogicNode;
+            _swimLane.RemoveChild(ghostNode);
             ghostNode.QueueFree();
 
-            var ghostNodeForItem = GhostNodes[item];
+            var ghostNodeForItem = _ghostNodes[item];
             ghostNodeForItem.Remove(index);
             if (!ghostNodeForItem.Any())
             {
-                GhostNodes.Remove(item);
+                _ghostNodes.Remove(item);
             }
         }
 
@@ -225,7 +212,7 @@ namespace Refactor1.Game.Logic
         {
             if (_logicNodeChoiceBox != null)
             {
-                swimLane.RemoveChild(_logicNodeChoiceBox);
+                _swimLane.RemoveChild(_logicNodeChoiceBox);
                 _logicNodeChoiceBox.QueueFree();
                 _logicNodeChoiceBox = null;
             }
@@ -237,9 +224,9 @@ namespace Refactor1.Game.Logic
             else if (graphicalLogicNode.GhostInformation != null)
             {
                 // create a choice box
-                var choiceBox = LogicNodeChoiceBox.Instance() as Node2D;
+                var choiceBox = _logicNodeChoiceBoxPackedScene.Instance() as Node2D;
                 choiceBox.Position = graphicalLogicNode.Position + new Vector2(0, 100);
-                swimLane.AddChild(choiceBox);
+                _swimLane.AddChild(choiceBox);
                 
                 // store the choice box and the information about what we are editing
                 _logicNodeChoiceBox = choiceBox;
@@ -259,7 +246,7 @@ namespace Refactor1.Game.Logic
                 // add them to the container
                 matchingLogicNodeTypes.ForEach(type =>
                 {
-                    var choice = LogicNodeChoiceBoxChoice.Instance();
+                    var choice = LogicNodeChoiceBoxChoicePackedScene.Instance();
                     ((Label) choice.GetNode("label")).Text = type.Name;
                     ((TextureRect) choice.GetNode("texture")).Modulate = new Color(type.Colour);
                     container.AddChild(choice);
@@ -270,9 +257,9 @@ namespace Refactor1.Game.Logic
 
         public Node2D GetNode(LogicNodeType logicNodeType)
         {
-            if (!LogicNodeTypeToPackedScene.ContainsKey(logicNodeType))
+            if (!_logicNodeTypeToPackedScene.ContainsKey(logicNodeType))
                 throw new ArgumentException($"Couldn't create node for {logicNodeType}");
-            var scene = LogicNodeTypeToPackedScene[logicNodeType].Instance();
+            var scene = _logicNodeTypeToPackedScene[logicNodeType].Instance();
             return scene as Node2D;
         }
 
@@ -280,20 +267,20 @@ namespace Refactor1.Game.Logic
         {
             if (Input.IsMouseButtonPressed((int) ButtonList.Middle))
             {
-                if (!isDragging)
+                if (!_isDragging)
                 {
-                    lastMousePosition = GetLocalMousePosition();
+                    _lastMousePosition = GetLocalMousePosition();
                 }
 
-                isDragging = true;
-                var difference = GetLocalMousePosition() - lastMousePosition;
+                _isDragging = true;
+                var difference = GetLocalMousePosition() - _lastMousePosition;
                 var swimlane = GetNode("SwimLane1") as SwimLane;
                 swimlane.SetPosition(swimlane.GetPosition() + difference);
-                lastMousePosition = GetLocalMousePosition();
+                _lastMousePosition = GetLocalMousePosition();
             }
             else
             {
-                isDragging = false;
+                _isDragging = false;
             }
         }
 
@@ -305,13 +292,13 @@ namespace Refactor1.Game.Logic
                 {
                     if (iemb.ButtonIndex == (int) ButtonList.WheelUp)
                     {
-                        scale += 0.02f;
-                        (GetNode("SwimLane1") as SwimLane).SetScaleFloat(scale);
+                        _scale += 0.02f;
+                        (GetNode("SwimLane1") as SwimLane).SetScaleFloat(_scale);
                     }
                     else if (iemb.ButtonIndex == (int) ButtonList.WheelDown)
                     {
-                        scale -= 0.02f;
-                        (GetNode("SwimLane1") as SwimLane).SetScaleFloat(scale);
+                        _scale -= 0.02f;
+                        (GetNode("SwimLane1") as SwimLane).SetScaleFloat(_scale);
                     }
                 }
             }
@@ -324,7 +311,7 @@ namespace Refactor1.Game.Logic
             {
                 if (_logicNodeChoiceBox != null)
                 {
-                    swimLane.RemoveChild(_logicNodeChoiceBox);
+                    _swimLane.RemoveChild(_logicNodeChoiceBox);
                     _logicNodeChoiceBox.QueueFree();
                     _logicNodeChoiceBox = null;
                 }
@@ -341,7 +328,7 @@ namespace Refactor1.Game.Logic
                 {
                     var logicNode = _editingLogicNode;
                     logicNode.SetChildAt(new LogicNode(type), _logicNodeChoiceBoxGhostIndex);
-                    this.BuildTree(roots[0]);
+                    this.BuildTree(_roots[0]);
                 }
                 DeleteChoiceBox();
             }
@@ -349,7 +336,7 @@ namespace Refactor1.Game.Logic
 
         private void DeleteChoiceBox()
         {
-            swimLane.RemoveChild(_logicNodeChoiceBox);
+            _swimLane.RemoveChild(_logicNodeChoiceBox);
             _logicNodeChoiceBox.QueueFree();
             _logicNodeChoiceBox = null;
         }
