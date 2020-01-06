@@ -56,6 +56,7 @@
     <Compile Include="Game\Common\GameOrientation.cs" />
     <Compile Include="Game\Common\InventoryItem.cs" />
     <Compile Include="Game\Common\Point2D.cs" />
+    <Compile Include="Game\Common\Recipe.cs" />
     <Compile Include="Game\Entity\ArrowTile.cs" />
     <Compile Include="Game\Entity\GridEntity.cs" />
     <Compile Include="Game\Entity\LogicTile.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Game\Logic\GhostIndexInformation.cs" />
     <Compile Include="Game\Logic\GraphicalLogicNode.cs" />
     <Compile Include="Game\Logic\GraphicalLogicNodeConnector.cs" />
+    <Compile Include="Game\Logic\LogicEditorPackedScenes.cs" />
     <Compile Include="Game\Logic\SwimLane.cs" />
     <Compile Include="Game\Logic\ToolboxNode.cs" />
     <Compile Include="Game\Logic\LogicEditor.cs" />
@@ -80,6 +82,7 @@
     <Compile Include="Game\Logic\LogicNodeConnection.cs" />
     <Compile Include="Game\Logic\LogicNodeType.cs" />
     <Compile Include="Game\Mechanics\Goal.cs" />
+    <Compile Include="Game\Mechanics\SellItemAmountGoal.cs" />
     <Compile Include="Game\UserInterface\GoalItem.cs" />
     <Compile Include="Game\UserInterface\UserInterface.cs" />
     <Compile Include="Game\WorkerScene.cs" />

@@ -12,6 +12,7 @@ namespace Refactor1.Game.Events
     {
         public Worker Worker { get; set; }
     }
+    
 
     public class GoalCompletedEvent : GameEvent
     {

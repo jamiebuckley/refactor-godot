@@ -46,6 +46,13 @@ namespace Refactor1.Game.Logic
             label.SetText(text);
         }
 
+        public void UpdateVisuals(String text, Color color, Vector2 position)
+        {
+            SetText(text);
+            SetColor(color);
+            SetPosition(position);
+        }
+
         public override void _Input(InputEvent @event)
         {
 
