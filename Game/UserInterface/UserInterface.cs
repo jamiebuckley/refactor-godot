@@ -71,8 +71,8 @@ namespace Refactor1.Game
         
         public void SetLogicModalCoordinates(Point2D gridCoords)
         {
-            var logicEditor = LogicModal.FindNode("LogicEditorArea", true) as LogicEditor;
-            logicEditor.SetCoordinates(gridCoords);
+            var logicEditor = (LogicEditor) LogicModal.FindNode("LogicEditorArea");
+            logicEditor.Coordinates = gridCoords;
         }
 
         public GoalItem AddGoal(string title, string description)

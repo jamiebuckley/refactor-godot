@@ -50,6 +50,8 @@ namespace Refactor1.Game.Logic
         private readonly Dictionary<LogicNode, Dictionary<int, Node>> _lines = new Dictionary<LogicNode, Dictionary<int, Node>>();
 
         private SwimLane _swimLane;
+        
+        public Point2D Coordinates { get; set; }
 
         public override void _Ready()
         {
@@ -307,11 +309,6 @@ namespace Refactor1.Game.Logic
             _swimLane.RemoveChild(_logicNodeChoiceBox);
             _logicNodeChoiceBox.QueueFree();
             _logicNodeChoiceBox = null;
-        }
-
-        public void SetCoordinates(Point2D gridCoords)
-        {
-            
         }
     }
 }
